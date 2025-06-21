@@ -254,57 +254,72 @@ export default function SaephonePlatform() {
                   <p className="text-white/80 text-lg">{t.dashboard_manage}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <Card className="bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-2xl">
-                    <CardContent className="p-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-blue-600">{t.dashboard_processPayments}</h3>
-                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                          <FileText className="w-6 h-6 text-blue-600" />
+                  <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                    <CardContent className="p-8 flex flex-col h-full">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-2xl font-bold text-blue-600">{t.dashboard_processPayments}</h3>
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <FileText className="w-6 h-6 text-blue-500" />
+                          </div>
                         </div>
+                        <p className="text-gray-600 mb-6">{t.dashboard_processPaymentsDesc}</p>
                       </div>
-                      <p className="text-gray-600 mb-6">{t.dashboard_processPaymentsDesc}</p>
-                      <Button onClick={() => setCurrentPage("payments")} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg">
+                      <Button onClick={() => setCurrentPage("payments")} className="bg-blue-600 hover:bg-blue-700 font-semibold py-3 px-6 rounded-lg">
                         {t.dashboard_processPaymentBtn}
                       </Button>
                     </CardContent>
                   </Card>
-                  <Card className="bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-2xl">
-                    <CardContent className="p-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-green-600">{t.dashboard_sellDevices}</h3>
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                          <Smartphone className="w-6 h-6 text-green-600" />
+
+                  {userRole !== "admin" && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-green-600">{t.dashboard_sellDevices}</h3>
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              <Smartphone className="w-6 h-6 text-green-500" />
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_sellDevicesDesc}</p>
                         </div>
-                      </div>
-                      <p className="text-gray-600 mb-6">{t.dashboard_sellDevicesDesc}</p>
-                      <Button onClick={() => setCurrentPage("device-selection")} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
-                        {t.dashboard_newSaleBtn}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-2xl">
-                    <CardContent className="p-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-purple-600">{t.dashboard_reports}</h3>
-                        <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                          <BarChart3 className="w-6 h-6 text-purple-600" />
+                        <Button onClick={() => setCurrentPage("device-selection")} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_newSaleBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {userRole !== "sales" && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-purple-600">{t.dashboard_reports}</h3>
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                              <BarChart3 className="w-6 h-6 text-purple-500" />
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_reportsDesc}</p>
                         </div>
-                      </div>
-                      <p className="text-gray-600 mb-6">{t.dashboard_reportsDesc}</p>
-                      <Button onClick={() => setCurrentPage("reports")} className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
-                        {t.dashboard_viewReportsBtn}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-white/90 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow duration-300 rounded-2xl">
-                    <CardContent className="p-8">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-gray-700">{t.dashboard_config}</h3>
-                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                          <Settings className="w-6 h-6 text-gray-700" />
+                        <Button onClick={() => setCurrentPage("reports")} className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_viewReportsBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                    <CardContent className="p-8 flex flex-col h-full">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-2xl font-bold text-gray-700">{t.dashboard_config}</h3>
+                          <div className="p-2 bg-gray-200 rounded-lg">
+                            <Settings className="w-6 h-6 text-gray-700" />
+                          </div>
                         </div>
+                        <p className="text-gray-600 mb-6">{t.dashboard_configDesc}</p>
                       </div>
-                      <p className="text-gray-600 mb-6">{t.dashboard_configDesc}</p>
                       <Button onClick={() => setCurrentPage("settings")} variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg">
                         {t.dashboard_goToConfigBtn}
                       </Button>
