@@ -31,6 +31,7 @@ import {
   Check,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type PageType =
   | "login"
@@ -78,8 +79,9 @@ export default function SaephonePlatform() {
   const [friendContactName, setFriendContactName] = useState("")
   const [friendContactPhone, setFriendContactPhone] = useState("")
 
-  const [devicePhoneNumber, setDevicePhoneNumber] = useState("551328")
+  const [devicePhoneNumber, setDevicePhoneNumber] = useState("")
   const [connectWifi, setConnectWifi] = useState(false)
+  const [userRole, setUserRole] = useState<"admin" | "sales" | null>(null)
 
   const handleCreateAccount = () => {
     setCurrentPage("create-account")
@@ -113,10 +115,14 @@ export default function SaephonePlatform() {
   }, [currentPage, appInstalled])
 
   const handleLogin = (email: string, password: string) => {
-    if (email && password) {
+    if (email === "admin@test.com" && password === "Testing4dmin") {
+      setUserRole("admin")
+      setCurrentPage("dashboard")
+    } else if (email === "sales@test.com" && password === "Testing5ales") {
+      setUserRole("sales")
       setCurrentPage("dashboard")
     } else {
-      alert("Por favor ingresa tu correo electrónico y contraseña")
+      alert(t.login_invalidCredentials)
     }
   }
 
@@ -216,17 +222,17 @@ export default function SaephonePlatform() {
         </div>
       </div>
       <div className="flex items-center gap-4">
+        <GlobalLanguageSwitcher />
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
-          <span className="text-sm font-medium">{t.dashboard_demoUser}</span>
+          <span>
+            {userRole === "admin" ? t.dashboard_adminProfile : userRole === "sales" ? t.dashboard_salesProfile : ""}
+          </span>
         </div>
-        <button
-          onClick={() => setCurrentPage("login")}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          {t.dashboard_logout}
-        </button>
+        <Button onClick={() => setCurrentPage("login")} variant="destructive" className="flex items-center gap-2">
+          <LogOut className="w-5 h-5" />
+          <span>{t.dashboard_logout}</span>
+        </Button>
       </div>
     </div>
   )
@@ -323,24 +329,37 @@ export default function SaephonePlatform() {
                     </div>
                     <div className="space-y-6">
                       <div>
-                        <Label htmlFor="client" className="text-gray-700 font-medium">{t.payments_clientLabel}</Label>
+                        <Label htmlFor="client" className="text-gray-700">
+                          {t.payments_clientLabel}
+                        </Label>
                         <Input id="client" placeholder={t.payments_clientPlaceholder} className="w-full mt-1 p-2 border rounded" />
                       </div>
                       <div>
-                        <Label htmlFor="amount" className="text-gray-700 font-medium">{t.payments_amountLabel}</Label>
+                        <Label htmlFor="amount" className="text-gray-700">
+                          {t.payments_amountLabel}
+                        </Label>
                         <Input id="amount" placeholder={t.payments_amountPlaceholder} className="w-full mt-1 p-2 border rounded" />
                       </div>
                       <div>
-                        <Label htmlFor="paymentMethod" className="text-gray-700 font-medium">{t.payments_methodLabel}</Label>
-                        <select id="paymentMethod" className="w-full mt-1 p-2 border rounded">
-                          <option>{t.payments_methodOptions.cash}</option>
-                          <option>{t.payments_methodOptions.card}</option>
-                          <option>{t.payments_methodOptions.transfer}</option>
-                        </select>
+                        <Label htmlFor="paymentMethod" className="text-gray-700">
+                          {t.payments_paymentMethodLabel}
+                        </Label>
+                        <Select>
+                          <SelectTrigger className="w-full mt-1 p-2 border rounded">
+                            <SelectValue placeholder={t.payments_methodOptions.cash} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="cash">{t.payments_methodOptions.cash}</SelectItem>
+                            <SelectItem value="card">{t.payments_methodOptions.card}</SelectItem>
+                            <SelectItem value="transfer">{t.payments_methodOptions.transfer}</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
-                        <Label htmlFor="paymentDate" className="text-gray-700 font-medium">{t.payments_dateLabel}</Label>
-                        <Input id="paymentDate" type="date" placeholder={t.payments_datePlaceholder} className="w-full mt-1 p-2 border rounded" />
+                        <Label htmlFor="paymentDate" className="text-gray-700">
+                          {t.payments_paymentDateLabel}
+                        </Label>
+                        <Input id="paymentDate" placeholder={t.payments_datePlaceholder} className="w-full mt-1 p-2 border rounded" />
                       </div>
                     </div>
                     <div className="mt-8">

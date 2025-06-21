@@ -26,6 +26,8 @@ export const translations = {
     login_terms_part2: " y la ",
     login_terms_link2: "Política de Privacidad",
     login_terms_part3: " de SAEPHONE",
+    login_footer: "© 2024 Saephone. Todos los derechos reservados. Política de Privacidad | Términos de Servicio",
+    login_invalidCredentials: "Correo electrónico o contraseña incorrectos.",
 
     // Create Account Page
     create_headerSubtitle: "SMARTPHONE & ACCESORIOS",
@@ -65,6 +67,8 @@ export const translations = {
     dashboard_config: "Configuración",
     dashboard_configDesc: "Administra tu cuenta y configuraciones del sistema para optimizar tu experiencia",
     dashboard_goToConfigBtn: "Ir a Configuración",
+    dashboard_adminProfile: "Perfil de distribuidor / administrador: Admin Testing",
+    dashboard_salesProfile: "Perfil de vendedor: Sales Testing",
 
     // Process Payments Page
     payments_title: "Procesar Pago",
@@ -73,13 +77,13 @@ export const translations = {
     payments_clientPlaceholder: "Nombre del cliente o ID",
     payments_amountLabel: "Monto a pagar",
     payments_amountPlaceholder: "$0.00",
-    payments_methodLabel: "Método de pago",
+    payments_paymentMethodLabel: "Método de pago",
     payments_methodOptions: {
       cash: "Efectivo",
       card: "Tarjeta de crédito/débito",
       transfer: "Transferencia bancaria",
     },
-    payments_dateLabel: "Fecha de pago",
+    payments_paymentDateLabel: "Fecha de pago",
     payments_datePlaceholder: "dd/mm/yyyy",
     payments_registerPaymentBtn: "Registrar Pago",
     payments_backToHome: "Volver al Inicio",
@@ -253,6 +257,8 @@ export const translations = {
     login_terms_part2: " and the ",
     login_terms_link2: "Privacy Policy",
     login_terms_part3: " of SAEPHONE",
+    login_footer: "© 2024 Saephone. All rights reserved. Privacy Policy | Terms of Service",
+    login_invalidCredentials: "Incorrect email or password.",
 
     // Create Account Page
     create_headerSubtitle: "SMARTPHONES & ACCESSORIES",
@@ -292,6 +298,8 @@ export const translations = {
     dashboard_config: "Configuration",
     dashboard_configDesc: "Manage your account and system settings to optimize your experience",
     dashboard_goToConfigBtn: "Go to Settings",
+    dashboard_adminProfile: "Distributor / Admin Profile: Admin Testing",
+    dashboard_salesProfile: "Sales Profile: Sales Testing",
 
     // Process Payments Page
     payments_title: "Process Payment",
@@ -300,13 +308,13 @@ export const translations = {
     payments_clientPlaceholder: "Client name or ID",
     payments_amountLabel: "Amount to pay",
     payments_amountPlaceholder: "$0.00",
-    payments_methodLabel: "Payment method",
+    payments_paymentMethodLabel: "Payment method",
     payments_methodOptions: {
       cash: "Cash",
       card: "Credit/debit card",
       transfer: "Bank transfer",
     },
-    payments_dateLabel: "Payment date",
+    payments_paymentDateLabel: "Payment date",
     payments_datePlaceholder: "dd/mm/yyyy",
     payments_registerPaymentBtn: "Register Payment",
     payments_backToHome: "Back to Home",
