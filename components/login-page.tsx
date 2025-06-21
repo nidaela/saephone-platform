@@ -10,82 +10,84 @@ import { Shield, CreditCard, Lock, Star } from "lucide-react"
 
 interface LoginPageProps {
   onCreateAccount: () => void
+  onLogin: (email: string, password: string) => void
+  t: any
 }
 
-export default function LoginPage({ onCreateAccount }: LoginPageProps) {
+export default function LoginPage({ onCreateAccount, onLogin, t }: LoginPageProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      {/* Logo y Header */}
+    <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
       <div className="text-center mb-8">
-        <div className="mb-6">
-          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-32 h-32 mx-auto object-contain" />
+        <div className="bg-white rounded-3xl p-6 mb-6 inline-block shadow-lg">
+          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-20 h-20 object-contain" />
         </div>
-        <h1 className="text-white text-4xl font-bold mb-2">SAEPHONE</h1>
-        <div className="flex items-center justify-center mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
-          ))}
+        <h1 className="text-white text-5xl font-bold mb-3">SAEPHONE</h1>
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="w-16 h-1 bg-green-400 rounded-full"></div>
+          <div className="text-green-400">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path d="M13 2L3 14h6l-2 8 10-12h-6l2-8z" />
+            </svg>
+          </div>
+          <div className="w-16 h-1 bg-green-400 rounded-full"></div>
         </div>
-        <p className="text-white/90 text-sm mb-4">Smartphone & Accesorios</p>
-        <p className="text-white/80 text-xs">Dispositivos premium • Pagos a meses • Sin complicaciones</p>
-
-        {/* Estadísticas */}
-        <div className="flex justify-center gap-8 mt-6 text-white">
+        <p className="text-white text-lg font-medium mb-2">{t.login_headerTitle}</p>
+        <p className="text-white/80 text-sm mb-8">{t.login_headerSubtitle}</p>
+        <div className="flex justify-center gap-12 mb-8 text-white">
           <div className="text-center">
-            <div className="text-2xl font-bold">50K+</div>
-            <div className="text-xs opacity-80">Clientes Felices</div>
+            <div className="text-3xl font-bold">50K+</div>
+            <div className="text-sm opacity-90">{t.login_happyClients}</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold flex items-center justify-center gap-1">
-              4.9 <Star className="w-4 h-4 text-yellow-400 fill-current" />
+            <div className="text-3xl font-bold flex items-center justify-center gap-1">
+              4.9 <Star className="w-5 h-5 text-yellow-400 fill-current" />
             </div>
-            <div className="text-xs opacity-80">Calificación</div>
+            <div className="text-sm opacity-90">{t.login_rating}</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">0%</div>
-            <div className="text-xs opacity-80">Pagos Sin Interés</div>
+            <div className="text-3xl font-bold">0%</div>
+            <div className="text-sm opacity-90">{t.login_interestFreePayments}</div>
           </div>
         </div>
       </div>
 
-      {/* Formulario de Login */}
-      <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl">
-        <CardContent className="p-6">
-          <div className="text-center mb-6">
-            <h2 className="text-blue-600 text-xl font-bold mb-2">¡Bienvenido de Vuelta!</h2>
-            <p className="text-gray-600 text-sm">Inicia sesión para continuar tu experiencia con smartphones</p>
+      <Card className="w-full max-w-md bg-white shadow-2xl rounded-2xl">
+        <CardContent className="p-8">
+          <div className="text-center mb-8">
+            <h2 className="text-blue-600 text-2xl font-bold mb-2">{t.login_welcomeBack}</h2>
+            <p className="text-gray-600 text-sm">{t.login_loginToContinue}</p>
           </div>
 
-          <form className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <Label htmlFor="email" className="text-blue-600 font-medium">
-                Correo Electrónico
+              <Label htmlFor="email" className="text-blue-600 font-semibold text-sm">
+                {t.login_emailLabel}
               </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Ingresa tu correo electrónico"
+                placeholder={t.login_emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 border-gray-200 focus:border-blue-500"
+                className="mt-2 w-full h-12 px-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-blue-600 font-medium">
-                Contraseña
+              <Label htmlFor="password" className="text-blue-600 font-semibold text-sm">
+                {t.login_passwordLabel}
               </Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Ingresa tu contraseña"
+                placeholder={t.login_passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 border-gray-200 focus:border-blue-500"
+                className="mt-2 w-full h-12 px-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -96,68 +98,80 @@ export default function LoginPage({ onCreateAccount }: LoginPageProps) {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                 />
-                <Label htmlFor="remember" className="text-sm text-gray-600">
-                  Recordarme
+                <Label htmlFor="remember" className="text-sm text-gray-700">
+                  {t.login_rememberMe}
                 </Label>
               </div>
-              <button type="button" className="text-sm text-green-600 hover:underline">
-                ¿Olvidaste tu contraseña?
+              <button type="button" className="text-sm text-green-600 hover:underline font-medium">
+                {t.login_forgotPassword}
               </button>
             </div>
 
-            <Button className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-3">
-              Iniciar Sesión en SAEPHONE
+            <Button
+              onClick={() => onLogin(email, password)}
+              className="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-3 h-12 rounded-lg"
+            >
+              {t.login_loginButton}
             </Button>
 
-            <div className="text-center text-gray-500 text-sm">O CONTINÚA CON</div>
+            <div className="relative text-center text-gray-500 text-sm font-medium my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative bg-white px-4">{t.login_continueWith}</div>
+            </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" className="flex items-center justify-center gap-2 py-3">
-                <div className="w-5 h-5 bg-red-500 rounded"></div>
-                Google
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <Button variant="outline" className="flex items-center justify-center gap-3 py-4 h-14 rounded-2xl">
+                <span className="font-bold text-lg">G</span>
+                <span className="font-medium text-gray-700">Google</span>
               </Button>
-              <Button variant="outline" className="flex items-center justify-center gap-2 py-3">
-                <div className="w-5 h-5 bg-blue-600 rounded"></div>
-                Facebook
+              <Button variant="outline" className="flex items-center justify-center gap-3 py-4 h-14 rounded-2xl">
+                <span className="font-bold text-lg">f</span>
+                <span className="font-medium text-gray-700">Facebook</span>
               </Button>
             </div>
 
-            <div className="text-center text-sm text-gray-600">
-              ¿Nuevo en SAEPHONE?{" "}
-              <button type="button" onClick={onCreateAccount} className="text-green-600 hover:underline font-medium">
-                Crear Cuenta
+            <div className="text-center text-sm text-gray-600 mb-8">
+              {t.login_newToSaephone}{" "}
+              <button
+                type="button"
+                onClick={onCreateAccount}
+                className="text-green-500 hover:text-green-600 font-semibold"
+              >
+                {t.login_createAccount}
               </button>
             </div>
-          </form>
+          </div>
 
-          {/* Iconos de seguridad */}
-          <div className="flex justify-center gap-8 mt-6 pt-4 border-t">
-            <div className="text-center">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mb-1">
-                <Shield className="w-5 h-5 text-blue-600" />
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="bg-blue-50 rounded-2xl p-4 text-center">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Shield className="w-6 h-6 text-white" />
               </div>
-              <div className="text-xs text-gray-600">Pagos Seguros</div>
+              <div className="text-sm font-semibold text-blue-600">{t.login_securePayments}</div>
             </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-1">
-                <CreditCard className="w-5 h-5 text-green-600" />
+            <div className="bg-green-50 rounded-2xl p-4 text-center">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CreditCard className="w-6 h-6 text-white" />
               </div>
-              <div className="text-xs text-gray-600">Pagos a Meses</div>
+              <div className="text-sm font-semibold text-green-500">{t.login_monthlyPaymentsLabel}</div>
             </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mb-1">
-                <Lock className="w-5 h-5 text-blue-600" />
+            <div className="bg-blue-50 rounded-2xl p-4 text-center">
+              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Lock className="w-6 h-6 text-white" />
               </div>
-              <div className="text-xs text-gray-600">Última Tecnología</div>
+              <div className="text-sm font-semibold text-blue-600">{t.login_latestTechnology}</div>
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* Footer */}
       <div className="text-center text-white/70 text-xs mt-6 max-w-md">
-        Al iniciar sesión, aceptas los <span className="underline">Términos y Condiciones</span> y la{" "}
-        <span className="underline">Política de Privacidad</span> de SAEPHONE
+        {t.login_terms_part1}
+        <span className="underline">{t.login_terms_link1}</span>
+        {t.login_terms_part2}
+        <span className="underline">{t.login_terms_link2}</span>
+        {t.login_terms_part3}
       </div>
     </div>
   )
