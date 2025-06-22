@@ -19,6 +19,7 @@ import {
   Download,
   Loader2,
   User,
+  UserPlus,
   Smartphone,
   BarChart3,
   Settings,
@@ -240,7 +241,7 @@ export default function SaephonePlatform() {
   const renderPage = () => {
     switch (currentPage) {
       case "login":
-        return <LoginPage onCreateAccount={handleCreateAccount} onLogin={handleLogin} t={t} />
+        return <LoginPage onLogin={handleLogin} t={t} />
       case "create-account":
         return <CreateAccountPage onBack={handleBackToLogin} onNext={handleNextFromCreate} t={t} />
       case "dashboard":
@@ -254,6 +255,25 @@ export default function SaephonePlatform() {
                   <p className="text-white/80 text-lg">{t.dashboard_manage}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {userRole === 'admin' && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-teal-600">{t.dashboard_createAccount}</h3>
+                            <div className="p-2 bg-teal-100 rounded-lg">
+                              <UserPlus className="w-6 h-6 text-teal-500" />
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_createAccountDesc}</p>
+                        </div>
+                        <Button onClick={() => setCurrentPage("create-account")} className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_createAccountBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                     <CardContent className="p-8 flex flex-col h-full">
                       <div className="flex-1">

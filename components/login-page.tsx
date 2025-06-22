@@ -9,12 +9,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Shield, CreditCard, Lock, Star } from "lucide-react"
 
 interface LoginPageProps {
-  onCreateAccount: () => void
   onLogin: (email: string, password: string) => void
   t: any
 }
 
-export default function LoginPage({ onCreateAccount, onLogin, t }: LoginPageProps) {
+export default function LoginPage({ onLogin, t }: LoginPageProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
@@ -113,17 +112,6 @@ export default function LoginPage({ onCreateAccount, onLogin, t }: LoginPageProp
             >
               {t.login_loginButton}
             </Button>
-
-            <div className="text-center text-sm text-gray-600 mb-8 pt-8">
-              {t.login_newToSaephone}{" "}
-              <button
-                type="button"
-                onClick={onCreateAccount}
-                className="text-green-500 hover:text-green-600 font-semibold"
-              >
-                {t.login_createAccount}
-              </button>
-            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 mt-6">
