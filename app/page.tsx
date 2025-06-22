@@ -218,7 +218,7 @@ export default function SaephonePlatform() {
   )
 
   const DashboardHeader = () => (
-    <div className="flex items-center justify-between p-6">
+    <div className="flex items-center justify-between px-6 pt-20 pb-6">
       <div className="flex items-center gap-4">
         <div className="bg-white rounded-2xl p-2 shadow-lg">
           <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12 object-contain" />
