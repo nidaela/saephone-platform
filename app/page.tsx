@@ -329,22 +329,24 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
-                    <CardContent className="p-8 flex flex-col h-full">
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-2xl font-bold text-gray-700">{t.dashboard_config}</h3>
-                          <div className="p-2 bg-gray-200 rounded-lg">
-                            <Settings className="w-6 h-6 text-gray-700" />
+                  {userRole !== "sales" && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-gray-700">{t.dashboard_config}</h3>
+                            <div className="p-2 bg-gray-200 rounded-lg">
+                              <Settings className="w-6 h-6 text-gray-700" />
+                            </div>
                           </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_configDesc}</p>
                         </div>
-                        <p className="text-gray-600 mb-6">{t.dashboard_configDesc}</p>
-                      </div>
-                      <Button onClick={() => setCurrentPage("settings")} variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg">
-                        {t.dashboard_goToConfigBtn}
-                      </Button>
-                    </CardContent>
-                  </Card>
+                        <Button onClick={() => setCurrentPage("settings")} variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_goToConfigBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               </div>
             </div>
