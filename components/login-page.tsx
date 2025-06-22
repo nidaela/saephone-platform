@@ -114,25 +114,7 @@ export default function LoginPage({ onCreateAccount, onLogin, t }: LoginPageProp
               {t.login_loginButton}
             </Button>
 
-            <div className="relative text-center text-gray-500 text-sm font-medium my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative bg-white px-4">{t.login_continueWith}</div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <Button variant="outline" className="flex items-center justify-center gap-3 py-4 h-14 rounded-2xl">
-                <span className="font-bold text-lg">G</span>
-                <span className="font-medium text-gray-700">Google</span>
-              </Button>
-              <Button variant="outline" className="flex items-center justify-center gap-3 py-4 h-14 rounded-2xl">
-                <span className="font-bold text-lg">f</span>
-                <span className="font-medium text-gray-700">Facebook</span>
-              </Button>
-            </div>
-
-            <div className="text-center text-sm text-gray-600 mb-8">
+            <div className="text-center text-sm text-gray-600 mb-8 pt-8">
               {t.login_newToSaephone}{" "}
               <button
                 type="button"
