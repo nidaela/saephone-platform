@@ -151,6 +151,7 @@ export const translations = {
     // Sell Device Flow
     sell_device: "Vender Dispositivo",
     back_to_dashboard: "Volver al Dashboard",
+    back_to_main_panel: "Regresar a Panel Principal",
 
     // Progress Steps
     contractSteps_register: "Registrarse",
@@ -387,6 +388,7 @@ export const translations = {
     // Sell Device Flow
     sell_device: "Sell Device",
     back_to_dashboard: "Back to Dashboard",
+    back_to_main_panel: "Back to Main Panel",
 
     // Progress Steps
     contractSteps_register: "Register",

@@ -26,14 +26,6 @@ export default function CreateAccountPage({ onBack, onNext, t }: CreateAccountPa
             <p className="text-white/80 text-sm">{t.create_headerSubtitle}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/20 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
-          >
-            {t.create_backToHome}
-          </button>
-        </div>
       </div>
 
       {/* Progress Steps */}
@@ -133,7 +125,7 @@ export default function CreateAccountPage({ onBack, onNext, t }: CreateAccountPa
                   onClick={onBack}
                   className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded"
                 >
-                  ← {t.create_backToHome}
+                  ← {t.back_to_main_panel}
                 </Button>
                 <Button
                   onClick={onNext}

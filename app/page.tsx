@@ -254,7 +254,6 @@ export default function SaephonePlatform() {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <GlobalLanguageSwitcher />
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
           <span>
@@ -440,19 +439,19 @@ export default function SaephonePlatform() {
                         <Input id="paymentDate" placeholder={t.payments_datePlaceholder} className="w-full mt-1 p-2 border rounded" />
                       </div>
                     </div>
-                    <div className="mt-8">
-                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3">
+                    <div className="mt-8 flex gap-4">
+                      <Button
+                        onClick={() => setCurrentPage("dashboard")}
+                        className="flex-1 rounded-lg bg-gray-200 py-3 font-medium text-gray-700 hover:bg-gray-300"
+                      >
+                        ← {t.back_to_main_panel}
+                      </Button>
+                      <Button className="flex-1 bg-green-500 py-3 font-bold text-white hover:bg-green-600">
                         {t.payments_registerPaymentBtn}
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
-                <div className="flex justify-end mt-8">
-                  <Button onClick={() => setCurrentPage("dashboard")}
-                    className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/20 font-medium transition-all duration-200 hover:scale-105 shadow-lg">
-                    ← {t.payments_backToHome}
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
@@ -498,14 +497,16 @@ export default function SaephonePlatform() {
                         <Button className="w-full bg-purple-500 hover:bg-purple-600 text-white mt-1">{t.reports_downloadBtn}</Button>
                       </div>
                     </div>
+                    <div className="flex justify-start mt-8">
+                      <Button
+                        onClick={() => setCurrentPage("dashboard")}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                      >
+                        ← {t.back_to_main_panel}
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
-                <div className="flex justify-end mt-8">
-                  <Button onClick={() => setCurrentPage("dashboard")}
-                    className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/20 font-medium transition-all duration-200 hover:scale-105 shadow-lg">
-                    ← {t.payments_backToHome}
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
@@ -632,10 +633,12 @@ export default function SaephonePlatform() {
                     </CardContent>
                   </Card>
                 </div>
-                <div className="flex justify-end w-full mt-8">
-                  <Button onClick={() => setCurrentPage("dashboard")}
-                    className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/20 font-medium transition-all duration-200 hover:scale-105 shadow-lg">
-                    ← {t.payments_backToHome}
+                <div className="flex justify-start w-full mt-8">
+                  <Button
+                    onClick={() => setCurrentPage("dashboard")}
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                  >
+                    ← {t.back_to_main_panel}
                   </Button>
                 </div>
               </div>
@@ -770,7 +773,7 @@ export default function SaephonePlatform() {
                       </div>
                     </div>
                     <div className="flex gap-4 justify-center mt-8">
-                      <Button onClick={() => setCurrentPage("dashboard")} className="px-6 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded">← {t.back_to_dashboard}</Button>
+                      <Button onClick={() => setCurrentPage("dashboard")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg">← {t.back_to_main_panel}</Button>
                       <Button onClick={() => { if (paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing) { setCurrentPage("contract-generation"); } else { alert(t.deviceSelection_completeAllFields); } }} className={`px-8 py-3 rounded-lg font-medium transition-colors ${paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`} disabled={!(paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing)}>{t.deviceSelection_continue} →</Button>
                     </div>
                   </div>
@@ -835,7 +838,7 @@ export default function SaephonePlatform() {
                   </div>
                 </div>
                 <div className="flex justify-start mt-8">
-                  <Button onClick={() => setCurrentPage("device-selection")} className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/20 font-medium transition-all duration-200 hover:scale-105 shadow-lg flex items-center gap-2">← {t.deviceSelection_back}</Button>
+                  <Button onClick={() => setCurrentPage("device-selection")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button>
                 </div>
               </div>
             </div>
@@ -878,7 +881,10 @@ export default function SaephonePlatform() {
                     </div>
                     <div className="bg-gray-50 rounded-lg p-6"><h3 className="text-blue-600 text-xl font-bold mb-6">{t.contractSigned_clientInfo}</h3></div>
                   </div>
-                  <div className="flex justify-start mt-8"><Button onClick={() => setCurrentPage("contract-generation")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button></div>
+                  <div className="flex justify-between mt-8">
+                    <Button onClick={() => setCurrentPage("contract-generation")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button>
+                    <Button onClick={() => setCurrentPage("references")} className="bg-green-500 hover:bg-green-600 text-white">{t.contractSigned_nextStep}</Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -910,7 +916,9 @@ export default function SaephonePlatform() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-start mt-8"><Button onClick={() => setCurrentPage("contract-signed")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button></div>
+                  <div className="flex justify-start mt-8">
+                    <Button onClick={() => setCurrentPage("contract-signed")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -944,12 +952,17 @@ export default function SaephonePlatform() {
                         <Checkbox id="wifi" checked={connectWifi} onCheckedChange={(checked) => setConnectWifi(checked as boolean)} />
                         <Label htmlFor="wifi" className="text-gray-700 font-medium">{t.deviceConfig_connectWifi}</Label>
                       </div>
-                      <Button onClick={() => setConnectWifi(true)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3">{t.deviceConfig_finish}</Button>
+                      <div className="mt-8 flex gap-4">
+                        <Button onClick={() => setCurrentPage("references")} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-lg">← {t.deviceSelection_back}</Button>
+                        <Button onClick={() => setConnectWifi(true)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3">{t.deviceConfig_finish}</Button>
+                      </div>
                     </div>
                   )}
-                  <div className="flex justify-center mt-8">
-                    <Button onClick={() => setCurrentPage("dashboard")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.back_to_dashboard}</Button>
-                  </div>
+                  {connectWifi && (
+                    <div className="flex justify-center mt-8">
+                      <Button onClick={() => setCurrentPage("dashboard")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.back_to_main_panel}</Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
