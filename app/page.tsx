@@ -82,7 +82,7 @@ export default function SaephonePlatform() {
 
   const [devicePhoneNumber, setDevicePhoneNumber] = useState("")
   const [connectWifi, setConnectWifi] = useState(false)
-  const [userRole, setUserRole] = useState<"admin" | "sales" | "manager" | null>(null)
+  const [userRole, setUserRole] = useState<"admin" | "sales" | "manager" | "super-admin" | null>(null)
 
   const handleCreateAccount = () => {
     setCurrentPage("create-account")
@@ -124,6 +124,9 @@ export default function SaephonePlatform() {
       setCurrentPage("dashboard")
     } else if (email === "manager@test.com" && password === "Testingmanag3r") {
       setUserRole("manager")
+      setCurrentPage("dashboard")
+    } else if (email === "superadmin@test.com" && password === "Testing5uper4dmin") {
+      setUserRole("super-admin")
       setCurrentPage("dashboard")
     } else {
       alert(t.login_invalidCredentials)
@@ -236,6 +239,8 @@ export default function SaephonePlatform() {
               ? t.dashboard_salesProfile
               : userRole === "manager"
               ? t.dashboard_managerProfile
+              : userRole === "super-admin"
+              ? t.dashboard_superAdminProfile
               : ""}
           </span>
         </div>
@@ -264,7 +269,7 @@ export default function SaephonePlatform() {
                   <p className="text-white/80 text-lg">{t.dashboard_manage}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {userRole === 'admin' && (
+                  {(userRole === "admin" || userRole === "super-admin") && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -283,7 +288,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "sales") && (
+                  {(userRole === "admin" || userRole === "super-admin") && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -302,7 +307,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {userRole === "sales" && (
+                  {(userRole === "sales" || userRole === "super-admin") && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -321,7 +326,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "manager") && (
+                  {(userRole === "admin" || userRole === "manager" || userRole === "super-admin") && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -340,7 +345,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {userRole === "admin" && (
+                  {(userRole === "admin" || userRole === "super-admin") && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">

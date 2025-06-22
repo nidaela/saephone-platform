@@ -73,6 +73,7 @@ export const translations = {
     dashboard_adminProfile: "Perfil de distribuidor / administrador: Admin Testing",
     dashboard_salesProfile: "Perfil de vendedor: Sales Testing",
     dashboard_managerProfile: "Perfil de gerente: Manager Testing",
+    dashboard_superAdminProfile: "Perfil de super-admin: Super Admin Testing",
 
     // Process Payments Page
     payments_title: "Procesar Pago",
@@ -308,6 +309,7 @@ export const translations = {
     dashboard_adminProfile: "Distributor/Administrator Profile: Admin Testing",
     dashboard_salesProfile: "Salesperson Profile: Sales Testing",
     dashboard_managerProfile: "Manager Profile: Manager Testing",
+    dashboard_superAdminProfile: "Super Admin Profile: Super Admin Testing",
 
     // Process Payments Page
     payments_title: "Process Payment",
