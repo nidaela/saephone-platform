@@ -84,6 +84,26 @@ export default function SaephonePlatform() {
   const [connectWifi, setConnectWifi] = useState(false)
   const [userRole, setUserRole] = useState<"admin" | "sales" | "manager" | "super-admin" | null>(null)
 
+  useEffect(() => {
+    const savedPage = localStorage.getItem("saephone-currentPage") as PageType
+    const savedUserRole = localStorage.getItem("saephone-userRole") as "admin" | "sales" | "manager" | "super-admin" | null
+
+    if (savedPage && savedUserRole && savedPage !== "login") {
+      setCurrentPage(savedPage)
+      setUserRole(savedUserRole)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (currentPage !== "login" && userRole) {
+      localStorage.setItem("saephone-currentPage", currentPage)
+      localStorage.setItem("saephone-userRole", userRole)
+    } else {
+      localStorage.removeItem("saephone-currentPage")
+      localStorage.removeItem("saephone-userRole")
+    }
+  }, [currentPage, userRole])
+
   const handleCreateAccount = () => {
     setCurrentPage("create-account")
   }
@@ -94,6 +114,11 @@ export default function SaephonePlatform() {
 
   const handleNextFromCreate = () => {
     setCurrentPage("dashboard") // or the next step in the creation process
+  }
+
+  const handleLogout = () => {
+    setCurrentPage("login")
+    setUserRole(null)
   }
 
   const toggleLanguage = () => {
@@ -244,7 +269,7 @@ export default function SaephonePlatform() {
               : ""}
           </span>
         </div>
-        <Button onClick={() => setCurrentPage("login")} variant="destructive" className="flex items-center gap-2">
+        <Button onClick={handleLogout} variant="destructive" className="flex items-center gap-2">
           <LogOut className="w-5 h-5" />
           <span>{t.dashboard_logout}</span>
         </Button>
