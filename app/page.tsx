@@ -33,6 +33,7 @@ import {
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { QRCodeCanvas } from "qrcode.react"
 
 type PageType =
   | "login"
@@ -64,6 +65,8 @@ export default function SaephonePlatform() {
   const [selfieCaptured, setSelfieCaptured] = useState(false)
   const [isCapturing, setIsCapturing] = useState<"front" | "back" | "selfie" | null>(null)
   const [extractedName, setExtractedName] = useState("")
+  const [extractedEmail, setExtractedEmail] = useState("")
+  const [extractedPhone, setExtractedPhone] = useState("")
   const [userRegistered, setUserRegistered] = useState(false)
   const [selectedBrand, setSelectedBrand] = useState("")
   const [selectedModel, setSelectedModel] = useState("")
@@ -83,6 +86,10 @@ export default function SaephonePlatform() {
   const [devicePhoneNumber, setDevicePhoneNumber] = useState("")
   const [connectWifi, setConnectWifi] = useState(false)
   const [userRole, setUserRole] = useState<"admin" | "sales" | "manager" | "super-admin" | null>(null)
+  const [qrValue, setQrValue] = useState("")
+  const [isQrZoomed, setIsQrZoomed] = useState(false)
+  const [isInstalling, setIsInstalling] = useState(false)
+  const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
     const savedPage = localStorage.getItem("saephone-currentPage") as PageType
@@ -113,7 +120,7 @@ export default function SaephonePlatform() {
   }
 
   const handleNextFromCreate = () => {
-    setCurrentPage("dashboard") // or the next step in the creation process
+    setCurrentPage("terms")
   }
 
   const handleLogout = () => {
@@ -128,17 +135,19 @@ export default function SaephonePlatform() {
   const t = translations[language]
 
   useEffect(() => {
-    if (currentPage === "app-install" && !appInstalled) {
+    if (currentPage === "app-install") {
+      setQrValue(`saephone-install-${new Date().getTime()}`)
+      setIsInstalling(true)
       const timer = setTimeout(() => {
-        setAppInstalling(true)
-        setTimeout(() => {
-          setAppInstalling(false)
-          setAppInstalled(true)
-        }, 4000)
-      }, 2000)
+        setIsInstalling(false)
+        setIsInstalled(true)
+      }, 45000)
       return () => clearTimeout(timer)
+    } else {
+      setIsInstalling(false)
+      setIsInstalled(false)
     }
-  }, [currentPage, appInstalled])
+  }, [currentPage])
 
   const handleLogin = (email: string, password: string) => {
     if (email === "admin@test.com" && password === "Testing4dmin") {
@@ -170,43 +179,71 @@ export default function SaephonePlatform() {
       setIsCapturing(null)
 
       if ((type === "front" && backIdCaptured) || (type === "back" && frontIdCaptured)) {
-        setTimeout(() => setExtractedName("María Rodríguez Hernández"), 1500)
+        setTimeout(() => {
+          setExtractedName("María Rodríguez Hernández")
+          setExtractedEmail("maria.perez@email.com")
+          setExtractedPhone("+53 738 837 7366")
+        }, 1500)
       }
     }, 2000)
   }
 
   const ContractProgressSteps = () => {
+    const pageToStepIndex: Partial<Record<PageType, number>> = {
+      "create-account": 0,
+      "terms": 1,
+      "app-install": 2,
+      "identity-verification": 3,
+    }
+    const stepIndexToPage: Record<number, PageType> = {
+      0: "create-account",
+      1: "terms",
+      2: "app-install",
+      3: "identity-verification",
+    }
+
+    const currentStepIndex = pageToStepIndex[currentPage] ?? -1
+
     const steps = [
-      { name: t.contractSteps_register, completed: true },
-      {
-        name: t.contractSteps_price,
-        completed: ["device-selection", "contract-generation", "contract-signed", "references", "device-configuration"].includes(currentPage),
-      },
-      {
-        name: t.contractSteps_contract,
-        completed: ["contract-generation", "contract-signed", "references", "device-configuration"].includes(currentPage),
-      },
-      { name: t.contractSteps_software, completed: ["references", "device-configuration"].includes(currentPage) },
-      { name: t.contractSteps_finish, completed: currentPage === "device-configuration" && connectWifi },
+      { name: t.contractSteps_register },
+      { name: t.contractSteps_price },
+      { name: t.contractSteps_contract },
+      { name: t.contractSteps_software },
     ]
+
     return (
-      <div className="flex items-center justify-center mb-8">
+      <div className="flex items-center justify-center">
         <div className="flex items-center gap-4">
-          {steps.map((step, index) => (
-            <div key={index} className="flex items-center">
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
-                    step.completed ? "bg-green-500" : "bg-white/30"
-                  }`}
-                >
-                  {index + 1}
+          {steps.map((step, index) => {
+            const isActive = index <= currentStepIndex
+            return (
+              <div
+                key={index}
+                className={`flex items-center ${isActive ? "cursor-pointer" : "cursor-default"}`}
+                onClick={() => {
+                  if (isActive) {
+                    setCurrentPage(stepIndexToPage[index])
+                  }
+                }}
+              >
+                <div className="flex flex-col items-center text-center w-24">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
+                      isActive ? "bg-green-500" : "bg-white/30"
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                  <span
+                    className={`text-sm mt-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/70"}`}
+                  >
+                    {step.name}
+                  </span>
                 </div>
-                <span className={`text-sm mt-2 ${step.completed ? "text-white" : "text-white/70"}`}>{step.name}</span>
+                {index < steps.length - 1 && <div className="w-16 h-0.5 bg-white/30 mx-2"></div>}
               </div>
-              {index < steps.length - 1 && <div className="w-16 h-0.5 bg-white/30 mx-2"></div>}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     )
@@ -276,12 +313,289 @@ export default function SaephonePlatform() {
     </div>
   )
 
+  const FlowHeader = () => (
+    <div className="w-full max-w-4xl">
+      <div className="flex items-center gap-4">
+        <div className="bg-white rounded-2xl p-2 shadow-lg">
+          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12 object-contain" />
+        </div>
+        <div>
+          <h1 className="text-white text-2xl font-bold">SAEPHONE</h1>
+          <p className="text-white/80 text-sm">{t.create_headerSubtitle}</p>
+        </div>
+      </div>
+    </div>
+  )
+
   const renderPage = () => {
     switch (currentPage) {
       case "login":
         return <LoginPage onLogin={handleLogin} t={t} />
       case "create-account":
-        return <CreateAccountPage onBack={() => setCurrentPage("dashboard")} onNext={handleNextFromCreate} t={t} />
+        return (
+          <div className="relative z-10 flex flex-col items-center min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <FlowHeader />
+            <div className="w-full max-w-4xl mt-8">
+              <ContractProgressSteps />
+            </div>
+            <CreateAccountPage onBack={() => setCurrentPage("dashboard")} onNext={handleNextFromCreate} t={t} />
+          </div>
+        )
+      case "terms":
+        return (
+          <div className="relative z-10 flex flex-col items-center min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <FlowHeader />
+            <div className="w-full max-w-4xl mt-8">
+              <ContractProgressSteps />
+            </div>
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-8 md:p-12 mt-8">
+              <h2 className="text-center text-gray-500 font-semibold mb-6 text-lg">
+                Importante: Los siguientes términos deben ser leídos y completados personalmente por el cliente.
+              </h2>
+              <div className="border rounded-xl p-6 sm:p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12" />
+                  <h3 className="text-2xl font-bold text-gray-800">Términos y Condiciones</h3>
+                </div>
+                <div className="prose max-w-none space-y-4 text-gray-600 max-h-64 overflow-y-auto pr-4">
+                  <p>
+                    Este documento describe los términos y condiciones generales aplicables al uso de los contenidos,
+                    productos y servicios ofrecidos a través del sitio www.saephone.com, del cual es titular SAEPHONE
+                    México, S. de R.L. de C.V.
+                  </p>
+                  <h4 className="font-bold">1. OBJETO</h4>
+                  <p>
+                    El objeto de los presentes TÉRMINOS Y CONDICIONES es regular el acceso y la utilización del SITIO WEB.
+                  </p>
+                  <h4 className="font-bold">2. EL TITULAR</h4>
+                  <p>
+                    Se reserva el derecho de realizar cualquier tipo de modificación en el SITIO WEB en cualquier momento
+                    y sin previo aviso.
+                  </p>
+                  <h4 className="font-bold">3. RESPONSABILIDADES</h4>
+                  <p>
+                    El usuario se compromete a utilizar el sitio web de manera responsable y conforme a la legislación
+                    aplicable.
+                  </p>
+                </div>
+                <div className="mt-8 space-y-4">
+                  <div className="flex items-center">
+                    <Checkbox id="terms" checked={acceptTerms} onCheckedChange={(checked) => setAcceptTerms(Boolean(checked))} />
+                    <Label htmlFor="terms" className="ml-3 text-gray-700">
+                      Acepto los términos y condiciones de SAEPHONE
+                    </Label>
+                  </div>
+                  <div className="flex items-center">
+                    <Checkbox id="privacy" checked={acceptPrivacy} onCheckedChange={(checked) => setAcceptPrivacy(Boolean(checked))} />
+                    <Label htmlFor="privacy" className="ml-3 text-gray-700">
+                      Acepto el aviso de privacidad de SAEPHONE
+                    </Label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between mt-8">
+                <Button variant="ghost" onClick={() => setCurrentPage("create-account")} className="text-gray-600">
+                  ← Regresar
+                </Button>
+                <Button
+                  onClick={() => setCurrentPage("app-install")}
+                  disabled={!acceptTerms || !acceptPrivacy}
+                  className="bg-gray-800 text-white hover:bg-gray-900"
+                >
+                  Acepto los términos →
+                </Button>
+              </div>
+            </div>
+          </div>
+        )
+      case "app-install":
+        return (
+          <div className="relative z-10 flex flex-col items-center min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <FlowHeader />
+            <div className="w-full max-w-4xl mt-8">
+              <ContractProgressSteps />
+            </div>
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-8 md:p-12 mt-8">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-blue-600">{t.appInstall_title}</h2>
+                <p className="text-gray-600 mt-2">{t.appInstall_subtitle}</p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8 mt-8 items-start">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">{t.appInstall_qrTitle}</h3>
+                  <p className="text-sm text-gray-500 mt-2 mb-4">{t.appInstall_qrSubtitle}</p>
+                  <button className="block w-full" onClick={() => setIsQrZoomed(true)}>
+                    <QRCodeCanvas value={qrValue} size={192} className="mx-auto border-2 rounded-lg p-2" />
+                  </button>
+                </div>
+                <div className="mt-6 md:mt-0">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">{t.appInstall_statusTitle}</h3>
+                  <div className="bg-gray-50 rounded-lg p-6 text-center h-40 flex flex-col justify-center">
+                    {isInstalling && (
+                      <div>
+                        <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+                        <p className="text-blue-600">Instalando aplicación...</p>
+                      </div>
+                    )}
+                    {isInstalled && (
+                      <>
+                        <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Check className="w-7 h-7 text-white" />
+                        </div>
+                        <h4 className="font-semibold text-green-600">{t.appInstall_successTitle}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{t.appInstall_successSubtitle}</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-between mt-12">
+                <Button variant="ghost" onClick={() => setCurrentPage("terms")} className="text-gray-600">
+                  {t.appInstall_backBtn}
+                </Button>
+                <Button onClick={() => setCurrentPage("identity-verification")} className="bg-blue-600 text-white hover:bg-blue-700">
+                  {t.appInstall_continueBtn}
+                </Button>
+              </div>
+            </div>
+            {isQrZoomed && (
+              <div
+                className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black bg-opacity-75"
+                onClick={() => setIsQrZoomed(false)}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="cursor-default rounded-lg bg-white p-4"
+                >
+                  <QRCodeCanvas value={qrValue} size={384} />
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      case "identity-verification":
+        return (
+          <div className="relative z-10 flex flex-col items-center min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <FlowHeader />
+            <div className="w-full max-w-4xl mt-8">
+              <ContractProgressSteps />
+            </div>
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-8 md:p-12 mt-8">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-blue-600">{t.identityVerification_title}</h2>
+                <p className="text-gray-600 mt-2">{t.identityVerification_subtitle}</p>
+              </div>
+
+              <div className="mt-8 space-y-8">
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Check className="w-6 h-6 text-green-500" />
+                    <h3 className="text-lg font-semibold text-gray-800">{t.identityVerification_idCardTitle}</h3>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <button
+                      onClick={() => handleCapture("front")}
+                      className={`relative w-full h-48 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        frontIdCaptured ? "bg-pink-100" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      {isCapturing === "front" && <Loader2 className="w-8 h-8 animate-spin text-pink-500" />}
+                      {!isCapturing && frontIdCaptured && (
+                        <>
+                          <div className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <p className="text-green-600 font-semibold">{t.identityVerification_frontId}</p>
+                        </>
+                      )}
+                      {!isCapturing && !frontIdCaptured && (
+                        <div className="w-12 h-12 rounded-full border-2 border-dashed border-red-400" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleCapture("back")}
+                      className={`relative w-full h-48 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        backIdCaptured ? "bg-blue-100" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      {isCapturing === "back" && <Loader2 className="w-8 h-8 animate-spin text-blue-500" />}
+                      {!isCapturing && backIdCaptured && (
+                        <>
+                          <div className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <p className="text-green-600 font-semibold">{t.identityVerification_backId}</p>
+                        </>
+                      )}
+                      {!isCapturing && !backIdCaptured && (
+                        <div className="w-12 h-12 rounded-full border-2 border-dashed border-blue-400" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {extractedName && (
+                  <div className="bg-green-50 border-l-4 border-green-400 p-4">
+                    <div className="flex items-center gap-3">
+                      <Check className="w-6 h-6 text-green-500" />
+                      <p className="text-gray-800">
+                        <span className="font-semibold">{t.identityVerification_extractedDataTitle}</span> {extractedName}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <Check className="w-6 h-6 text-green-500" />
+                    <h3 className="text-lg font-semibold text-gray-800">{t.identityVerification_selfieTitle}</h3>
+                  </div>
+                  <div className="text-center">
+                    <button
+                      onClick={() => handleCapture("selfie")}
+                      className={`relative w-48 h-48 rounded-full mx-auto flex items-center justify-center transition-all duration-300 ${
+                        selfieCaptured ? "bg-yellow-100" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      {isCapturing === "selfie" && <Loader2 className="w-12 h-12 animate-spin text-yellow-500" />}
+                      {!isCapturing && selfieCaptured && (
+                        <>
+                          <div className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                          <User className="w-16 h-16 text-red-400" />
+                        </>
+                      )}
+                      {!isCapturing && !selfieCaptured && <User className="w-16 h-16 text-red-400" />}
+                    </button>
+                    {selfieCaptured && (
+                      <p className="mt-4 text-green-600 font-semibold">{t.identityVerification_selfieSuccess}</p>
+                    )}
+                  </div>
+                </div>
+
+                {userRegistered && (
+                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+                    <div className="flex items-center gap-3">
+                      <Check className="w-6 h-6 text-blue-500" />
+                      <p className="text-gray-800 font-semibold">{t.identityVerification_registrationSuccess}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between mt-12">
+                <Button variant="ghost" onClick={() => setCurrentPage("app-install")} className="text-gray-600">
+                  {t.identityVerification_backBtn}
+                </Button>
+                <Button onClick={() => setCurrentPage("settings")} className="bg-blue-600 text-white hover:bg-blue-700">
+                  {t.identityVerification_viewProfileBtn}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )
       case "dashboard":
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
@@ -530,15 +844,30 @@ export default function SaephonePlatform() {
                       <form className="space-y-4">
                         <div>
                           <Label htmlFor="fullName" className="text-blue-600 font-medium">{t.settings_fullName}</Label>
-                          <input id="fullName" className="w-full mt-1 p-2 border rounded" placeholder="Juan Pérez González" />
+                          <input
+                            id="fullName"
+                            className="w-full mt-1 p-2 border rounded bg-gray-50"
+                            value={extractedName || "Juan Pérez González"}
+                            readOnly
+                          />
                         </div>
                         <div>
                           <Label htmlFor="email" className="text-blue-600 font-medium">{t.settings_email}</Label>
-                          <input id="email" className="w-full mt-1 p-2 border rounded" placeholder="juan.perez@email.com" />
+                          <input
+                            id="email"
+                            className="w-full mt-1 p-2 border rounded bg-gray-50"
+                            value={extractedEmail || "juan.perez@email.com"}
+                            readOnly
+                          />
                         </div>
                         <div>
                           <Label htmlFor="phone" className="text-blue-600 font-medium">{t.settings_phone}</Label>
-                          <input id="phone" className="w-full mt-1 p-2 border rounded" placeholder="+52 834 123 4567" />
+                          <input
+                            id="phone"
+                            className="w-full mt-1 p-2 border rounded bg-gray-50"
+                            value={extractedPhone || "+52 834 123 4567"}
+                            readOnly
+                          />
                         </div>
                         <div className="flex gap-2 mt-4">
                           <Button className="bg-blue-600 hover:bg-blue-700 text-white">{t.settings_save}</Button>
