@@ -282,7 +282,7 @@ export default function SaephonePlatform() {
       case "login":
         return <LoginPage onLogin={handleLogin} t={t} />
       case "create-account":
-        return <CreateAccountPage onBack={handleBackToLogin} onNext={handleNextFromCreate} t={t} />
+        return <CreateAccountPage onBack={() => setCurrentPage("dashboard")} onNext={handleNextFromCreate} t={t} />
       case "dashboard":
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
