@@ -82,7 +82,7 @@ export default function SaephonePlatform() {
 
   const [devicePhoneNumber, setDevicePhoneNumber] = useState("")
   const [connectWifi, setConnectWifi] = useState(false)
-  const [userRole, setUserRole] = useState<"admin" | "sales" | null>(null)
+  const [userRole, setUserRole] = useState<"admin" | "sales" | "manager" | null>(null)
 
   const handleCreateAccount = () => {
     setCurrentPage("create-account")
@@ -121,6 +121,9 @@ export default function SaephonePlatform() {
       setCurrentPage("dashboard")
     } else if (email === "sales@test.com" && password === "Testing5ales") {
       setUserRole("sales")
+      setCurrentPage("dashboard")
+    } else if (email === "manager@test.com" && password === "Testingmanag3r") {
+      setUserRole("manager")
       setCurrentPage("dashboard")
     } else {
       alert(t.login_invalidCredentials)
@@ -227,7 +230,13 @@ export default function SaephonePlatform() {
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
           <span>
-            {userRole === "admin" ? t.dashboard_adminProfile : userRole === "sales" ? t.dashboard_salesProfile : ""}
+            {userRole === "admin"
+              ? t.dashboard_adminProfile
+              : userRole === "sales"
+              ? t.dashboard_salesProfile
+              : userRole === "manager"
+              ? t.dashboard_managerProfile
+              : ""}
           </span>
         </div>
         <Button onClick={() => setCurrentPage("login")} variant="destructive" className="flex items-center gap-2">
@@ -274,24 +283,26 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
-                    <CardContent className="p-8 flex flex-col h-full">
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-2xl font-bold text-blue-600">{t.dashboard_processPayments}</h3>
-                          <div className="p-2 bg-blue-100 rounded-lg">
-                            <FileText className="w-6 h-6 text-blue-500" />
+                  {(userRole === "admin" || userRole === "sales") && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-blue-600">{t.dashboard_processPayments}</h3>
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              <FileText className="w-6 h-6 text-blue-500" />
+                            </div>
                           </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_processPaymentsDesc}</p>
                         </div>
-                        <p className="text-gray-600 mb-6">{t.dashboard_processPaymentsDesc}</p>
-                      </div>
-                      <Button onClick={() => setCurrentPage("payments")} className="bg-blue-600 hover:bg-blue-700 font-semibold py-3 px-6 rounded-lg">
-                        {t.dashboard_processPaymentBtn}
-                      </Button>
-                    </CardContent>
-                  </Card>
+                        <Button onClick={() => setCurrentPage("payments")} className="bg-blue-600 hover:bg-blue-700 font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_processPaymentBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
 
-                  {userRole !== "admin" && (
+                  {userRole === "sales" && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -310,7 +321,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {userRole !== "sales" && (
+                  {(userRole === "admin" || userRole === "manager") && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -329,7 +340,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {userRole !== "sales" && (
+                  {userRole === "admin" && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">

@@ -72,6 +72,7 @@ export const translations = {
     dashboard_goToConfigBtn: "Ir a Configuración",
     dashboard_adminProfile: "Perfil de distribuidor / administrador: Admin Testing",
     dashboard_salesProfile: "Perfil de vendedor: Sales Testing",
+    dashboard_managerProfile: "Perfil de gerente: Manager Testing",
 
     // Process Payments Page
     payments_title: "Procesar Pago",
@@ -304,8 +305,9 @@ export const translations = {
     dashboard_config: "Configuration",
     dashboard_configDesc: "Manage your account and system settings to optimize your experience",
     dashboard_goToConfigBtn: "Go to Settings",
-    dashboard_adminProfile: "Distributor / Admin Profile: Admin Testing",
-    dashboard_salesProfile: "Sales Profile: Sales Testing",
+    dashboard_adminProfile: "Distributor/Administrator Profile: Admin Testing",
+    dashboard_salesProfile: "Salesperson Profile: Sales Testing",
+    dashboard_managerProfile: "Manager Profile: Manager Testing",
 
     // Process Payments Page
     payments_title: "Process Payment",
