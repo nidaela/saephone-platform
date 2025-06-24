@@ -52,6 +52,21 @@ type PageType =
   | "reports" // Nueva página de reportes
 
 export default function SaephonePlatform() {
+  const models = {
+    "Samsung": {
+      "Galaxy S23": ["128GB", "256GB"],
+      "Galaxy A54": ["64GB", "128GB"]
+    },
+    "Apple": {
+      "iPhone 14": ["128GB", "256GB", "512GB"],
+      "iPhone SE": ["64GB", "128GB"]
+    },
+    "Xiaomi": {
+      "Redmi Note 12": ["128GB"],
+      "Mi 11 Lite": ["64GB", "128GB"]
+    }
+    // ... agrega más marcas y modelos según necesites
+  };
   const [currentPage, setCurrentPage] = useState<PageType>("login")
   const [language, setLanguage] = useState<"es" | "en">("es")
   const [rememberMe, setRememberMe] = useState(false)
@@ -975,31 +990,66 @@ export default function SaephonePlatform() {
           </div>
         )
       case "device-selection": {
-        const brands = ["Apple", "Samsung", "Xiaomi", "Huawei", "OnePlus"]
-        const models: Record<string, string[]> = {
-          Apple: ["iPhone 15 Pro", "iPhone 15", "iPhone 14 Pro", "iPhone 14"],
-          Samsung: ["Galaxy S24 Ultra", "Galaxy S24", "Galaxy A54", "Galaxy A34"],
-          Xiaomi: ["Redmi Note 13", "Mi 13", "Redmi 12", "POCO X5"],
-          Huawei: ["P60 Pro", "Mate 50", "Nova 11", "Y70"],
-          OnePlus: ["OnePlus 12", "OnePlus 11", "Nord 3", "Nord CE 3"],
-        }
-        const capacities = ["64GB", "128GB", "256GB", "512GB", "1TB"]
-        const prices: Record<string, Record<string, number>> = {
-          "iPhone 15 Pro": { "128GB": 25999, "256GB": 28999, "512GB": 34999, "1TB": 40999 },
-          "iPhone 15": { "128GB": 21999, "256GB": 24999, "512GB": 30999 },
-          "Galaxy S24 Ultra": { "256GB": 26999, "512GB": 31999, "1TB": 37999 },
-        }
-        const updatePrice = () => {
-          if (selectedModel && selectedCapacity && prices[selectedModel] && prices[selectedModel][selectedCapacity]) {
-            setDevicePrice(prices[selectedModel][selectedCapacity])
-          } else {
-            setDevicePrice(0)
-          }
-        }
+        // Progress steps for device sale
+        const deviceSteps = [
+          "Selección de Modelo y Plan de Financiamiento",
+          "Modelo",
+          "Precio del dispositivo",
+          "Plan de Financiamiento"
+        ];
+        const deviceStepIndexToPage = {
+          0: "device-selection",
+          1: "device-selection",
+          2: "device-selection",
+          3: "device-selection"
+        };
+        const deviceCurrentStep =
+          paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing
+            ? 3
+            : selectedBrand && selectedModel && selectedCapacity
+            ? 2
+            : selectedBrand && selectedModel
+            ? 1
+            : 0;
+        const devicePriceInitial = devicePrice > 0 ? Math.round(devicePrice * 0.15) : 0;
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
             <DashboardHeader />
-            <ContractProgressSteps />
+            {/* Progress bar for device sale */}
+            <div className="w-full max-w-4xl mx-auto mt-8 mb-8">
+              <div className="flex items-center justify-center">
+                <div className="flex items-center gap-4">
+                  {deviceSteps.map((step, index) => {
+                    const isActive = index <= deviceCurrentStep;
+                    return (
+                      <div
+                        key={index}
+                        className={`flex items-center ${isActive ? "cursor-pointer" : "cursor-default"}`}
+                        onClick={() => {
+                          if (isActive) setCurrentPage("device-selection");
+                        }}
+                      >
+                        <div className="flex flex-col items-center text-center w-48">
+                          <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
+                              isActive ? "bg-green-500" : "bg-white/30"
+                            }`}
+                          >
+                            {index + 1}
+                          </div>
+                          <span
+                            className={`text-sm mt-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/70"}`}
+                          >
+                            {step}
+                          </span>
+                        </div>
+                        {index < deviceSteps.length - 1 && <div className="w-16 h-0.5 bg-white/30 mx-2"></div>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
             <div className="flex-1 flex items-center justify-center p-4">
               <Card className="w-full max-w-4xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1008,10 +1058,11 @@ export default function SaephonePlatform() {
                     <p className="text-gray-600 text-lg">{t.deviceSelection_subtitle}</p>
                   </div>
                   <div className="space-y-8">
+                    {/* Paso 1 */}
                     <div>
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">1</span></div>
-                        <h3 className="text-blue-600 text-xl font-bold">{t.deviceSelection_paymentMethod}</h3>
+                        <h3 className="text-blue-600 text-xl font-bold">Selección de Modelo y Plan de Financiamiento</h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <button onClick={() => setPaymentMethod("financiado")} className={`p-4 border-2 rounded-lg text-center transition-all ${paymentMethod === "financiado" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
@@ -1025,6 +1076,7 @@ export default function SaephonePlatform() {
                       </div>
                       {!paymentMethod && <p className="text-red-500 text-sm">{t.deviceSelection_selectPaymentMethod}</p>}
                     </div>
+                    {/* Paso 2 */}
                     <div>
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">2</span></div>
@@ -1033,72 +1085,148 @@ export default function SaephonePlatform() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div>
                           <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_brand}</label>
-                          <select value={selectedBrand} onChange={e => { setSelectedBrand(e.target.value); setSelectedModel(""); setSelectedCapacity(""); setDevicePrice(0); }} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          <select
+                            value={selectedBrand}
+                            onChange={e => {
+                              setSelectedBrand(e.target.value);
+                              setSelectedModel("");
+                              setSelectedCapacity("");
+                              setDevicePrice(0);
+                            }}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
                             <option value="">{t.deviceSelection_selectBrand}</option>
-                            {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
+                            {models && typeof models === "object" && !Array.isArray(models) &&
+                              Object.keys(models).map((brand: string) => (
+                                <option key={brand} value={brand}>
+                                  {brand}
+                                </option>
+                              ))
+                            }
                           </select>
                         </div>
                         <div>
                           <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_model}</label>
-                          <select value={selectedModel} onChange={e => { setSelectedModel(e.target.value); setSelectedCapacity(""); setDevicePrice(0); }} disabled={!selectedBrand} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
+                          <select
+                            value={selectedModel}
+                            onChange={e => {
+                              setSelectedModel(e.target.value);
+                              setSelectedCapacity("");
+                              setDevicePrice(0);
+                            }}
+                            disabled={!selectedBrand}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                          >
                             <option value="">{t.deviceSelection_selectModel}</option>
-                            {selectedBrand && models[selectedBrand] && models[selectedBrand].map(model => <option key={model} value={model}>{model}</option>)}
+                            {selectedBrand &&
+                              models &&
+                              typeof models === "object" &&
+                              selectedBrand &&
+                              (Object.keys(models as Record<string, Record<string, string[]>>)[0] &&
+                                typeof (models as Record<string, Record<string, string[]>>)[selectedBrand] === "object" &&
+                                Object.keys((models as Record<string, Record<string, string[]>>)[selectedBrand] || {}).map((model: string) => (
+                                  <option key={model} value={model}>
+                                    {model}
+                                  </option>
+                                ))
+                              )
+                            }
                           </select>
                         </div>
                         <div>
                           <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_capacity}</label>
-                          <select value={selectedCapacity} onChange={e => { setSelectedCapacity(e.target.value); setTimeout(updatePrice, 100); }} disabled={!selectedModel} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
+                          <select
+                            value={selectedCapacity}
+                            onChange={e => {
+                              setSelectedCapacity(e.target.value);
+                              // If you want to update the price, do it here directly or call a defined function
+                              // For now, let's assume price updates automatically elsewhere
+                            }}
+                            disabled={!selectedModel}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                          >
                             <option value="">{t.deviceSelection_selectCapacity}</option>
-                            {capacities.map(capacity => <option key={capacity} value={capacity}>{capacity}</option>)}
+                            {models &&
+                              typeof models === "object" &&
+                              selectedBrand &&
+                              selectedModel &&
+                              Array.isArray(
+                                (models as Record<string, Record<string, string[]>>)[selectedBrand]?.[selectedModel]
+                              ) &&
+                              ((models as Record<string, Record<string, string[]>>)[selectedBrand][selectedModel] as string[]).map(
+                                (capacity: string) => (
+                                  <option key={capacity} value={capacity}>
+                                    {capacity}
+                                  </option>
+                                )
+                              )
+                            }
                           </select>
                         </div>
                       </div>
-                      {!selectedBrand && <p className="text-red-500 text-sm mb-4">{t.deviceSelection_selectBrandPrompt}</p>}
-                      <div>
-                        <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_devicePrice}</label>
-                        <div className="flex items-center">
-                          <span className="bg-gray-100 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg text-gray-700 font-medium">$</span>
-                          <input type="number" value={devicePrice} onChange={e => setDevicePrice(Number(e.target.value) || 0)} placeholder="Ingresa el precio del dispositivo" className="flex-1 p-3 border border-gray-300 rounded-r-lg text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        </div>
-                        <p className="text-sm text-gray-500 mt-1">{t.deviceSelection_priceDisclaimer}</p>
-                      </div>
+                      {!selectedBrand && (
+                        <p className="text-red-500 text-sm mb-4">
+                          {t.deviceSelection_selectBrandPrompt}
+                        </p>
+                      )}
                     </div>
+                    {/* Paso 3 */}
                     <div>
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">3</span></div>
-                        <h3 className="text-blue-600 text-xl font-bold">{t.deviceSelection_financingPlan}</h3>
+                        <h3 className="text-blue-600 text-xl font-bold">Precio del dispositivo</h3>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button onClick={() => setSelectedFinancing("13")} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "13" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
-                          <div className="text-xl font-bold text-blue-600 mb-2">13 {t.deviceSelection_weeks}</div>
-                          <div className="text-sm text-gray-600 mb-2">SMES</div>
-                          {devicePrice > 0 && (<>
-                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 13).toLocaleString()}</div>
-                            <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
-                            <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.15).toLocaleString()}</span></div>
-                          </>)}
-                        </button>
-                        <button onClick={() => setSelectedFinancing("26")} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "26" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
-                          <div className="text-xl font-bold text-blue-600 mb-2">26 {t.deviceSelection_weeks}</div>
-                          <div className="text-sm text-gray-600 mb-2">SMES</div>
-                          {devicePrice > 0 && (<>
-                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 26).toLocaleString()}</div>
-                            <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
-                            <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.25).toLocaleString()}</span></div>
-                          </>)}
-                        </button>
-                        <button onClick={() => setSelectedFinancing("39")} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "39" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
-                          <div className="text-xl font-bold text-blue-600 mb-2">39 {t.deviceSelection_weeks}</div>
-                          <div className="text-sm text-gray-600 mb-2">SMES</div>
-                          {devicePrice > 0 && (<>
-                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 39).toLocaleString()}</div>
-                            <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
-                            <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.35).toLocaleString()}</span></div>
-                          </>)}
-                        </button>
+                      <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_devicePrice}</label>
+                      <div className="flex items-center">
+                        <span className="bg-gray-100 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg text-gray-700 font-medium">$</span>
+                        <input type="number" value={devicePrice} onChange={e => setDevicePrice(Number(e.target.value) || 0)} placeholder="Ingresa el precio del dispositivo" className="flex-1 p-3 border border-gray-300 rounded-r-lg text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1">{t.deviceSelection_priceDisclaimer}</p>
+                      <div className="mt-2 text-green-700 font-semibold">Relación de pago inicial del 15%: ${devicePriceInitial.toLocaleString()}</div>
+                    </div>
+                    {/* Paso 4 */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">4</span></div>
+                        <h3 className="text-blue-600 text-xl font-bold">Plan de Financiamiento</h3>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {[10, 20, 26, 30].map(weeks => (
+                          <button key={weeks} onClick={() => setSelectedFinancing(String(weeks))} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === String(weeks) ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
+                            <div className="text-xl font-bold text-blue-600 mb-2">{weeks} SEMANAS</div>
+                            {devicePrice > 0 && (<>
+                              <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / weeks).toLocaleString()}</div>
+                              <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
+                              <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
+                              <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * (1 + weeks * 0.01)).toLocaleString()}</span></div>
+                            </>)}
+                          </button>
+                        ))}
+                      </div>
+                      {/* Opción personalizada con slider */}
+                      <div className="mt-8 p-6 border-2 rounded-lg text-center transition-all bg-gray-50">
+                        <label className="block text-blue-600 font-bold mb-2">Personalizar plazo de financiamiento</label>
+                        <div className="flex flex-col items-center gap-4">
+                          <input
+                            type="range"
+                            min={10}
+                            max={35}
+                            value={selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? Number(selectedFinancing) : 10}
+                            onChange={e => {
+                              setSelectedFinancing(e.target.value);
+                            }}
+                            className="w-full max-w-xs accent-blue-600"
+                          />
+                          <div className="text-lg font-semibold text-blue-700">{selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? selectedFinancing : 10} SEMANAS</div>
+                          {devicePrice > 0 && (
+                            <>
+                              <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / (selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? Number(selectedFinancing) : 10)).toLocaleString()}</div>
+                              <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
+                              <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
+                              <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * (1 + ((selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? Number(selectedFinancing) : 10) * 0.01))).toLocaleString()}</span></div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex gap-4 justify-center mt-8">
@@ -1116,7 +1244,6 @@ export default function SaephonePlatform() {
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
             <DashboardHeader />
-            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="w-full max-w-6xl">
                 <div className="text-center mb-8">
@@ -1177,7 +1304,6 @@ export default function SaephonePlatform() {
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
             <DashboardHeader />
-            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center p-4">
               <Card className="w-full max-w-7xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1223,7 +1349,6 @@ export default function SaephonePlatform() {
         return (
           <div className="relative z-10 flex flex-col min-h-screen p-6">
             <DashboardHeader />
-            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center">
               <Card className="w-full max-w-7xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1257,7 +1382,6 @@ export default function SaephonePlatform() {
         return (
           <div className="relative z-10 flex flex-col min-h-screen p-6">
             <DashboardHeader />
-            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center">
               <Card className="w-full max-w-2xl bg-white shadow-2xl">
                 <CardContent className="p-8">
