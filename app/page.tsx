@@ -34,6 +34,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { QRCodeCanvas } from "qrcode.react"
+import jsPDF from "jspdf"
+import html2canvas from "html2canvas"
 
 type PageType =
   | "login"
@@ -52,21 +54,6 @@ type PageType =
   | "reports" // Nueva página de reportes
 
 export default function SaephonePlatform() {
-  const models = {
-    "Samsung": {
-      "Galaxy S23": ["128GB", "256GB"],
-      "Galaxy A54": ["64GB", "128GB"]
-    },
-    "Apple": {
-      "iPhone 14": ["128GB", "256GB", "512GB"],
-      "iPhone SE": ["64GB", "128GB"]
-    },
-    "Xiaomi": {
-      "Redmi Note 12": ["128GB"],
-      "Mi 11 Lite": ["64GB", "128GB"]
-    }
-    // ... agrega más marcas y modelos según necesites
-  };
   const [currentPage, setCurrentPage] = useState<PageType>("login")
   const [language, setLanguage] = useState<"es" | "en">("es")
   const [rememberMe, setRememberMe] = useState(false)
@@ -205,27 +192,24 @@ export default function SaephonePlatform() {
 
   const ContractProgressSteps = () => {
     const pageToStepIndex: Partial<Record<PageType, number>> = {
-      "create-account": 0,
-      "terms": 1,
-      "app-install": 2,
-      "identity-verification": 3,
+      "device-selection": 0,
+      "contract-generation": 1,
+      "contract-signed": 2,
+      "device-configuration": 3,
     }
     const stepIndexToPage: Record<number, PageType> = {
-      0: "create-account",
-      1: "terms",
-      2: "app-install",
-      3: "identity-verification",
+      0: "device-selection",
+      1: "contract-generation",
+      2: "contract-signed",
+      3: "device-configuration",
     }
-
     const currentStepIndex = pageToStepIndex[currentPage] ?? -1
-
     const steps = [
-      { name: t.contractSteps_register },
-      { name: t.contractSteps_price },
-      { name: t.contractSteps_contract },
-      { name: t.contractSteps_software },
+      { name: "Selección de Modelo y Plan" },
+      { name: "Generación del Contrato" },
+      { name: "Contrato Firmado" },
+      { name: "Configuración del Dispositivo" },
     ]
-
     return (
       <div className="flex items-center justify-center">
         <div className="flex items-center gap-4">
@@ -241,7 +225,7 @@ export default function SaephonePlatform() {
                   }
                 }}
               >
-                <div className="flex flex-col items-center text-center w-24">
+                <div className="flex flex-col items-center text-center w-32">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
                       isActive ? "bg-green-500" : "bg-white/30"
@@ -990,66 +974,31 @@ export default function SaephonePlatform() {
           </div>
         )
       case "device-selection": {
-        // Progress steps for device sale
-        const deviceSteps = [
-          "Selección de Modelo y Plan de Financiamiento",
-          "Modelo",
-          "Precio del dispositivo",
-          "Plan de Financiamiento"
-        ];
-        const deviceStepIndexToPage = {
-          0: "device-selection",
-          1: "device-selection",
-          2: "device-selection",
-          3: "device-selection"
-        };
-        const deviceCurrentStep =
-          paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing
-            ? 3
-            : selectedBrand && selectedModel && selectedCapacity
-            ? 2
-            : selectedBrand && selectedModel
-            ? 1
-            : 0;
-        const devicePriceInitial = devicePrice > 0 ? Math.round(devicePrice * 0.15) : 0;
+        const brands = ["Apple", "Samsung", "Xiaomi", "Huawei", "OnePlus"]
+        const models: Record<string, string[]> = {
+          Apple: ["iPhone 15 Pro", "iPhone 15", "iPhone 14 Pro", "iPhone 14"],
+          Samsung: ["Galaxy S24 Ultra", "Galaxy S24", "Galaxy A54", "Galaxy A34"],
+          Xiaomi: ["Redmi Note 13", "Mi 13", "Redmi 12", "POCO X5"],
+          Huawei: ["P60 Pro", "Mate 50", "Nova 11", "Y70"],
+          OnePlus: ["OnePlus 12", "OnePlus 11", "Nord 3", "Nord CE 3"],
+        }
+        const capacities = ["64GB", "128GB", "256GB", "512GB", "1TB"]
+        const prices: Record<string, Record<string, number>> = {
+          "iPhone 15 Pro": { "128GB": 25999, "256GB": 28999, "512GB": 34999, "1TB": 40999 },
+          "iPhone 15": { "128GB": 21999, "256GB": 24999, "512GB": 30999 },
+          "Galaxy S24 Ultra": { "256GB": 26999, "512GB": 31999, "1TB": 37999 },
+        }
+        const updatePrice = () => {
+          if (selectedModel && selectedCapacity && prices[selectedModel] && prices[selectedModel][selectedCapacity]) {
+            setDevicePrice(prices[selectedModel][selectedCapacity])
+          } else {
+            setDevicePrice(0)
+          }
+        }
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
             <DashboardHeader />
-            {/* Progress bar for device sale */}
-            <div className="w-full max-w-4xl mx-auto mt-8 mb-8">
-              <div className="flex items-center justify-center">
-                <div className="flex items-center gap-4">
-                  {deviceSteps.map((step, index) => {
-                    const isActive = index <= deviceCurrentStep;
-                    return (
-                      <div
-                        key={index}
-                        className={`flex items-center ${isActive ? "cursor-pointer" : "cursor-default"}`}
-                        onClick={() => {
-                          if (isActive) setCurrentPage("device-selection");
-                        }}
-                      >
-                        <div className="flex flex-col items-center text-center w-48">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
-                              isActive ? "bg-green-500" : "bg-white/30"
-                            }`}
-                          >
-                            {index + 1}
-                          </div>
-                          <span
-                            className={`text-sm mt-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/70"}`}
-                          >
-                            {step}
-                          </span>
-                        </div>
-                        {index < deviceSteps.length - 1 && <div className="w-16 h-0.5 bg-white/30 mx-2"></div>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center p-4">
               <Card className="w-full max-w-4xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1058,11 +1007,10 @@ export default function SaephonePlatform() {
                     <p className="text-gray-600 text-lg">{t.deviceSelection_subtitle}</p>
                   </div>
                   <div className="space-y-8">
-                    {/* Paso 1 */}
                     <div>
                       <div className="flex items-center gap-3 mb-4">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">1</span></div>
-                        <h3 className="text-blue-600 text-xl font-bold">Selección de Modelo y Plan de Financiamiento</h3>
+                        <h3 className="text-blue-600 text-xl font-bold">{t.deviceSelection_paymentMethod}</h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <button onClick={() => setPaymentMethod("financiado")} className={`p-4 border-2 rounded-lg text-center transition-all ${paymentMethod === "financiado" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
@@ -1076,7 +1024,6 @@ export default function SaephonePlatform() {
                       </div>
                       {!paymentMethod && <p className="text-red-500 text-sm">{t.deviceSelection_selectPaymentMethod}</p>}
                     </div>
-                    {/* Paso 2 */}
                     <div>
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">2</span></div>
@@ -1085,148 +1032,72 @@ export default function SaephonePlatform() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div>
                           <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_brand}</label>
-                          <select
-                            value={selectedBrand}
-                            onChange={e => {
-                              setSelectedBrand(e.target.value);
-                              setSelectedModel("");
-                              setSelectedCapacity("");
-                              setDevicePrice(0);
-                            }}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
+                          <select value={selectedBrand} onChange={e => { setSelectedBrand(e.target.value); setSelectedModel(""); setSelectedCapacity(""); setDevicePrice(0); }} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">{t.deviceSelection_selectBrand}</option>
-                            {models && typeof models === "object" && !Array.isArray(models) &&
-                              Object.keys(models).map((brand: string) => (
-                                <option key={brand} value={brand}>
-                                  {brand}
-                                </option>
-                              ))
-                            }
+                            {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
                           </select>
                         </div>
                         <div>
                           <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_model}</label>
-                          <select
-                            value={selectedModel}
-                            onChange={e => {
-                              setSelectedModel(e.target.value);
-                              setSelectedCapacity("");
-                              setDevicePrice(0);
-                            }}
-                            disabled={!selectedBrand}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                          >
+                          <select value={selectedModel} onChange={e => { setSelectedModel(e.target.value); setSelectedCapacity(""); setDevicePrice(0); }} disabled={!selectedBrand} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
                             <option value="">{t.deviceSelection_selectModel}</option>
-                            {selectedBrand &&
-                              models &&
-                              typeof models === "object" &&
-                              selectedBrand &&
-                              (Object.keys(models as Record<string, Record<string, string[]>>)[0] &&
-                                typeof (models as Record<string, Record<string, string[]>>)[selectedBrand] === "object" &&
-                                Object.keys((models as Record<string, Record<string, string[]>>)[selectedBrand] || {}).map((model: string) => (
-                                  <option key={model} value={model}>
-                                    {model}
-                                  </option>
-                                ))
-                              )
-                            }
+                            {selectedBrand && models[selectedBrand] && models[selectedBrand].map(model => <option key={model} value={model}>{model}</option>)}
                           </select>
                         </div>
                         <div>
                           <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_capacity}</label>
-                          <select
-                            value={selectedCapacity}
-                            onChange={e => {
-                              setSelectedCapacity(e.target.value);
-                              // If you want to update the price, do it here directly or call a defined function
-                              // For now, let's assume price updates automatically elsewhere
-                            }}
-                            disabled={!selectedModel}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                          >
+                          <select value={selectedCapacity} onChange={e => { setSelectedCapacity(e.target.value); setTimeout(updatePrice, 100); }} disabled={!selectedModel} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100">
                             <option value="">{t.deviceSelection_selectCapacity}</option>
-                            {models &&
-                              typeof models === "object" &&
-                              selectedBrand &&
-                              selectedModel &&
-                              Array.isArray(
-                                (models as Record<string, Record<string, string[]>>)[selectedBrand]?.[selectedModel]
-                              ) &&
-                              ((models as Record<string, Record<string, string[]>>)[selectedBrand][selectedModel] as string[]).map(
-                                (capacity: string) => (
-                                  <option key={capacity} value={capacity}>
-                                    {capacity}
-                                  </option>
-                                )
-                              )
-                            }
+                            {capacities.map(capacity => <option key={capacity} value={capacity}>{capacity}</option>)}
                           </select>
                         </div>
                       </div>
-                      {!selectedBrand && (
-                        <p className="text-red-500 text-sm mb-4">
-                          {t.deviceSelection_selectBrandPrompt}
-                        </p>
-                      )}
+                      {!selectedBrand && <p className="text-red-500 text-sm mb-4">{t.deviceSelection_selectBrandPrompt}</p>}
+                      <div>
+                        <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_devicePrice}</label>
+                        <div className="flex items-center">
+                          <span className="bg-gray-100 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg text-gray-700 font-medium">$</span>
+                          <input type="number" value={devicePrice} onChange={e => setDevicePrice(Number(e.target.value) || 0)} placeholder="Ingresa el precio del dispositivo" className="flex-1 p-3 border border-gray-300 rounded-r-lg text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">{t.deviceSelection_priceDisclaimer}</p>
+                      </div>
                     </div>
-                    {/* Paso 3 */}
                     <div>
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">3</span></div>
-                        <h3 className="text-blue-600 text-xl font-bold">Precio del dispositivo</h3>
+                        <h3 className="text-blue-600 text-xl font-bold">{t.deviceSelection_financingPlan}</h3>
                       </div>
-                      <label className="block text-blue-600 font-medium mb-2">{t.deviceSelection_devicePrice}</label>
-                      <div className="flex items-center">
-                        <span className="bg-gray-100 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg text-gray-700 font-medium">$</span>
-                        <input type="number" value={devicePrice} onChange={e => setDevicePrice(Number(e.target.value) || 0)} placeholder="Ingresa el precio del dispositivo" className="flex-1 p-3 border border-gray-300 rounded-r-lg text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">{t.deviceSelection_priceDisclaimer}</p>
-                      <div className="mt-2 text-green-700 font-semibold">Relación de pago inicial del 15%: ${devicePriceInitial.toLocaleString()}</div>
-                    </div>
-                    {/* Paso 4 */}
-                    <div>
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><span className="text-white font-bold text-sm">4</span></div>
-                        <h3 className="text-blue-600 text-xl font-bold">Plan de Financiamiento</h3>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {[10, 20, 26, 30].map(weeks => (
-                          <button key={weeks} onClick={() => setSelectedFinancing(String(weeks))} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === String(weeks) ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
-                            <div className="text-xl font-bold text-blue-600 mb-2">{weeks} SEMANAS</div>
-                            {devicePrice > 0 && (<>
-                              <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / weeks).toLocaleString()}</div>
-                              <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                              <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                              <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * (1 + weeks * 0.01)).toLocaleString()}</span></div>
-                            </>)}
-                          </button>
-                        ))}
-                      </div>
-                      {/* Opción personalizada con slider */}
-                      <div className="mt-8 p-6 border-2 rounded-lg text-center transition-all bg-gray-50">
-                        <label className="block text-blue-600 font-bold mb-2">Personalizar plazo de financiamiento</label>
-                        <div className="flex flex-col items-center gap-4">
-                          <input
-                            type="range"
-                            min={10}
-                            max={35}
-                            value={selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? Number(selectedFinancing) : 10}
-                            onChange={e => {
-                              setSelectedFinancing(e.target.value);
-                            }}
-                            className="w-full max-w-xs accent-blue-600"
-                          />
-                          <div className="text-lg font-semibold text-blue-700">{selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? selectedFinancing : 10} SEMANAS</div>
-                          {devicePrice > 0 && (
-                            <>
-                              <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / (selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? Number(selectedFinancing) : 10)).toLocaleString()}</div>
-                              <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                              <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                              <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * (1 + ((selectedFinancing && !["10","20","26","30"].includes(selectedFinancing) ? Number(selectedFinancing) : 10) * 0.01))).toLocaleString()}</span></div>
-                            </>
-                          )}
-                        </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button onClick={() => setSelectedFinancing("13")} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "13" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
+                          <div className="text-xl font-bold text-blue-600 mb-2">13 {t.deviceSelection_weeks}</div>
+                          <div className="text-sm text-gray-600 mb-2">SMES</div>
+                          {devicePrice > 0 && (<>
+                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 13).toLocaleString()}</div>
+                            <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
+                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
+                            <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.15).toLocaleString()}</span></div>
+                          </>)}
+                        </button>
+                        <button onClick={() => setSelectedFinancing("26")} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "26" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
+                          <div className="text-xl font-bold text-blue-600 mb-2">26 {t.deviceSelection_weeks}</div>
+                          <div className="text-sm text-gray-600 mb-2">SMES</div>
+                          {devicePrice > 0 && (<>
+                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 26).toLocaleString()}</div>
+                            <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
+                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
+                            <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.25).toLocaleString()}</span></div>
+                          </>)}
+                        </button>
+                        <button onClick={() => setSelectedFinancing("39")} className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "39" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}>
+                          <div className="text-xl font-bold text-blue-600 mb-2">39 {t.deviceSelection_weeks}</div>
+                          <div className="text-sm text-gray-600 mb-2">SMES</div>
+                          {devicePrice > 0 && (<>
+                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 39).toLocaleString()}</div>
+                            <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
+                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
+                            <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.35).toLocaleString()}</span></div>
+                          </>)}
+                        </button>
                       </div>
                     </div>
                     <div className="flex gap-4 justify-center mt-8">
@@ -1240,70 +1111,223 @@ export default function SaephonePlatform() {
           </div>
         )
       }
-      case "contract-generation":
-        return (
-          <div className="relative z-10 flex flex-col min-h-screen">
-            <DashboardHeader />
-            <div className="flex-1 flex items-center justify-center p-4">
-              <div className="w-full max-w-6xl">
-                <div className="text-center mb-8">
-                  <h2 className="text-white text-4xl font-bold mb-4">{t.contractGeneration_title}</h2>
-                  <p className="text-white/90 text-lg">{t.contractGeneration_subtitle}</p>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <Card className="bg-white shadow-2xl">
-                    <CardContent className="p-8">
-                      <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-4"><FileText className="w-8 h-8 text-gray-500" /></div>
-                        <h3 className="text-gray-800 text-xl font-bold mb-4">{t.contractGeneration_cardTitle}</h3>
-                      </div>
-                      <div className="space-y-4 text-sm text-gray-700">
-                        <div><p className="font-semibold">{t.contractGeneration_providerData}</p></div>
-                        <div>
-                          <p className="font-semibold mb-2">{t.contractGeneration_clientData}</p>
-                          <div className="bg-gray-50 p-4 rounded-lg text-center">
-                            <p className="font-bold text-gray-800">GONZALEZ TREJO YAZMIN ARCELIA</p>
-                            <p className="text-gray-600 mt-1">GOTY840630MDFNZ03</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-8">
-                        {contractGenerated ? (
-                          <div className="text-center">
-                            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3"><Check className="w-6 h-6 text-white" /></div>
-                            <p className="text-green-600 font-semibold">{t.contractGeneration_generatedSuccess}</p>
-                          </div>
-                        ) : (
-                          <Button onClick={() => setContractGenerated(true)} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 text-lg">{t.contractGeneration_generateBtn}</Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <div className="space-y-6">
-                    <Card className="bg-white shadow-2xl">
-                      <CardContent className="p-8 text-center">
-                        <h3 className="text-blue-600 text-xl font-bold mb-4">{t.contractGeneration_qrTitle}</h3>
-                        <div className="flex justify-center mb-6">
-                          <button onClick={() => setQrCodeClicked(!qrCodeClicked)} className={`bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all ${qrCodeClicked ? "scale-150 z-50" : ""}`}>
-                            <img src="/qr-code.png" alt="QR Code" className="w-48 h-48" />
-                          </button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    {contractGenerated && <Button onClick={() => setCurrentPage("contract-signed")} className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 text-lg rounded-xl">{t.contractGeneration_simulateSign}</Button>}
-                  </div>
-                </div>
-                <div className="flex justify-start mt-8">
-                  <Button onClick={() => setCurrentPage("device-selection")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button>
-                </div>
+      case "contract-generation": {
+        const generatePDF = async () => {
+          const element = document.getElementById("contract-content")
+          if (!element) return
+          
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true
+          })
+          
+          const imgData = canvas.toDataURL("image/png")
+          const pdf = new jsPDF("p", "mm", "a4")
+          const imgWidth = 210
+          const pageHeight = 295
+          const imgHeight = (canvas.height * imgWidth) / canvas.width
+          let heightLeft = imgHeight
+          
+          let position = 0
+          
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
+          heightLeft -= pageHeight
+          
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight
+            pdf.addPage()
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
+            heightLeft -= pageHeight
+          }
+          
+          pdf.save(`contrato-${selectedBrand}-${selectedModel}.pdf`)
+        }
+        
+        const contrato = (
+          <div id="contract-content" className="space-y-6 text-sm text-gray-700">
+            <div className="text-center border-b-2 border-gray-300 pb-4">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">CONTRATO DE VENTA EN PARCIALIDADES</h2>
+              <p className="text-gray-600">SAEPHONE México, S. de R.L. de C.V.</p>
+              <p className="text-gray-600">Fecha: {new Date().toLocaleDateString('es-ES')}</p>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-lg text-gray-800 mb-3">1. DATOS DEL PROVEEDOR</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p><strong>Razón Social:</strong> SAEPHONE México, S. de R.L. de C.V.</p>
+                <p><strong>RFC:</strong> SAE-123456-ABC</p>
+                <p><strong>Domicilio:</strong> Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</p>
+                <p><strong>Teléfono:</strong> (55) 1234-5678</p>
+                <p><strong>Email:</strong> contacto@saephone.com</p>
               </div>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-lg text-gray-800 mb-3">2. DATOS DEL CLIENTE</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p><strong>Nombre Completo:</strong> {extractedName || "NOMBRE DEL CLIENTE"}</p>
+                <p><strong>Email:</strong> {extractedEmail || "correo@cliente.com"}</p>
+                <p><strong>Teléfono:</strong> {extractedPhone || "55-1234-5678"}</p>
+                <p><strong>Domicilio:</strong> Calle del Cliente 123, Col. Ciudad</p>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-lg text-gray-800 mb-3">3. DISPOSITIVO Y PLAN DE FINANCIAMIENTO</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p><strong>Marca:</strong> {selectedBrand}</p>
+                <p><strong>Modelo:</strong> {selectedModel}</p>
+                <p><strong>Capacidad:</strong> {selectedCapacity}</p>
+                <p><strong>Precio Original:</strong> ${devicePrice.toLocaleString()}</p>
+                <p><strong>Plan de Financiamiento:</strong> {selectedFinancing} semanas</p>
+                <p><strong>Pago Semanal:</strong> ${Math.round(devicePrice / parseInt(selectedFinancing)).toLocaleString()}</p>
+                <p><strong>Pago Inicial:</strong> ${Math.round(devicePrice * 0.2).toLocaleString()}</p>
+                <p><strong>Precio Final:</strong> ${Math.round(devicePrice * (selectedFinancing === "13" ? 1.15 : selectedFinancing === "26" ? 1.25 : 1.35)).toLocaleString()}</p>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-lg text-gray-800 mb-3">4. CONDICIONES DEL CONTRATO</h3>
+              <div className="space-y-2">
+                <p><strong>4.1.</strong> El cliente se compromete a realizar los pagos semanales en las fechas establecidas.</p>
+                <p><strong>4.2.</strong> En caso de atraso en los pagos, el dispositivo será bloqueado automáticamente.</p>
+                <p><strong>4.3.</strong> El cliente puede realizar pagos anticipados sin penalización.</p>
+                <p><strong>4.4.</strong> Una vez completado el pago total, el dispositivo será desbloqueado permanentemente.</p>
+                <p><strong>4.5.</strong> El cliente acepta las condiciones de uso y políticas de privacidad de SAEPHONE.</p>
+              </div>
+            </div>
+            
+            <div className="border-t-2 border-gray-300 pt-4">
+              <p className="text-center text-gray-600">
+                <strong>Este contrato es válido desde la fecha de firma y se rige por las leyes mexicanas.</strong>
+              </p>
             </div>
           </div>
         )
+        
+        return (
+          <div className="relative z-10 flex flex-col min-h-screen">
+            <DashboardHeader />
+            <ContractProgressSteps />
+            <div className="flex-1 flex items-center justify-center p-4">
+              <Card className="w-full max-w-4xl bg-white shadow-2xl">
+                <CardContent className="p-8">
+                  <div className="text-center mb-8">
+                    <h2 className="text-blue-600 text-3xl font-bold mb-4">Generación del Contrato</h2>
+                    <p className="text-gray-600 text-lg">Escanea el código QR para que el cliente firme el contrato</p>
+                  </div>
+                  <div className="space-y-8">
+                    {/* Sección 1: Contrato */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">1</span>
+                        </div>
+                        <h3 className="text-blue-600 text-xl font-bold">Contrato de Financiamiento</h3>
+                      </div>
+                      <div className="border rounded-lg p-6 bg-gray-50">
+                        <div className="text-center mb-4">
+                          <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
+                            <FileText className="w-6 h-6 text-gray-500" />
+                          </div>
+                          <h4 className="text-gray-800 text-lg font-bold">CONTRATO DE VENTA EN PARCIALIDADES</h4>
+                        </div>
+                        <div className="max-h-64 overflow-y-auto pr-2">
+                          {contrato}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sección 2: Código QR */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">2</span>
+                        </div>
+                        <h3 className="text-blue-600 text-xl font-bold">Firma Digital del Cliente</h3>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-gray-600 mb-4">Haz click sobre el código para ampliarlo</p>
+                        <div className="flex justify-center mb-4">
+                          <button 
+                            onClick={() => setIsQrZoomed(true)} 
+                            className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all"
+                          >
+                            <QRCodeCanvas 
+                              value={`contrato-${selectedBrand}-${selectedModel}-${selectedCapacity}-${devicePrice}-${selectedFinancing}`} 
+                              size={160} 
+                              className="mx-auto" 
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sección 3: Acciones */}
+                    <div>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">3</span>
+                        </div>
+                        <h3 className="text-blue-600 text-xl font-bold">Acciones Disponibles</h3>
+                      </div>
+                      <div className="flex justify-center mb-6">
+                        <Button 
+                          onClick={generatePDF} 
+                          className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-2"
+                        >
+                          <Download className="w-5 h-5" />
+                          Descargar Contrato PDF
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Botones de navegación */}
+                    <div className="flex gap-4 justify-center mt-8">
+                      <Button 
+                        onClick={() => setCurrentPage("device-selection")} 
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                      >
+                        ← Regresar
+                      </Button>
+                      <Button 
+                        onClick={() => setCurrentPage("contract-signed")} 
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg"
+                      >
+                        Continuar →
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Modal de QR ampliado */}
+            {isQrZoomed && (
+              <div 
+                className="fixed inset-0 z-50 flex cursor-pointer items-center justify-center bg-black bg-opacity-75" 
+                onClick={() => setIsQrZoomed(false)}
+              >
+                <div 
+                  onClick={e => e.stopPropagation()} 
+                  className="cursor-default rounded-lg bg-white p-8"
+                >
+                  <QRCodeCanvas 
+                    value={`contrato-${selectedBrand}-${selectedModel}-${selectedCapacity}-${devicePrice}-${selectedFinancing}`} 
+                    size={384} 
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      }
       case "contract-signed":
         return (
           <div className="relative z-10 flex flex-col min-h-screen">
             <DashboardHeader />
+            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center p-4">
               <Card className="w-full max-w-7xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1337,7 +1361,7 @@ export default function SaephonePlatform() {
                     <div className="bg-gray-50 rounded-lg p-6"><h3 className="text-blue-600 text-xl font-bold mb-6">{t.contractSigned_clientInfo}</h3></div>
                   </div>
                   <div className="flex justify-between mt-8">
-                    <Button onClick={() => setCurrentPage("contract-generation")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button>
+                    <Button onClick={() => setCurrentPage("contract-generation")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← Regresar</Button>
                     <Button onClick={() => setCurrentPage("references")} className="bg-green-500 hover:bg-green-600 text-white">{t.contractSigned_nextStep}</Button>
                   </div>
                 </CardContent>
@@ -1349,6 +1373,7 @@ export default function SaephonePlatform() {
         return (
           <div className="relative z-10 flex flex-col min-h-screen p-6">
             <DashboardHeader />
+            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center">
               <Card className="w-full max-w-7xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1371,7 +1396,7 @@ export default function SaephonePlatform() {
                     </div>
                   </div>
                   <div className="flex justify-start mt-8">
-                    <Button onClick={() => setCurrentPage("contract-signed")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← {t.deviceSelection_back}</Button>
+                    <Button onClick={() => setCurrentPage("contract-signed")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← Regresar</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -1382,6 +1407,7 @@ export default function SaephonePlatform() {
         return (
           <div className="relative z-10 flex flex-col min-h-screen p-6">
             <DashboardHeader />
+            <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center">
               <Card className="w-full max-w-2xl bg-white shadow-2xl">
                 <CardContent className="p-8">
@@ -1406,7 +1432,7 @@ export default function SaephonePlatform() {
                         <Label htmlFor="wifi" className="text-gray-700 font-medium">{t.deviceConfig_connectWifi}</Label>
                       </div>
                       <div className="mt-8 flex gap-4">
-                        <Button onClick={() => setCurrentPage("references")} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-lg">← {t.deviceSelection_back}</Button>
+                        <Button onClick={() => setCurrentPage("references")} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-lg">← Regresar</Button>
                         <Button onClick={() => setConnectWifi(true)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3">{t.deviceConfig_finish}</Button>
                       </div>
                     </div>
@@ -1434,3 +1460,4 @@ export default function SaephonePlatform() {
     </div>
   )
 }
+

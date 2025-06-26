@@ -14,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="min-h-screen relative overflow-hidden">
+          {children}
+        </div>
+      </body>
     </html>
   )
 }

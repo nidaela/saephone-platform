@@ -190,13 +190,13 @@ export const translations = {
 
     // Contract Generation Page (contract-generation)
     contractGeneration_title: "Generación del Contrato",
-    contractGeneration_subtitle: "Escanea el código QR con un lector normal para que el cliente firme el contrato",
+    contractGeneration_subtitle: "Escanea el código QR para que el cliente firme el contrato",
     contractGeneration_cardTitle: "CONTRATO DE VENTA EN PARCIALIDADES",
     contractGeneration_providerData: "1. Datos del Proveedor y para Atención a Clientes",
     contractGeneration_clientData: "2. Datos del cliente responsable para el contrato:",
     contractGeneration_generateBtn: "Generar Contrato",
     contractGeneration_generatedSuccess: "Contrato generado exitosamente",
-    contractGeneration_qrTitle: "Escanea el código QR con un lector normal para que el cliente firme el contrato. Da click sobre el código para ampliarlo",
+    contractGeneration_qrTitle: "Haz click sobre el código para ampliarlo",
     contractGeneration_simulateSign: "Simular Firma del Cliente",
 
     // Contract Signed Page (contract-signed)
@@ -452,13 +452,13 @@ export const translations = {
 
     // Contract Generation Page (contract-generation)
     contractGeneration_title: "Contract Generation",
-    contractGeneration_subtitle: "Scan the QR code with a normal reader for the client to sign the contract",
+    contractGeneration_subtitle: "Scan the QR code for the client to sign the contract",
     contractGeneration_cardTitle: "INSTALLMENT SALE AGREEMENT",
     contractGeneration_providerData: "1. Provider and Customer Service Data",
     contractGeneration_clientData: "2. Data of the responsible client for the contract:",
     contractGeneration_generateBtn: "Generate Contract",
     contractGeneration_generatedSuccess: "Contract generated successfully",
-    contractGeneration_qrTitle: "Scan the QR code with a normal reader for the client to sign the contract. Click on the code to enlarge it",
+    contractGeneration_qrTitle: "Click on the code to enlarge it",
     contractGeneration_simulateSign: "Simulate Client Signature",
 
     // Contract Signed Page (contract-signed)
