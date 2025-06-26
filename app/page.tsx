@@ -213,14 +213,14 @@ export default function SaephonePlatform() {
     }
     const currentStepIndex = pageToStepIndex[currentPage] ?? -1
     const steps = [
-      { name: "Verificación Telefónica" },
-      { name: "Términos y Condiciones" },
-      { name: "Instalación de App" },
-      { name: "Verificación de Identidad" },
-      { name: "Selección de Modelo y Plan de Financiamiento" },
-      { name: "Generación del Contrato" },
-      { name: "Referencias" },
-      { name: "Finalizar" },
+      { name: t.progress_step1 },
+      { name: t.progress_step2 },
+      { name: t.progress_step3 },
+      { name: t.progress_step4 },
+      { name: t.progress_step5 },
+      { name: t.progress_step6 },
+      { name: t.progress_step7 },
+      { name: t.progress_step8 },
     ]
     return (
       <div className="flex items-center justify-center">

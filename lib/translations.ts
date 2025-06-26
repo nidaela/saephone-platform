@@ -37,7 +37,7 @@ export const translations = {
     create_step3: "Contrato",
     create_step4: "Software",
     create_step5: "Finalizar",
-    create_formTitle: "Crear Cuenta en SAEPHONE",
+    create_formTitle: "Registrar nuevo cliente en Saephone",
     create_formSubtitle: "Para comenzar, necesitamos verificar tu número de teléfono",
     create_verificationCodeLabel: "Código de verificación",
     create_verificationCodePlaceholder: "Ingresa el código que ves a la derecha",
@@ -260,6 +260,16 @@ export const translations = {
     identityVerification_registrationSuccess: "¡Nuevo usuario registrado con éxito!",
     identityVerification_backBtn: "← Regresar",
     identityVerification_viewProfileBtn: "Ver perfil",
+
+    // Progress Steps for Sell Device
+    progress_step1: "Verificación Telefónica",
+    progress_step2: "Términos y Condiciones",
+    progress_step3: "Instalación de App",
+    progress_step4: "Verificación de Identidad",
+    progress_step5: "Selección de Modelo y Plan de Financiamiento",
+    progress_step6: "Generación del Contrato",
+    progress_step7: "Referencias",
+    progress_step8: "Finalizar",
   },
   en: {
     // Login Page
@@ -299,7 +309,7 @@ export const translations = {
     create_step3: "Contract",
     create_step4: "Software",
     create_step5: "Finish",
-    create_formTitle: "Create Account in SAEPHONE",
+    create_formTitle: "Register new client in Saephone",
     create_formSubtitle: "To start, we need to verify your phone number",
     create_verificationCodeLabel: "Verification code",
     create_verificationCodePlaceholder: "Enter the code you see on the right",
@@ -419,8 +429,8 @@ export const translations = {
 
     // Progress Steps
     contractSteps_register: "Phone Verification",
-    contractSteps_price: "Terms & Conditions",
-    contractSteps_contract: "Application Installation",
+    contractSteps_price: "Terms and Conditions",
+    contractSteps_contract: "App Installation",
     contractSteps_software: "Identity Verification",
 
     // Device Selection Page (device-selection)
@@ -522,5 +532,15 @@ export const translations = {
     identityVerification_registrationSuccess: "New user registered successfully!",
     identityVerification_backBtn: "← Back",
     identityVerification_viewProfileBtn: "View profile",
+
+    // Progress Steps for Sell Device (EN)
+    progress_step1: "Phone Verification",
+    progress_step2: "Terms and Conditions",
+    progress_step3: "App Installation",
+    progress_step4: "Identity Verification",
+    progress_step5: "Model and Financing Plan Selection",
+    progress_step6: "Contract Generation",
+    progress_step7: "References",
+    progress_step8: "Finish",
   },
 } 
