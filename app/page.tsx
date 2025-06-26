@@ -410,7 +410,7 @@ export default function SaephonePlatform() {
               </div>
               <div className="flex justify-between mt-8">
                 <Button variant="ghost" onClick={() => setCurrentPage("terms")}>← Regresar</Button>
-                <Button onClick={() => setCurrentPage("identity-verification")}>
+                <Button onClick={() => setCurrentPage("app-install")}>
                   Continuar
                 </Button>
               </div>
