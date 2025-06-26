@@ -459,7 +459,7 @@ export default function SaephonePlatform() {
                 </div>
               </div>
               <div className="flex justify-between mt-12">
-                <Button variant="ghost" onClick={() => setCurrentPage("terms")} className="text-gray-600">
+                <Button onClick={() => setCurrentPage("terms")} className="text-gray-600">
                   {t.appInstall_backBtn}
                 </Button>
                 <Button onClick={() => setCurrentPage("identity-verification")} className="bg-blue-600 text-white hover:bg-blue-700">
@@ -594,8 +594,8 @@ export default function SaephonePlatform() {
               </div>
 
               <div className="flex justify-between mt-12">
-                <Button onClick={() => setCurrentPage("identity-verification")}>← Regresar</Button>
-                <Button onClick={() => setCurrentPage("contract-generation")}>
+                <Button onClick={() => setCurrentPage("app-install")}>← Regresar</Button>
+                <Button onClick={() => setCurrentPage("device-selection")}>
                   Continuar →
                 </Button>
               </div>
@@ -1068,6 +1068,37 @@ export default function SaephonePlatform() {
                         </div>
                         <p className="text-sm text-gray-500 mt-1">{t.deviceSelection_priceDisclaimer}</p>
                       </div>
+                      
+                      {/* Sección de Pago Inicial */}
+                      {devicePrice > 0 && (
+                        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                              <span className="text-white font-bold text-xs">!</span>
+                            </div>
+                            <h4 className="text-blue-800 font-semibold text-lg">Pago Inicial Requerido</h4>
+                          </div>
+                          <div className="bg-white p-4 rounded-lg border border-blue-300">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-gray-700 font-medium">Precio del dispositivo:</span>
+                              <span className="text-gray-900 font-bold">${devicePrice.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-gray-700 font-medium">Pago inicial (15%):</span>
+                              <span className="text-blue-600 font-bold text-lg">${Math.round(devicePrice * 0.15).toLocaleString()}</span>
+                            </div>
+                            <div className="border-t border-gray-300 pt-2 mt-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-gray-700 font-medium">Saldo a financiar:</span>
+                                <span className="text-green-600 font-bold">${Math.round(devicePrice * 0.85).toLocaleString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <p className="text-sm text-blue-700 mt-3">
+                            <strong>Importante:</strong> El pago inicial del 15% debe realizarse al momento de la entrega del dispositivo.
+                          </p>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <div className="flex items-center gap-3 mb-6">
@@ -1079,9 +1110,9 @@ export default function SaephonePlatform() {
                           <div className="text-xl font-bold text-blue-600 mb-2">13 {t.deviceSelection_weeks}</div>
                           <div className="text-sm text-gray-600 mb-2">SMES</div>
                           {devicePrice > 0 && (<>
-                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 13).toLocaleString()}</div>
+                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / 13).toLocaleString()}</div>
                             <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
+                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
                             <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.15).toLocaleString()}</span></div>
                           </>)}
                         </button>
@@ -1089,9 +1120,9 @@ export default function SaephonePlatform() {
                           <div className="text-xl font-bold text-blue-600 mb-2">26 {t.deviceSelection_weeks}</div>
                           <div className="text-sm text-gray-600 mb-2">SMES</div>
                           {devicePrice > 0 && (<>
-                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 26).toLocaleString()}</div>
+                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / 26).toLocaleString()}</div>
                             <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
+                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
                             <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.25).toLocaleString()}</span></div>
                           </>)}
                         </button>
@@ -1099,9 +1130,9 @@ export default function SaephonePlatform() {
                           <div className="text-xl font-bold text-blue-600 mb-2">39 {t.deviceSelection_weeks}</div>
                           <div className="text-sm text-gray-600 mb-2">SMES</div>
                           {devicePrice > 0 && (<>
-                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round(devicePrice / 39).toLocaleString()}</div>
+                            <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / 39).toLocaleString()}</div>
                             <div className="text-sm text-gray-600 mb-4">{t.deviceSelection_perWeek}</div>
-                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.2).toLocaleString()}</span></div>
+                            <div className="text-sm text-gray-700 mb-1">{t.deviceSelection_initialPayment}: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
                             <div className="text-sm text-gray-700">{t.deviceSelection_finalPrice}: <span className="font-semibold">${Math.round(devicePrice * 1.35).toLocaleString()}</span></div>
                           </>)}
                         </button>
@@ -1188,8 +1219,8 @@ export default function SaephonePlatform() {
                 <p><strong>Capacidad:</strong> {selectedCapacity}</p>
                 <p><strong>Precio Original:</strong> ${devicePrice.toLocaleString()}</p>
                 <p><strong>Plan de Financiamiento:</strong> {selectedFinancing} semanas</p>
-                <p><strong>Pago Semanal:</strong> ${Math.round(devicePrice / parseInt(selectedFinancing)).toLocaleString()}</p>
-                <p><strong>Pago Inicial:</strong> ${Math.round(devicePrice * 0.2).toLocaleString()}</p>
+                <p><strong>Pago Semanal:</strong> ${Math.round((devicePrice * 0.85) / parseInt(selectedFinancing)).toLocaleString()}</p>
+                <p><strong>Pago Inicial:</strong> ${Math.round(devicePrice * 0.15).toLocaleString()}</p>
                 <p><strong>Precio Final:</strong> ${Math.round(devicePrice * (selectedFinancing === "13" ? 1.15 : selectedFinancing === "26" ? 1.25 : 1.35)).toLocaleString()}</p>
               </div>
             </div>
