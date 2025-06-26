@@ -94,6 +94,8 @@ export default function SaephonePlatform() {
   const [isInstalled, setIsInstalled] = useState(false)
 
   const [customWeeks, setCustomWeeks] = useState(10)
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => { setIsMounted(true); }, []);
 
   useEffect(() => {
     const savedPage = localStorage.getItem("saephone-currentPage") as PageType
@@ -1151,37 +1153,39 @@ export default function SaephonePlatform() {
                       </div>
 
                       {/* Opción personalizada */}
-                      <div className="mt-8">
-                        <div className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === 'custom' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
-                          onClick={() => setSelectedFinancing('custom')}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <div className="text-xl font-bold text-blue-600 mb-2">Plan personalizado</div>
-                          <div className="flex flex-col items-center gap-2 mb-4">
-                            <label htmlFor="custom-weeks" className="text-gray-700 font-medium">Semanas: <span className="text-blue-700 font-bold">{customWeeks || 10}</span></label>
-                            <input
-                              id="custom-weeks"
-                              type="range"
-                              min={10}
-                              max={35}
-                              value={customWeeks}
-                              onChange={e => { setCustomWeeks(Number(e.target.value)); setSelectedFinancing('custom'); }}
-                              className="w-64"
-                              disabled={devicePrice <= 0}
-                            />
+                      {isMounted && (
+                        <div className="mt-8">
+                          <div className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === 'custom' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
+                            onClick={() => setSelectedFinancing('custom')}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <div className="text-xl font-bold text-blue-600 mb-2">Plan personalizado</div>
+                            <div className="flex flex-col items-center gap-2 mb-4">
+                              <label htmlFor="custom-weeks" className="text-gray-700 font-medium">Semanas: <span className="text-blue-700 font-bold">{customWeeks || 10}</span></label>
+                              <input
+                                id="custom-weeks"
+                                type="range"
+                                min={10}
+                                max={35}
+                                value={customWeeks}
+                                onChange={e => { setCustomWeeks(Number(e.target.value)); setSelectedFinancing('custom'); }}
+                                className="w-64"
+                                disabled={devicePrice <= 0}
+                              />
+                            </div>
+                            {devicePrice > 0 && (
+                              <>
+                                <div className="text-2xl font-bold text-green-600 mb-1">
+                                  ${Math.round((devicePrice * 0.85) / (customWeeks || 10)).toLocaleString()}
+                                </div>
+                                <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
+                                <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
+                                <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * (1 + 0.01 * ((customWeeks || 10) - 10))).toLocaleString()}</span></div>
+                              </>
+                            )}
                           </div>
-                          {devicePrice > 0 && (
-                            <>
-                              <div className="text-2xl font-bold text-green-600 mb-1">
-                                ${Math.round((devicePrice * 0.85) / (customWeeks || 10)).toLocaleString()}
-                              </div>
-                              <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
-                              <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                              <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * (1 + 0.01 * ((customWeeks || 10) - 10))).toLocaleString()}</span></div>
-                            </>
-                          )}
                         </div>
-                      </div>
+                      )}
                     </div>
                     <div className="flex gap-4 justify-center mt-8">
                       <Button onClick={() => setCurrentPage("dashboard")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg">← {t.back_to_main_panel}</Button>
@@ -1450,71 +1454,32 @@ export default function SaephonePlatform() {
             <DashboardHeader />
             <ContractProgressSteps />
             <div className="flex-1 flex items-center justify-center p-4">
-              <Card className="w-full max-w-6xl bg-white shadow-2xl">
+              <Card className="w-full max-w-2xl bg-white shadow-2xl mx-auto">
                 <CardContent className="p-8">
                   <div className="text-center mb-8">
                     <h2 className="text-blue-600 text-3xl font-bold mb-2">Referencias</h2>
                     <p className="text-gray-600 text-lg">¡Ayúdanos a conocerte mejor! Por favor, completa la información sobre usted.</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Formulario de referencias */}
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-blue-600 font-semibold mb-2">email :</label>
-                        <input type="email" placeholder="Ingrese su correo electrónico" value={userEmail} onChange={e => setUserEmail(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                      <div>
-                        <label className="block text-blue-600 font-semibold mb-2">Nombre del contacto familiar :</label>
-                        <input type="text" placeholder="Nombre completo del contacto familiar" value={familyContactName} onChange={e => setFamilyContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                      <div>
-                        <label className="block text-blue-600 font-semibold mb-2">Número de teléfono 1 :</label>
-                        <input type="tel" placeholder="Ingrese número de teléfono" value={familyContactPhone} onChange={e => setFamilyContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                      <div>
-                        <label className="block text-blue-600 font-semibold mb-2">Nombre del contacto amigo :</label>
-                        <input type="text" placeholder="Nombre completo del contacto amigo" value={friendContactName} onChange={e => setFriendContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
-                      <div>
-                        <label className="block text-blue-600 font-semibold mb-2">Número de teléfono 2 :</label>
-                        <input type="tel" placeholder="Ingrese número de teléfono del amigo" value={friendContactPhone} onChange={e => setFriendContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                      </div>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-blue-600 font-semibold mb-2">email :</label>
+                      <input type="email" placeholder="Ingrese su correo electrónico" value={userEmail} onChange={e => setUserEmail(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
-                    {/* Resumen de dispositivo y datos */}
-                    <div className="bg-gray-50 rounded-lg p-8">
-                      <h3 className="text-blue-600 text-xl font-bold mb-4">{selectedBrand} {selectedModel} {selectedCapacity}</h3>
-                      <div className="grid grid-cols-2 gap-2 mb-2">
-                        <span className="font-semibold">Modelo</span>
-                        <span>${devicePrice.toLocaleString()}</span>
-                        <span className="font-semibold">IVA</span>
-                        <span>$1120</span>
-                        <span className="font-semibold">Pay recompensas</span>
-                        <span>39</span>
-                        <span className="font-semibold">Semanas</span>
-                        <span>$1 250</span>
-                      </div>
-                      <div className="mt-4">
-                        <span className="font-semibold">Estado donde vive</span>
-                        <span className="ml-2">Celular</span>
-                      </div>
-                      <div className="mt-2">
-                        <span className="font-semibold">CURP</span>
-                        <span className="ml-2 font-bold">VAZQUEZ GOMEZ BEATIZADRIANA</span>
-                      </div>
-                      <div className="mt-2">
-                        <span className="font-semibold">Número de celular</span>
-                        <span className="ml-2">Celular</span>
-                      </div>
-                      <div className="mt-2">5533985775</div>
-                      <div className="mt-2">
-                        <span className="font-semibold">Estado donde nació :</span>
-                        <input type="text" className="w-full p-2 border border-gray-300 rounded-lg font-bold mt-1" value="VAZQUEZGOMEZBRZ ADRIANA" readOnly />
-                      </div>
-                      <div className="mt-2">5533382575</div>
-                      <div className="mt-2">
-                        <span className="font-semibold">Ciudad donde vive :</span>
-                        <input type="text" className="w-full p-2 border border-gray-300 rounded-lg mt-1" />
-                      </div>
+                    <div>
+                      <label className="block text-blue-600 font-semibold mb-2">Nombre del contacto familiar :</label>
+                      <input type="text" placeholder="Nombre completo del contacto familiar" value={familyContactName} onChange={e => setFamilyContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                      <label className="block text-blue-600 font-semibold mb-2">Número de teléfono 1 :</label>
+                      <input type="tel" placeholder="Ingrese número de teléfono" value={familyContactPhone} onChange={e => setFamilyContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                      <label className="block text-blue-600 font-semibold mb-2">Nombre del contacto amigo :</label>
+                      <input type="text" placeholder="Nombre completo del contacto amigo" value={friendContactName} onChange={e => setFriendContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                    <div>
+                      <label className="block text-blue-600 font-semibold mb-2">Número de teléfono 2 :</label>
+                      <input type="tel" placeholder="Ingrese número de teléfono del amigo" value={friendContactPhone} onChange={e => setFriendContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
                   </div>
                   <div className="flex justify-between mt-8">
