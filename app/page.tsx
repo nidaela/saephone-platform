@@ -192,23 +192,35 @@ export default function SaephonePlatform() {
 
   const ContractProgressSteps = () => {
     const pageToStepIndex: Partial<Record<PageType, number>> = {
-      "device-selection": 0,
-      "contract-generation": 1,
-      "contract-signed": 2,
-      "device-configuration": 3,
+      "create-account": 0,
+      "terms": 1,
+      "app-install": 2,
+      "identity-verification": 3,
+      "device-selection": 4,
+      "contract-generation": 5,
+      "references": 6,
+      "device-configuration": 7,
     }
     const stepIndexToPage: Record<number, PageType> = {
-      0: "device-selection",
-      1: "contract-generation",
-      2: "contract-signed",
-      3: "device-configuration",
+      0: "create-account",
+      1: "terms",
+      2: "app-install",
+      3: "identity-verification",
+      4: "device-selection",
+      5: "contract-generation",
+      6: "references",
+      7: "device-configuration",
     }
     const currentStepIndex = pageToStepIndex[currentPage] ?? -1
     const steps = [
-      { name: "Selección de Modelo y Plan" },
-      { name: "Generación del Contrato" },
-      { name: "Contrato Firmado" },
-      { name: "Configuración del Dispositivo" },
+      { name: "Verificación" },
+      { name: "Términos" },
+      { name: "Instalación App" },
+      { name: "Verificación Identidad" },
+      { name: "Modelo y Plan" },
+      { name: "Contrato" },
+      { name: "Referencias" },
+      { name: "Finalizar" },
     ]
     return (
       <div className="flex items-center justify-center">
@@ -225,21 +237,21 @@ export default function SaephonePlatform() {
                   }
                 }}
               >
-                <div className="flex flex-col items-center text-center w-32">
+                <div className="flex flex-col items-center text-center w-28">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
                       isActive ? "bg-green-500" : "bg-white/30"
                     }`}
                   >
                     {index + 1}
                   </div>
                   <span
-                    className={`text-sm mt-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/70"}`}
+                    className={`text-xs mt-2 transition-colors duration-300 ${isActive ? "text-white" : "text-white/70"}`}
                   >
                     {step.name}
                   </span>
                 </div>
-                {index < steps.length - 1 && <div className="w-16 h-0.5 bg-white/30 mx-2"></div>}
+                {index < steps.length - 1 && <div className="w-10 h-0.5 bg-white/30 mx-2"></div>}
               </div>
             )
           })}
@@ -337,7 +349,11 @@ export default function SaephonePlatform() {
             <div className="w-full max-w-4xl mt-8">
               <ContractProgressSteps />
             </div>
-            <CreateAccountPage onBack={() => setCurrentPage("dashboard")} onNext={handleNextFromCreate} t={t} />
+            <CreateAccountPage 
+              onBack={() => setCurrentPage("dashboard")} 
+              onNext={() => setCurrentPage("terms")} 
+              t={t} 
+            />
           </div>
         )
       case "terms":
@@ -392,17 +408,10 @@ export default function SaephonePlatform() {
                   </div>
                 </div>
               </div>
-
               <div className="flex justify-between mt-8">
-                <Button variant="ghost" onClick={() => setCurrentPage("create-account")} className="text-gray-600">
-                  ← Regresar
-                </Button>
-                <Button
-                  onClick={() => setCurrentPage("app-install")}
-                  disabled={!acceptTerms || !acceptPrivacy}
-                  className="bg-gray-800 text-white hover:bg-gray-900"
-                >
-                  Acepto los términos →
+                <Button variant="ghost" onClick={() => setCurrentPage("terms")}>← Regresar</Button>
+                <Button onClick={() => setCurrentPage("identity-verification")}>
+                  Continuar
                 </Button>
               </div>
             </div>
@@ -585,11 +594,9 @@ export default function SaephonePlatform() {
               </div>
 
               <div className="flex justify-between mt-12">
-                <Button variant="ghost" onClick={() => setCurrentPage("app-install")} className="text-gray-600">
-                  {t.identityVerification_backBtn}
-                </Button>
-                <Button onClick={() => setCurrentPage("settings")} className="bg-blue-600 text-white hover:bg-blue-700">
-                  {t.identityVerification_viewProfileBtn}
+                <Button onClick={() => setCurrentPage("identity-verification")}>← Regresar</Button>
+                <Button onClick={() => setCurrentPage("contract-generation")}>
+                  Continuar →
                 </Button>
               </div>
             </div>
@@ -656,7 +663,7 @@ export default function SaephonePlatform() {
                           </div>
                           <p className="text-gray-600 mb-6">{t.dashboard_sellDevicesDesc}</p>
                         </div>
-                        <Button onClick={() => setCurrentPage("device-selection")} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
+                        <Button onClick={() => setCurrentPage("create-account")} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
                           {t.dashboard_newSaleBtn}
                         </Button>
                       </CardContent>
@@ -1285,16 +1292,8 @@ export default function SaephonePlatform() {
 
                     {/* Botones de navegación */}
                     <div className="flex gap-4 justify-center mt-8">
-                      <Button 
-                        onClick={() => setCurrentPage("device-selection")} 
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
-                      >
-                        ← Regresar
-                      </Button>
-                      <Button 
-                        onClick={() => setCurrentPage("references")} 
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg"
-                      >
+                      <Button onClick={() => setCurrentPage("device-selection")}>← Regresar</Button>
+                      <Button onClick={() => setCurrentPage("references")}>
                         Continuar →
                       </Button>
                     </div>
@@ -1481,8 +1480,10 @@ export default function SaephonePlatform() {
                         <Label htmlFor="wifi" className="text-gray-700 font-medium">{t.deviceConfig_connectWifi}</Label>
                       </div>
                       <div className="mt-8 flex gap-4">
-                        <Button onClick={() => setCurrentPage("references")} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 rounded-lg">← Regresar</Button>
-                        <Button onClick={() => setConnectWifi(true)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3">{t.deviceConfig_finish}</Button>
+                        <Button onClick={() => setCurrentPage("references")}>← Regresar</Button>
+                        <Button onClick={() => setConnectWifi(true)}>
+                          Finalizar
+                        </Button>
                       </div>
                     </div>
                   )}
