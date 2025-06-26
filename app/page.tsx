@@ -93,6 +93,8 @@ export default function SaephonePlatform() {
   const [isInstalling, setIsInstalling] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
 
+  const [customWeeks, setCustomWeeks] = useState(10)
+
   useEffect(() => {
     const savedPage = localStorage.getItem("saephone-currentPage") as PageType
     const savedUserRole = localStorage.getItem("saephone-userRole") as "admin" | "sales" | "manager" | "super-admin" | null
@@ -1147,10 +1149,43 @@ export default function SaephonePlatform() {
                           </>)}
                         </button>
                       </div>
+
+                      {/* Opción personalizada */}
+                      <div className="mt-8">
+                        <div className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === 'custom' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
+                          onClick={() => setSelectedFinancing('custom')}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className="text-xl font-bold text-blue-600 mb-2">Plan personalizado</div>
+                          <div className="flex flex-col items-center gap-2 mb-4">
+                            <label htmlFor="custom-weeks" className="text-gray-700 font-medium">Semanas: <span className="text-blue-700 font-bold">{customWeeks || 10}</span></label>
+                            <input
+                              id="custom-weeks"
+                              type="range"
+                              min={10}
+                              max={35}
+                              value={customWeeks}
+                              onChange={e => { setCustomWeeks(Number(e.target.value)); setSelectedFinancing('custom'); }}
+                              className="w-64"
+                              disabled={devicePrice <= 0}
+                            />
+                          </div>
+                          {devicePrice > 0 && (
+                            <>
+                              <div className="text-2xl font-bold text-green-600 mb-1">
+                                ${Math.round((devicePrice * 0.85) / (customWeeks || 10)).toLocaleString()}
+                              </div>
+                              <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
+                              <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
+                              <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * (1 + 0.01 * ((customWeeks || 10) - 10))).toLocaleString()}</span></div>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                     <div className="flex gap-4 justify-center mt-8">
                       <Button onClick={() => setCurrentPage("dashboard")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg">← {t.back_to_main_panel}</Button>
-                      <Button onClick={() => { if (paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing) { setCurrentPage("contract-generation"); } else { alert(t.deviceSelection_completeAllFields); } }} className={`px-8 py-3 rounded-lg font-medium transition-colors ${paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`} disabled={!(paymentMethod && selectedBrand && selectedModel && selectedCapacity && selectedFinancing)}>{t.deviceSelection_continue} →</Button>
+                      <Button onClick={() => { if (paymentMethod && selectedBrand && selectedModel && selectedCapacity && (selectedFinancing === 'custom' || selectedFinancing)) { setCurrentPage("contract-generation"); } else { alert(t.deviceSelection_completeAllFields); } }} className={`px-8 py-3 rounded-lg font-medium transition-colors ${paymentMethod && selectedBrand && selectedModel && selectedCapacity && (selectedFinancing === 'custom' || selectedFinancing) ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`} disabled={!(paymentMethod && selectedBrand && selectedModel && selectedCapacity && (selectedFinancing === 'custom' || selectedFinancing))}>{t.deviceSelection_continue} →</Button>
                     </div>
                   </div>
                 </CardContent>
@@ -1228,10 +1263,10 @@ export default function SaephonePlatform() {
                 <p><strong>Modelo:</strong> {selectedModel}</p>
                 <p><strong>Capacidad:</strong> {selectedCapacity}</p>
                 <p><strong>Precio Original:</strong> ${devicePrice.toLocaleString()}</p>
-                <p><strong>Plan de Financiamiento:</strong> {selectedFinancing} semanas</p>
-                <p><strong>Pago Semanal:</strong> ${Math.round((devicePrice * 0.85) / parseInt(selectedFinancing)).toLocaleString()}</p>
+                <p><strong>Plan de Financiamiento:</strong> {selectedFinancing === 'custom' ? customWeeks : selectedFinancing} semanas</p>
+                <p><strong>Pago Semanal:</strong> ${selectedFinancing === 'custom' ? Math.round((devicePrice * 0.85) / customWeeks).toLocaleString() : Math.round((devicePrice * 0.85) / parseInt(selectedFinancing)).toLocaleString()}</p>
                 <p><strong>Pago Inicial:</strong> ${Math.round(devicePrice * 0.15).toLocaleString()}</p>
-                <p><strong>Precio Final:</strong> ${Math.round(devicePrice * (selectedFinancing === "10" ? 1.10 : selectedFinancing === "20" ? 1.20 : selectedFinancing === "26" ? 1.25 : 1.30)).toLocaleString()}</p>
+                <p><strong>Precio Final:</strong> ${selectedFinancing === 'custom' ? Math.round(devicePrice * (1 + 0.01 * (customWeeks - 10))).toLocaleString() : Math.round(devicePrice * (selectedFinancing === "10" ? 1.10 : selectedFinancing === "20" ? 1.20 : selectedFinancing === "26" ? 1.25 : 1.30)).toLocaleString()}</p>
               </div>
             </div>
             
