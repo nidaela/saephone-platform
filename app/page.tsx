@@ -1292,7 +1292,7 @@ export default function SaephonePlatform() {
                         ← Regresar
                       </Button>
                       <Button 
-                        onClick={() => setCurrentPage("contract-signed")} 
+                        onClick={() => setCurrentPage("references")} 
                         className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg"
                       >
                         Continuar →
@@ -1369,40 +1369,89 @@ export default function SaephonePlatform() {
             </div>
           </div>
         )
-      case "references":
+      case "references": {
         return (
-          <div className="relative z-10 flex flex-col min-h-screen p-6">
+          <div className="relative z-10 flex flex-col min-h-screen">
             <DashboardHeader />
             <ContractProgressSteps />
-            <div className="flex-1 flex items-center justify-center">
-              <Card className="w-full max-w-7xl bg-white shadow-2xl">
+            <div className="flex-1 flex items-center justify-center p-4">
+              <Card className="w-full max-w-6xl bg-white shadow-2xl">
                 <CardContent className="p-8">
                   <div className="text-center mb-8">
-                    <h2 className="text-blue-600 text-3xl font-bold mb-4">{t.references_title}</h2>
-                    <p className="text-gray-600 text-lg">{t.references_subtitle}</p>
+                    <h2 className="text-blue-600 text-3xl font-bold mb-2">Referencias</h2>
+                    <p className="text-gray-600 text-lg">¡Ayúdanos a conocerte mejor! Por favor, completa la información sobre usted.</p>
                   </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Formulario de referencias */}
                     <div className="space-y-6">
-                      <div><label className="block text-blue-600 font-semibold mb-2">{t.references_email}</label><input type="email" placeholder={t.references_emailPlaceholder} value={userEmail} onChange={e => setUserEmail(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                      <div><label className="block text-blue-600 font-semibold mb-2">{t.references_famContactName}</label><input type="text" placeholder={t.references_famContactNamePlaceholder} value={familyContactName} onChange={e => setFamilyContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                      <div><label className="block text-blue-600 font-semibold mb-2">{t.references_phone1}</label><input type="tel" placeholder={t.references_phone1Placeholder} value={familyContactPhone} onChange={e => setFamilyContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                      <div><label className="block text-blue-600 font-semibold mb-2">{t.references_friendContactName}</label><input type="text" placeholder={t.references_friendContactNamePlaceholder} value={friendContactName} onChange={e => setFriendContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
-                      <div><label className="block text-blue-600 font-semibold mb-2">{t.references_phone2}</label><input type="tel" placeholder={t.references_phone2Placeholder} value={friendContactPhone} onChange={e => setFriendContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                      <div>
+                        <label className="block text-blue-600 font-semibold mb-2">email :</label>
+                        <input type="email" placeholder="Ingrese su correo electrónico" value={userEmail} onChange={e => setUserEmail(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
+                      <div>
+                        <label className="block text-blue-600 font-semibold mb-2">Nombre del contacto familiar :</label>
+                        <input type="text" placeholder="Nombre completo del contacto familiar" value={familyContactName} onChange={e => setFamilyContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
+                      <div>
+                        <label className="block text-blue-600 font-semibold mb-2">Número de teléfono 1 :</label>
+                        <input type="tel" placeholder="Ingrese número de teléfono" value={familyContactPhone} onChange={e => setFamilyContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
+                      <div>
+                        <label className="block text-blue-600 font-semibold mb-2">Nombre del contacto amigo :</label>
+                        <input type="text" placeholder="Nombre completo del contacto amigo" value={friendContactName} onChange={e => setFriendContactName(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
+                      <div>
+                        <label className="block text-blue-600 font-semibold mb-2">Número de teléfono 2 :</label>
+                        <input type="tel" placeholder="Ingrese número de teléfono del amigo" value={friendContactPhone} onChange={e => setFriendContactPhone(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                      </div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <div className="mt-8 flex justify-end">
-                        <Button onClick={() => { if (userEmail && familyContactName && familyContactPhone && friendContactName && friendContactPhone) { setCurrentPage("device-configuration"); } else { alert(t.references_fillFields); } }} className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg font-semibold">{t.references_nextStep}</Button>
+                    {/* Resumen de dispositivo y datos */}
+                    <div className="bg-gray-50 rounded-lg p-8">
+                      <h3 className="text-blue-600 text-xl font-bold mb-4">{selectedBrand} {selectedModel} {selectedCapacity}</h3>
+                      <div className="grid grid-cols-2 gap-2 mb-2">
+                        <span className="font-semibold">Modelo</span>
+                        <span>${devicePrice.toLocaleString()}</span>
+                        <span className="font-semibold">IVA</span>
+                        <span>$1120</span>
+                        <span className="font-semibold">Pay recompensas</span>
+                        <span>39</span>
+                        <span className="font-semibold">Semanas</span>
+                        <span>$1 250</span>
+                      </div>
+                      <div className="mt-4">
+                        <span className="font-semibold">Estado donde vive</span>
+                        <span className="ml-2">Celular</span>
+                      </div>
+                      <div className="mt-2">
+                        <span className="font-semibold">CURP</span>
+                        <span className="ml-2 font-bold">VAZQUEZ GOMEZ BEATIZADRIANA</span>
+                      </div>
+                      <div className="mt-2">
+                        <span className="font-semibold">Número de celular</span>
+                        <span className="ml-2">Celular</span>
+                      </div>
+                      <div className="mt-2">5533985775</div>
+                      <div className="mt-2">
+                        <span className="font-semibold">Estado donde nació :</span>
+                        <input type="text" className="w-full p-2 border border-gray-300 rounded-lg font-bold mt-1" value="VAZQUEZGOMEZBRZ ADRIANA" readOnly />
+                      </div>
+                      <div className="mt-2">5533382575</div>
+                      <div className="mt-2">
+                        <span className="font-semibold">Ciudad donde vive :</span>
+                        <input type="text" className="w-full p-2 border border-gray-300 rounded-lg mt-1" />
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-start mt-8">
-                    <Button onClick={() => setCurrentPage("contract-signed")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← Regresar</Button>
+                  <div className="flex justify-between mt-8">
+                    <Button onClick={() => setCurrentPage("contract-generation")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">← Regresar</Button>
+                    <Button onClick={() => setCurrentPage("device-configuration")} className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">Siguiente paso</Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
         )
+      }
       case "device-configuration":
         return (
           <div className="relative z-10 flex flex-col min-h-screen p-6">
@@ -1461,3 +1510,4 @@ export default function SaephonePlatform() {
   )
 }
 
+      
