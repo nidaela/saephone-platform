@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { translations } from "@/lib/translations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,7 +39,7 @@ type SellDevicesModuleProps = {
 };
 
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
-  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "credit" | "modelplan" | "appinstall" | "references" | "complete">("phone")
+  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "credit" | "modelplan" | "contract" | "appinstall" | "references" | "complete">("phone")
   const [verificationCode, setVerificationCode] = useState(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     let result = ""
@@ -157,6 +157,63 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       }, 10000)
     }
   }
+
+  // Nombre extraído de la INE (fijo por ahora)
+  const extractedName = "María Rodríguez Hernández";
+  // Ref y estado para PDF
+  const pdfUrlRef = useRef<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string>("");
+
+  // Función para generar PDF dinámico
+  const generateContractPDF = () => {
+    const doc = new jsPDF();
+    const today = new Date();
+    const fecha = today.toLocaleDateString();
+    const weeks = selectedPlan || customWeeks;
+    const pagoSemanal = getWeeklyPayment(weeks);
+    doc.setFontSize(16);
+    doc.text("CONTRATO DE VENTA EN PARCIALIDADES", 15, 20);
+    doc.setFontSize(12);
+    doc.text(`SAEPHONE México, S. de R.L. de C.V.`, 15, 30);
+    doc.text(`Fecha: ${fecha}`, 15, 38);
+    doc.setFontSize(10);
+    doc.text("1. DATOS DEL PROVEEDOR", 15, 48);
+    doc.text("Razón Social: SAEPHONE México, S. de R.L. de C.V.", 15, 54);
+    doc.text("RFC: SAE-123456-ABC", 15, 60);
+    doc.text("Domicilio: Av. Insurgentes Sur 1234, Col. Del Valle, CDMX", 15, 66);
+    doc.text("Teléfono: (55) 1234-5678", 15, 72);
+    doc.text("2. DATOS DEL CLIENTE", 15, 82);
+    doc.text(`Nombre: ${extractedName}`, 15, 88);
+    doc.text(`Teléfono: +52 ${phoneNumber}`, 15, 94);
+    doc.text(`Email: ${userEmail}`, 15, 100);
+    doc.text("3. DETALLES DEL DISPOSITIVO Y PLAN", 15, 110);
+    doc.text(`Marca: ${selectedBrand}`, 15, 116);
+    doc.text(`Modelo: ${selectedModel}`, 15, 122);
+    doc.text(`Capacidad: ${selectedCapacity}`, 15, 128);
+    doc.text(`Precio: $${devicePrice}`, 15, 134);
+    doc.text(`Método de pago: ${paymentMethod === "financiado" ? "Financiado por Saephone" : paymentMethod === "contado" ? "Pago de Contado" : ""}`, 15, 140);
+    doc.text(`Semanas: ${weeks}`, 15, 146);
+    doc.text(`Pago inicial (15%): $${initialPayment}`, 15, 152);
+    doc.text(`Saldo a financiar: $${balance}`, 15, 158);
+    doc.text(`Pago semanal: $${pagoSemanal}`, 15, 164);
+    doc.text("\n\nEl cliente acepta los términos y condiciones del presente contrato.", 15, 180);
+    // Generar blob y url
+    const pdfBlob = doc.output("blob");
+    const url = URL.createObjectURL(pdfBlob);
+    pdfUrlRef.current = url;
+    setPdfUrl(url);
+    return url;
+  };
+
+  // Generar PDF cada vez que cambian los datos relevantes
+  React.useEffect(() => {
+    generateContractPDF();
+    // Cleanup url anterior
+    return () => {
+      if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
+    };
+    // eslint-disable-next-line
+  }, [selectedBrand, selectedModel, selectedCapacity, devicePrice, paymentMethod, selectedPlan, customWeeks, phoneNumber, userEmail]);
 
   const renderPhoneStep = () => (
     <div>
@@ -458,6 +515,78 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       )}
     </div>
   )
+  const renderContractStep = () => (
+    <div className="w-full flex flex-col items-center">
+      <p className="text-gray-700 mb-8 text-center">Escanea el código QR para que el cliente firme el contrato</p>
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-8">
+        {/* 1. Contrato de Financiamiento */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center font-bold">1</span>
+            <span className="font-bold text-green-700 text-lg">Contrato de Financiamiento</span>
+            <button className="ml-auto bg-gray-100 rounded-full p-2"><FileText className="w-5 h-5 text-gray-500" /></button>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <div className="text-center font-bold text-lg mb-2">CONTRATO DE VENTA EN PARCIALIDADES</div>
+            <div className="text-center font-bold text-md mb-4">SAEPHONE México, S. de R.L. de C.V.<br/>Fecha: {new Date().toLocaleDateString()}</div>
+            <hr className="my-2" />
+            <div className="text-sm mb-2 font-bold">1. DATOS DEL PROVEEDOR</div>
+            <div className="text-sm text-gray-700">
+              <div><span className="font-bold">Razón Social:</span> SAEPHONE México, S. de R.L. de C.V.</div>
+              <div><span className="font-bold">RFC:</span> SAE-123456-ABC</div>
+              <div><span className="font-bold">Domicilio:</span> Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</div>
+              <div><span className="font-bold">Teléfono:</span> (55) 1234-5678</div>
+            </div>
+            <div className="text-sm mt-4 mb-2 font-bold">2. DATOS DEL CLIENTE</div>
+            <div className="text-sm text-gray-700">
+              <div><span className="font-bold">Nombre:</span> {extractedName}</div>
+              <div><span className="font-bold">Teléfono:</span> +52 {phoneNumber}</div>
+              <div><span className="font-bold">Email:</span> {userEmail}</div>
+            </div>
+            <div className="text-sm mt-4 mb-2 font-bold">3. DETALLES DEL DISPOSITIVO Y PLAN</div>
+            <div className="text-sm text-gray-700">
+              <div><span className="font-bold">Marca:</span> {selectedBrand}</div>
+              <div><span className="font-bold">Modelo:</span> {selectedModel}</div>
+              <div><span className="font-bold">Capacidad:</span> {selectedCapacity}</div>
+              <div><span className="font-bold">Precio:</span> ${devicePrice}</div>
+              <div><span className="font-bold">Método de pago:</span> {paymentMethod === "financiado" ? "Financiado por Saephone" : paymentMethod === "contado" ? "Pago de Contado" : ""}</div>
+              <div><span className="font-bold">Semanas:</span> {selectedPlan || customWeeks}</div>
+              <div><span className="font-bold">Pago inicial (15%):</span> ${initialPayment}</div>
+              <div><span className="font-bold">Saldo a financiar:</span> ${balance}</div>
+              <div><span className="font-bold">Pago semanal:</span> ${getWeeklyPayment(selectedPlan || customWeeks)}</div>
+            </div>
+          </div>
+        </div>
+        {/* 2. Firma Digital del Cliente */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center font-bold">2</span>
+            <span className="font-bold text-green-700 text-lg">Firma Digital del Cliente</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="mb-2 text-gray-700">Haz click sobre el código para ampliarlo</span>
+            <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
+              <div className="bg-white p-2 rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition">
+                <QRCodeCanvas value={pdfUrl} size={128} />
+              </div>
+            </a>
+          </div>
+        </div>
+        {/* 3. Acciones Disponibles */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center font-bold">3</span>
+            <span className="font-bold text-green-700 text-lg">Acciones Disponibles</span>
+          </div>
+          <a href={pdfUrl} download={`Contrato_Saephone_${extractedName.replace(/ /g, "_")}.pdf`}>
+            <Button className="bg-green-600 text-white font-bold px-6 py-2 rounded-lg flex items-center gap-2">
+              <Download className="w-5 h-5" /> Descargar Contrato PDF
+            </Button>
+          </a>
+        </div>
+      </div>
+    </div>
+  )
   const renderAppInstallStep = () => (
     <div className="space-y-6 text-center">
       <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Instalación de App</h2>
@@ -630,6 +759,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return renderCreditProfileStep()
       case "modelplan":
         return renderModelPlanStep()
+      case "contract":
+        return renderContractStep()
       case "appinstall":
         return renderAppInstallStep()
       case "references":
@@ -707,6 +838,17 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("credit")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
+            <Button onClick={() => setCurrentStep("contract")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
+              Continuar
+            </Button>
+          </div>
+        )
+      case "contract":
+        return (
+          <div className="mt-8 flex gap-4 justify-end">
+            <Button onClick={() => setCurrentStep("modelplan")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Regresar
+            </Button>
             <Button onClick={() => setCurrentStep("appinstall")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
               Continuar
             </Button>
@@ -762,6 +904,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return "Verificación de Perfil Crediticio"
       case "modelplan":
         return "Selección de Modelo y Plan de Financiamiento"
+      case "contract":
+        return "Generación del Contrato"
       case "appinstall":
         return "Instalación de App"
       case "references":
@@ -780,6 +924,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     t.progress_step4, // Verificación de Identidad
     "Verificación de Perfil Crediticio",
     "Selección de Modelo y Plan de Financiamiento",
+    "Generación del Contrato",
     t.progress_step8, // Instalación de App
     t.progress_step3, // Referencias de Contacto
     t.progress_step5,
@@ -799,10 +944,12 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return 3;
       case "modelplan":
         return 4;
-      case "appinstall":
+      case "contract":
         return 5;
-      case "references":
+      case "appinstall":
         return 6;
+      case "references":
+        return 7;
       case "complete":
         return 10;
       default:
@@ -828,9 +975,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                   else if (index === 2) setCurrentStep("identity");
                   else if (index === 3) setCurrentStep("credit");
                   else if (index === 4) setCurrentStep("modelplan");
-                  else if (index === 5) setCurrentStep("appinstall");
-                  else if (index === 6) setCurrentStep("references");
-                  else if (index === 7) setCurrentStep("complete");
+                  else if (index === 5) setCurrentStep("contract");
+                  else if (index === 6) setCurrentStep("appinstall");
+                  else if (index === 7) setCurrentStep("references");
+                  else if (index === 8) setCurrentStep("complete");
                 }
               }}
             >
