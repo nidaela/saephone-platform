@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { translations } from "@/lib/translations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -40,7 +39,7 @@ type SellDevicesModuleProps = {
 };
 
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
-  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "appinstall" | "references" | "complete">("phone")
+  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "credit" | "appinstall" | "references" | "complete">("phone")
   const [verificationCode, setVerificationCode] = useState(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     let result = ""
@@ -62,6 +61,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const [selfieLoading, setSelfieLoading] = useState(false)
   const [selfieCaptured, setSelfieCaptured] = useState(false)
   const bothCaptured = frontCaptured && backCaptured
+  const [creditLoading, setCreditLoading] = useState(true)
+  const [creditEvaluated, setCreditEvaluated] = useState(false)
 
   const handleGenerateNewCode = () => {
     let result = ""
@@ -245,6 +246,93 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       </div>
     </div>
   )
+  const renderCreditProfileStep = () => (
+    <div className="w-full flex flex-col items-center">
+      {creditLoading && (
+        <div className="flex flex-col items-center justify-center py-16">
+          <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-6" />
+          <p className="text-xl font-semibold text-gray-800 mb-2">Evaluando perfil crediticio con Buró de Crédito...</p>
+          <p className="text-gray-600">Por favor espera unos segundos mientras verificamos tu historial.</p>
+        </div>
+      )}
+      {creditEvaluated && (
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Perfil crediticio verificado!</h2>
+          <p className="text-gray-700 mb-6">María Rodríguez Hernández tiene un excelente historial crediticio. Es posible otorgar crédito.</p>
+          <div className="flex gap-2 mb-6">
+            <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">Buró de Crédito</button>
+            <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">Círculo de Crédito</button>
+          </div>
+          <div className="w-full flex flex-col items-center mb-8">
+            {/* Score Gauge (simulado) */}
+            <div className="relative flex flex-col items-center mb-2">
+              <svg width="260" height="120" viewBox="0 0 260 120">
+                <defs>
+                  <linearGradient id="scoreGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="50%" stopColor="#facc15" />
+                    <stop offset="100%" stopColor="#22c55e" />
+                  </linearGradient>
+                </defs>
+                <path d="M30,110 A100,100 0 0,1 230,110" fill="none" stroke="url(#scoreGradient)" strokeWidth="16" />
+                <circle cx="200" cy="90" r="8" fill="#22c55e" />
+              </svg>
+              <div className="absolute top-14 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                <span className="text-5xl font-bold text-gray-900">803</span>
+                <span className="text-green-600 font-semibold text-lg">Excelente</span>
+              </div>
+              <div className="absolute top-24 right-12 flex items-center gap-1 bg-white rounded-full px-2 py-1 shadow text-green-600 font-semibold text-sm border border-green-200">
+                <svg width="16" height="16" fill="none"><path d="M8 12V4M8 4l-4 4m4-4l4 4" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                +6 pts
+              </div>
+            </div>
+            <div className="flex justify-between w-full mt-2 text-xs text-gray-400 px-2">
+              <span>300</span>
+              <span>450</span>
+              <span>580</span>
+              <span>700</span>
+              <span>850</span>
+            </div>
+          </div>
+          <button className="w-full py-3 rounded-lg bg-black text-white font-semibold text-lg mb-8">Actualizar score crediticio</button>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className="font-semibold text-gray-800">Historial de pagos</span>
+                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">Alto impacto</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">100%</div>
+              <div className="text-xs text-gray-500">Pagos realizados a tiempo</div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className="font-semibold text-gray-800">Uso de tarjeta</span>
+                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">Alto impacto</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">2%</div>
+              <div className="text-xs text-gray-500">Porcentaje de crédito utilizado</div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className="font-semibold text-gray-800">Antigüedad crediticia</span>
+                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">Impacto medio</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">7 años</div>
+              <div className="text-xs text-gray-500">Promedio de antigüedad</div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className="font-semibold text-gray-800">Cuentas totales</span>
+                <span className="text-red-600 font-semibold text-xs bg-red-100 rounded px-2 py-0.5">Bajo impacto</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">28</div>
+              <div className="text-xs text-gray-500">Cuentas abiertas y cerradas</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
   const renderAppInstallStep = () => (
     <div className="space-y-6 text-center">
       <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Instalación de App</h2>
@@ -413,6 +501,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return renderTermsStep()
       case "identity":
         return renderVerificationIdentityStep()
+      case "credit":
+        return renderCreditProfileStep()
       case "appinstall":
         return renderAppInstallStep()
       case "references":
@@ -468,7 +558,18 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("terms")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
-            <Button onClick={() => setCurrentStep("references")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
+            <Button onClick={() => setCurrentStep("credit")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
+              Continuar
+            </Button>
+          </div>
+        )
+      case "credit":
+        return (
+          <div className="mt-8 flex gap-4 justify-end">
+            <Button onClick={() => setCurrentStep("identity")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Regresar
+            </Button>
+            <Button onClick={() => setCurrentStep("appinstall")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
               Continuar
             </Button>
           </div>
@@ -519,10 +620,12 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return "Términos y Condiciones"
       case "identity":
         return "Verificación de Identidad"
-      case "references":
-        return "Referencias de Contacto"
+      case "credit":
+        return "Verificación de Perfil Crediticio"
       case "appinstall":
         return "Instalación de App"
+      case "references":
+        return "Referencias de Contacto"
       case "complete":
         return "Venta Completada"
       default:
@@ -535,11 +638,12 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     t.progress_step1, // Verificación Telefónica
     t.progress_step2, // Términos y Condiciones
     t.progress_step4, // Verificación de Identidad
+    "Verificación de Perfil Crediticio",
+    t.progress_step8, // Instalación de App
     t.progress_step3, // Referencias de Contacto
     t.progress_step5,
     t.progress_step6,
     t.progress_step7,
-    t.progress_step8, // Instalación de App (antes de Finalizar)
   ];
 
   const getCurrentStepIndex = () => {
@@ -550,12 +654,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return 1;
       case "identity":
         return 2;
-      case "references":
+      case "credit":
         return 3;
       case "appinstall":
-        return 7;
+        return 4;
+      case "references":
+        return 5;
       case "complete":
-        return 8;
+        return 9;
       default:
         return 0;
     }
@@ -576,9 +682,11 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                   // Map step index back to currentStep
                   if (index === 0) setCurrentStep("phone");
                   else if (index === 1) setCurrentStep("terms");
-                  else if (index === 2) setCurrentStep("references");
-                  else if (index === 7) setCurrentStep("appinstall");
-                  else if (index === 8) setCurrentStep("complete");
+                  else if (index === 2) setCurrentStep("identity");
+                  else if (index === 3) setCurrentStep("credit");
+                  else if (index === 4) setCurrentStep("appinstall");
+                  else if (index === 5) setCurrentStep("references");
+                  else if (index === 6) setCurrentStep("complete");
                 }
               }}
             >
@@ -603,6 +711,18 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       </div>
     </div>
   );
+
+  React.useEffect(() => {
+    if (currentStep === "credit") {
+      setCreditLoading(true)
+      setCreditEvaluated(false)
+      const timer = setTimeout(() => {
+        setCreditLoading(false)
+        setCreditEvaluated(true)
+      }, 10000)
+      return () => clearTimeout(timer)
+    }
+  }, [currentStep])
 
   return (
     <>
