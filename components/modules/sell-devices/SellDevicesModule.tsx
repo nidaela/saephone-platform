@@ -12,12 +12,6 @@ import { QRCodeCanvas } from "qrcode.react"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 
-interface SellDevicesModuleProps {
-  onBack: () => void
-  onComplete: (saleData: SaleData) => void
-  t: (typeof translations)["es"]
-}
-
 export interface SaleData {
   selectedBrand: string
   selectedModel: string
@@ -28,482 +22,285 @@ export interface SaleData {
   contractGenerated: boolean
 }
 
+export interface AccountSaleData {
+  phoneNumber: string;
+  verificationCode: string;
+  userEmail: string;
+  familyContactName: string;
+  familyContactPhone: string;
+  friendContactName: string;
+  friendContactPhone: string;
+}
+
+type SellDevicesModuleProps = {
+  onBack: () => void;
+  onComplete: (saleData: AccountSaleData) => void;
+  t: (typeof translations)["es"];
+};
+
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
-  const [currentStep, setCurrentStep] = useState<"device-selection" | "contract-generation" | "contract-signed" | "complete">("device-selection")
-  const [selectedBrand, setSelectedBrand] = useState("")
-  const [selectedModel, setSelectedModel] = useState("")
-  const [selectedCapacity, setSelectedCapacity] = useState("")
-  const [devicePrice, setDevicePrice] = useState(0)
-  const [selectedFinancing, setSelectedFinancing] = useState("")
-  const [paymentMethod, setPaymentMethod] = useState("")
-  const [contractGenerated, setContractGenerated] = useState(false)
-  const [customWeeks, setCustomWeeks] = useState(10)
+  const [currentStep, setCurrentStep] = useState<"phone" | "verification" | "references" | "complete">("phone")
+  const [verificationCode, setVerificationCode] = useState(() => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    let result = ""
+    for (let i = 0; i < 4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length))
+    return result
+  })
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [enteredCode, setEnteredCode] = useState("")
+  const [userEmail, setUserEmail] = useState("")
+  const [familyContactName, setFamilyContactName] = useState("")
+  const [familyContactPhone, setFamilyContactPhone] = useState("")
+  const [friendContactName, setFriendContactName] = useState("")
+  const [friendContactPhone, setFriendContactPhone] = useState("")
+  const [verificationCodeInput, setVerificationCodeInput] = useState("")
 
-  // Device data - independent from other modules
-  const brands = ["Apple", "Samsung", "Xiaomi", "Huawei", "Google"]
-  const models: Record<string, string[]> = {
-    Apple: ["iPhone 15", "iPhone 15 Pro", "iPhone 14", "iPhone 14 Pro"],
-    Samsung: ["Galaxy S24", "Galaxy S24 Ultra", "Galaxy A55", "Galaxy A35"],
-    Xiaomi: ["Redmi Note 13", "POCO X6", "Redmi 13", "POCO M6"],
-    Huawei: ["Pura 70", "Nova 12", "Y9 Prime", "Y7 Prime"],
-    Google: ["Pixel 8", "Pixel 8 Pro", "Pixel 7a", "Pixel 6a"]
+  const handleGenerateNewCode = () => {
+    let result = ""
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    for (let i = 0; i < 4; i++) result += chars.charAt(Math.floor(Math.random() * chars.length))
+    setVerificationCode(result)
   }
-  const capacities = ["128GB", "256GB", "512GB", "1TB"]
-
-  const updatePrice = () => {
-    if (selectedBrand && selectedModel && selectedCapacity) {
-      const basePrice = 15000
-      const brandMultiplier = selectedBrand === "Apple" ? 1.5 : selectedBrand === "Samsung" ? 1.3 : 1.0
-      const modelMultiplier = selectedModel.includes("Pro") || selectedModel.includes("Ultra") ? 1.4 : 1.0
-      const capacityMultiplier = selectedCapacity === "256GB" ? 1.2 : selectedCapacity === "512GB" ? 1.5 : selectedCapacity === "1TB" ? 2.0 : 1.0
-      
-      setDevicePrice(Math.round(basePrice * brandMultiplier * modelMultiplier * capacityMultiplier))
-    }
-  }
-
-  const handleDeviceSelection = () => {
-    if (paymentMethod && selectedBrand && selectedModel && selectedCapacity && (selectedFinancing === 'custom' || selectedFinancing)) {
-      setCurrentStep("contract-generation")
+  const handleSendCode = () => {
+    if (phoneNumber) {
+      alert(`Se ha enviado un código al teléfono +52 ${phoneNumber}`)
     } else {
-      alert("Por favor completa todos los campos")
+      alert("Por favor, ingresa un número de teléfono")
     }
   }
-
-  const generateContract = () => {
-    setContractGenerated(true)
-    setTimeout(() => {
-      setCurrentStep("contract-signed")
-    }, 2000)
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "")
+    setPhoneNumber(value)
   }
-
-  const generatePDF = async () => {
-    const element = document.getElementById("contract-content")
-    if (!element) return
-    
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true
+  const handleVerifyCode = () => {
+    if (enteredCode.length === 4) {
+      setCurrentStep("references")
+    } else {
+      alert("Código incorrecto. Por favor, intenta de nuevo.")
+    }
+  }
+  const handleCompleteAccount = () => {
+    onComplete({
+      phoneNumber,
+      verificationCode,
+      userEmail,
+      familyContactName,
+      familyContactPhone,
+      friendContactName,
+      friendContactPhone
     })
-    
-    const imgData = canvas.toDataURL("image/png")
-    const pdf = new jsPDF("p", "mm", "a4")
-    const imgWidth = 210
-    const pageHeight = 295
-    const imgHeight = (canvas.height * imgWidth) / canvas.width
-    let heightLeft = imgHeight
-    
-    let position = 0
-    
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
-    heightLeft -= pageHeight
-    
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight
-      pdf.addPage()
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight)
-      heightLeft -= pageHeight
-    }
-    
-    pdf.save(`contrato-${selectedBrand}-${selectedModel}.pdf`)
-  }
-
-  const handleCompleteSale = () => {
-    const saleData: SaleData = {
-      selectedBrand,
-      selectedModel,
-      selectedCapacity,
-      devicePrice,
-      selectedFinancing,
-      paymentMethod,
-      contractGenerated
-    }
-    onComplete(saleData)
     setCurrentStep("complete")
   }
 
-  const renderDeviceSelection = () => (
-    <div className="space-y-8">
-      <div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-sm">1</span>
-          </div>
-          <h3 className="text-blue-600 text-xl font-bold">Método de pago</h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <button 
-            onClick={() => setPaymentMethod("financiado")} 
-            className={`p-4 border-2 rounded-lg text-center transition-all ${paymentMethod === "financiado" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}
-          >
-            <div className="text-lg font-semibold text-gray-800">Financiado por Saephone</div>
-            <div className="text-sm text-gray-600 mt-1">Pagos a meses sin intereses</div>
-          </button>
-          <button 
-            onClick={() => setPaymentMethod("contado")} 
-            className={`p-4 border-2 rounded-lg text-center transition-all ${paymentMethod === "contado" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}
-          >
-            <div className="text-lg font-semibold text-gray-800">Pago de Contado</div>
-            <div className="text-sm text-gray-600 mt-1">Pago único completo</div>
-          </button>
-        </div>
-        {!paymentMethod && <p className="text-red-500 text-sm">* Selecciona un método de pago</p>}
+  const renderPhoneStep = () => (
+    <div>
+      <div className="text-center mb-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-1">Registrar nuevo cliente en Saephone</h2>
+        <p className="text-gray-600 text-sm md:text-base">Para comenzar, necesitamos verificar tu número de teléfono</p>
       </div>
-
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-bold text-sm">2</span>
-          </div>
-          <h3 className="text-blue-600 text-xl font-bold">Modelo</h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div>
-            <Label className="block text-blue-600 font-medium mb-2">Marca</Label>
-            <select 
-              value={selectedBrand} 
-              onChange={e => { 
-                setSelectedBrand(e.target.value); 
-                setSelectedModel(""); 
-                setSelectedCapacity(""); 
-                setDevicePrice(0); 
-              }} 
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Selecciona una marca</option>
-              {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
-            </select>
-          </div>
-          <div>
-            <Label className="block text-blue-600 font-medium mb-2">Modelo</Label>
-            <select 
-              value={selectedModel} 
-              onChange={e => { 
-                setSelectedModel(e.target.value); 
-                setSelectedCapacity(""); 
-                setDevicePrice(0); 
-              }} 
-              disabled={!selectedBrand} 
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-            >
-              <option value="">Selecciona un modelo</option>
-              {selectedBrand && models[selectedBrand] && models[selectedBrand].map(model => <option key={model} value={model}>{model}</option>)}
-            </select>
-          </div>
-          <div>
-            <Label className="block text-blue-600 font-medium mb-2">Capacidad</Label>
-            <select 
-              value={selectedCapacity} 
-              onChange={e => { 
-                setSelectedCapacity(e.target.value); 
-                setTimeout(updatePrice, 100); 
-              }} 
-              disabled={!selectedModel} 
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-            >
-              <option value="">Selecciona capacidad</option>
-              {capacities.map(capacity => <option key={capacity} value={capacity}>{capacity}</option>)}
-            </select>
-          </div>
-        </div>
-
-        {devicePrice > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <span className="text-blue-700 font-medium">Precio del dispositivo:</span>
-              <span className="text-blue-800 font-bold text-xl">${devicePrice.toLocaleString()}</span>
-            </div>
-            <p className="text-sm text-blue-600 mt-2">
-              El precio se actualiza automáticamente al seleccionar modelo y capacidad
-            </p>
-          </div>
-        )}
-      </div>
-
-      {paymentMethod === "financiado" && devicePrice > 0 && (
+      <div className="space-y-4">
         <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">3</span>
+          <Label htmlFor="verification-code" className="text-gray-700 text-sm">Código de verificación</Label>
+          <div className="mt-1 flex items-center gap-2 md:gap-4">
+            <Input
+              id="verification-code"
+              placeholder="Ingresa el código que ves a la derecha"
+              className="font-mono tracking-widest h-10 text-sm flex-1"
+              value={verificationCodeInput}
+              onChange={e => setVerificationCodeInput(e.target.value)}
+              maxLength={4}
+            />
+            <div className="rounded-md border border-gray-300 bg-gray-100 px-4 py-2 text-base font-bold text-gray-700 select-none min-w-[56px] text-center">
+              {verificationCode}
             </div>
-            <h3 className="text-blue-600 text-xl font-bold">Plan de financiamiento</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button 
-              onClick={() => setSelectedFinancing("10")} 
-              className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "10" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}
-            >
-              <div className="text-xl font-bold text-blue-600 mb-2">10 SEMANAS</div>
-              {devicePrice > 0 && (
-                <>
-                  <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / 10).toLocaleString()}</div>
-                  <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
-                  <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                  <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * 1.10).toLocaleString()}</span></div>
-                </>
-              )}
-            </button>
-            <button 
-              onClick={() => setSelectedFinancing("20")} 
-              className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "20" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}
-            >
-              <div className="text-xl font-bold text-blue-600 mb-2">20 SEMANAS</div>
-              {devicePrice > 0 && (
-                <>
-                  <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / 20).toLocaleString()}</div>
-                  <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
-                  <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                  <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * 1.20).toLocaleString()}</span></div>
-                </>
-              )}
-            </button>
-            <button 
-              onClick={() => setSelectedFinancing("26")} 
-              className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "26" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}
-            >
-              <div className="text-xl font-bold text-blue-600 mb-2">26 SEMANAS</div>
-              {devicePrice > 0 && (
-                <>
-                  <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / 26).toLocaleString()}</div>
-                  <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
-                  <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                  <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * 1.25).toLocaleString()}</span></div>
-                </>
-              )}
-            </button>
-            <button 
-              onClick={() => setSelectedFinancing("custom")} 
-              className={`p-6 border-2 rounded-lg text-center transition-all ${selectedFinancing === "custom" ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-gray-300"}`}
-            >
-              <div className="text-xl font-bold text-blue-600 mb-2">Personalizado</div>
-              <div className="text-sm text-gray-600 mb-2">SEMANAS</div>
-              <Input
-                type="number"
-                placeholder="10"
-                value={customWeeks}
-                onChange={(e) => setCustomWeeks(parseInt(e.target.value) || 10)}
-                className="w-full mb-2"
-                min="1"
-                max="52"
-              />
-              {devicePrice > 0 && (
-                <>
-                  <div className="text-2xl font-bold text-green-600 mb-1">${Math.round((devicePrice * 0.85) / customWeeks).toLocaleString()}</div>
-                  <div className="text-sm text-gray-600 mb-4">/SEMANA</div>
-                  <div className="text-sm text-gray-700 mb-1">pago inicial: <span className="font-semibold">${Math.round(devicePrice * 0.15).toLocaleString()}</span></div>
-                  <div className="text-sm text-gray-700">precio final: <span className="font-semibold">${Math.round(devicePrice * (1 + 0.01 * (customWeeks - 10))).toLocaleString()}</span></div>
-                </>
-              )}
-            </button>
+            <Button onClick={handleGenerateNewCode} className="bg-green-500 text-white hover:bg-green-600 h-10 px-3 text-sm">
+              Generar nuevo código
+            </Button>
           </div>
         </div>
-      )}
+        <div>
+          <Label htmlFor="phone-number" className="text-gray-700 text-sm">Número de teléfono</Label>
+          <div className="mt-1 flex items-center gap-2 md:gap-4">
+            <span className="rounded-md border border-gray-300 bg-gray-100 px-3 py-1.5 text-gray-700 text-sm">+52</span>
+            <Input
+              id="phone-number"
+              placeholder="Ingresa tu número de teléfono"
+              value={phoneNumber}
+              onChange={handlePhoneChange}
+              maxLength={10}
+              className="h-10 text-sm"
+            />
+            <Button onClick={handleSendCode} className="bg-green-500 text-white hover:bg-green-600 h-10 px-3 text-sm">
+              Enviar código
+            </Button>
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="entered-code" className="text-gray-700 text-sm">Introduce el código</Label>
+          <Input
+            id="entered-code"
+            placeholder="Código de 4 dígitos"
+            className="mt-1 h-10 text-sm"
+            value={enteredCode}
+            onChange={e => setEnteredCode(e.target.value)}
+            maxLength={4}
+          />
+        </div>
+      </div>
     </div>
   )
-
-  const renderContractGeneration = () => {
-    const contrato = (
-      <div id="contract-content" className="space-y-6 text-sm text-gray-700">
-        <div className="text-center border-b-2 border-gray-300 pb-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">CONTRATO DE VENTA EN PARCIALIDADES</h2>
-          <p className="text-gray-600">SAEPHONE México, S. de R.L. de C.V.</p>
-          <p className="text-gray-600">Fecha: {new Date().toLocaleDateString('es-ES')}</p>
-        </div>
-        
-        <div>
-          <h3 className="font-bold text-lg text-gray-800 mb-3">1. DATOS DEL PROVEEDOR</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p><strong>Razón Social:</strong> SAEPHONE México, S. de R.L. de C.V.</p>
-            <p><strong>RFC:</strong> SAE-123456-ABC</p>
-            <p><strong>Domicilio:</strong> Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</p>
-            <p><strong>Teléfono:</strong> (55) 1234-5678</p>
-            <p><strong>Email:</strong> contacto@saephone.com</p>
-          </div>
-        </div>
-        
-        <div>
-          <h3 className="font-bold text-lg text-gray-800 mb-3">2. DATOS DEL CLIENTE</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p><strong>Nombre Completo:</strong> CLIENTE EJEMPLO</p>
-            <p><strong>Email:</strong> cliente@ejemplo.com</p>
-            <p><strong>Teléfono:</strong> 55-1234-5678</p>
-            <p><strong>Domicilio:</strong> Calle del Cliente 123, Col. Ciudad</p>
-          </div>
-        </div>
-        
-        <div>
-          <h3 className="font-bold text-lg text-gray-800 mb-3">3. DISPOSITIVO Y PLAN DE FINANCIAMIENTO</h3>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p><strong>Marca:</strong> {selectedBrand}</p>
-            <p><strong>Modelo:</strong> {selectedModel}</p>
-            <p><strong>Capacidad:</strong> {selectedCapacity}</p>
-            <p><strong>Precio Original:</strong> ${devicePrice.toLocaleString()}</p>
-            <p><strong>Plan de Financiamiento:</strong> {selectedFinancing === 'custom' ? customWeeks : selectedFinancing} semanas</p>
-            <p><strong>Pago Semanal:</strong> ${selectedFinancing === 'custom' ? Math.round((devicePrice * 0.85) / customWeeks).toLocaleString() : Math.round((devicePrice * 0.85) / parseInt(selectedFinancing)).toLocaleString()}</p>
-            <p><strong>Pago Inicial:</strong> ${Math.round(devicePrice * 0.15).toLocaleString()}</p>
-            <p><strong>Precio Final:</strong> ${selectedFinancing === 'custom' ? Math.round(devicePrice * (1 + 0.01 * (customWeeks - 10))).toLocaleString() : Math.round(devicePrice * (selectedFinancing === "10" ? 1.10 : selectedFinancing === "20" ? 1.20 : selectedFinancing === "26" ? 1.25 : 1.30)).toLocaleString()}</p>
-          </div>
-        </div>
-        
-        <div>
-          <h3 className="font-bold text-lg text-gray-800 mb-3">4. CONDICIONES DEL CONTRATO</h3>
-          <div className="space-y-2">
-            <p><strong>4.1.</strong> El cliente se compromete a realizar los pagos semanales en las fechas establecidas.</p>
-            <p><strong>4.2.</strong> En caso de atraso en los pagos, el dispositivo será bloqueado automáticamente.</p>
-            <p><strong>4.3.</strong> El cliente puede realizar pagos anticipados sin penalización.</p>
-            <p><strong>4.4.</strong> Una vez completado el pago total, el dispositivo será desbloqueado permanentemente.</p>
-            <p><strong>4.5.</strong> El cliente acepta las condiciones de uso y políticas de privacidad de SAEPHONE.</p>
-          </div>
-        </div>
-        
-        <div className="border-t-2 border-gray-300 pt-4">
-          <p className="text-center text-gray-600">
-            <strong>Este contrato es válido desde la fecha de firma y se rige por las leyes mexicanas.</strong>
+  const renderVerificationStep = () => (
+    <div className="space-y-6">
+      <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+        <div className="flex items-center gap-3">
+          <Check className="w-6 h-6 text-blue-500" />
+          <p className="text-gray-800">
+            Se ha enviado un código al teléfono +52 {phoneNumber}
           </p>
         </div>
       </div>
-    )
-
-    return (
-      <div className="space-y-8">
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">1</span>
-            </div>
-            <h3 className="text-blue-600 text-xl font-bold">Contrato de Financiamiento</h3>
-          </div>
-          <div className="border rounded-lg p-6 bg-gray-50">
-            <div className="text-center mb-4">
-              <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <FileText className="w-6 h-6 text-gray-500" />
-              </div>
-              <h4 className="text-gray-800 text-lg font-bold">CONTRATO DE VENTA EN PARCIALIDADES</h4>
-            </div>
-            <div className="max-h-64 overflow-y-auto pr-2">
-              {contrato}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">2</span>
-            </div>
-            <h3 className="text-blue-600 text-xl font-bold">Firma Digital del Cliente</h3>
-          </div>
-          <div className="text-center">
-            <p className="text-gray-600 mb-4">Haz click sobre el código para ampliarlo</p>
-            <div className="flex justify-center mb-4">
-              <button className="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-all">
-                <QRCodeCanvas 
-                  value={`contrato-${selectedBrand}-${selectedModel}-${selectedCapacity}-${devicePrice}-${selectedFinancing}`} 
-                  size={160} 
-                  className="mx-auto" 
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">3</span>
-            </div>
-            <h3 className="text-blue-600 text-xl font-bold">Acciones</h3>
-          </div>
-          <div className="flex gap-4 justify-center">
-            <Button onClick={generatePDF} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Descargar PDF
-            </Button>
-            <Button onClick={generateContract} className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
-              <Check className="w-4 h-4" />
-              Simular Firma del Cliente
-            </Button>
-          </div>
-        </div>
+      <div>
+        <Label htmlFor="enter-code" className="text-gray-700">
+          Ingresa el código
+        </Label>
+        <Input
+          id="enter-code"
+          placeholder="Código de 4 dígitos"
+          className="mt-1"
+          value={enteredCode}
+          onChange={e => setEnteredCode(e.target.value)}
+          maxLength={4}
+        />
       </div>
-    )
-  }
-
-  const renderContractSigned = () => (
+    </div>
+  )
+  const renderReferencesStep = () => (
+    <div className="space-y-6">
+      <div>
+        <Label htmlFor="user-email" className="text-gray-700">
+          Email del usuario
+        </Label>
+        <Input
+          id="user-email"
+          type="email"
+          placeholder="Ingrese su correo electrónico"
+          value={userEmail}
+          onChange={e => setUserEmail(e.target.value)}
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label htmlFor="family-contact-name" className="text-gray-700">
+          Nombre del contacto familiar
+        </Label>
+        <Input
+          id="family-contact-name"
+          type="text"
+          placeholder="Nombre completo del contacto familiar"
+          value={familyContactName}
+          onChange={e => setFamilyContactName(e.target.value)}
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label htmlFor="family-contact-phone" className="text-gray-700">
+          Número de teléfono familiar
+        </Label>
+        <Input
+          id="family-contact-phone"
+          type="tel"
+          placeholder="Ingrese número de teléfono"
+          value={familyContactPhone}
+          onChange={e => setFamilyContactPhone(e.target.value)}
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label htmlFor="friend-contact-name" className="text-gray-700">
+          Nombre del contacto amigo
+        </Label>
+        <Input
+          id="friend-contact-name"
+          type="text"
+          placeholder="Nombre completo del contacto amigo"
+          value={friendContactName}
+          onChange={e => setFriendContactName(e.target.value)}
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label htmlFor="friend-contact-phone" className="text-gray-700">
+          Número de teléfono del amigo
+        </Label>
+        <Input
+          id="friend-contact-phone"
+          type="tel"
+          placeholder="Ingrese número de teléfono del amigo"
+          value={friendContactPhone}
+          onChange={e => setFriendContactPhone(e.target.value)}
+          className="mt-1"
+        />
+      </div>
+    </div>
+  )
+  const renderCompleteStep = () => (
     <div className="text-center space-y-6">
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
         <Check className="w-8 h-8 text-green-600" />
       </div>
       <div>
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Contrato Firmado</h3>
-        <p className="text-gray-600">El contrato ha sido firmado digitalmente por el cliente</p>
-      </div>
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-blue-700 font-medium">ID del pedido actual: SYSKT-{Date.now().toString().slice(-6)}</p>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">Venta completada exitosamente</h3>
+        <p className="text-gray-600">La venta ha sido registrada en el sistema</p>
       </div>
     </div>
   )
-
-  const renderComplete = () => (
-    <div className="text-center space-y-6">
-      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-        <Check className="w-8 h-8 text-green-600" />
-      </div>
-      <div>
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Venta Completada</h3>
-        <p className="text-gray-600">La venta del dispositivo ha sido procesada exitosamente</p>
-      </div>
-    </div>
-  )
-
   const renderStepContent = () => {
     switch (currentStep) {
-      case "device-selection":
-        return renderDeviceSelection()
-      case "contract-generation":
-        return renderContractGeneration()
-      case "contract-signed":
-        return renderContractSigned()
+      case "phone":
+        return renderPhoneStep()
+      case "references":
+        return renderReferencesStep()
       case "complete":
-        return renderComplete()
+        return renderCompleteStep()
       default:
-        return renderDeviceSelection()
+        return renderPhoneStep()
     }
   }
-
   const renderStepButtons = () => {
     switch (currentStep) {
-      case "device-selection":
+      case "phone":
         return (
-          <div className="flex gap-4 justify-center mt-8">
-            <Button onClick={onBack} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg">
+          <div className="mt-6 grid grid-cols-2 gap-3 md:gap-4">
+            <Button onClick={onBack} className="w-full bg-gray-200 py-2.5 md:py-3 text-gray-700 hover:bg-gray-300 text-sm md:text-base">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {t.back_to_main_panel}
+              Regresar a Panel Principal
             </Button>
-            <Button 
-              onClick={handleDeviceSelection} 
-              disabled={!(paymentMethod && selectedBrand && selectedModel && selectedCapacity && (selectedFinancing === 'custom' || selectedFinancing))}
-              className={`px-8 py-3 rounded-lg font-medium transition-colors ${paymentMethod && selectedBrand && selectedModel && selectedCapacity && (selectedFinancing === 'custom' || selectedFinancing) ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
+            <Button
+              onClick={() => {
+                if (phoneNumber.length === 10 && enteredCode.length === 4) {
+                  setCurrentStep("references")
+                } else {
+                  alert("Por favor, ingresa un teléfono válido y un código de 4 dígitos.")
+                }
+              }}
+              disabled={!(phoneNumber.length === 10 && enteredCode.length === 4)}
+              className="w-full bg-blue-600 py-2.5 md:py-3 text-white hover:bg-blue-700 disabled:bg-gray-300 text-sm md:text-base"
             >
-              Continuar →
+              Verificar y Continuar →
             </Button>
           </div>
         )
-      case "contract-generation":
+      case "references":
         return (
-          <div className="flex gap-4 justify-center mt-8">
-            <Button onClick={() => setCurrentStep("device-selection")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors">
+          <div className="mt-8 grid grid-cols-2 gap-4">
+            <Button onClick={() => setCurrentStep("phone")} className="w-full bg-gray-200 py-3 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
-          </div>
-        )
-      case "contract-signed":
-        return (
-          <div className="flex gap-4 justify-center mt-8">
-            <Button onClick={() => setCurrentStep("contract-generation")} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors">
-              ← Regresar
-            </Button>
-            <Button onClick={handleCompleteSale} className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            <Button
+              onClick={handleCompleteAccount}
+              disabled={!userEmail || !familyContactName || !familyContactPhone || !friendContactName || !friendContactPhone}
+              className="w-full bg-green-600 py-3 text-white hover:bg-green-700 disabled:bg-gray-300"
+            >
               Completar Venta →
             </Button>
           </div>
@@ -520,15 +317,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return null
     }
   }
-
   const getStepTitle = () => {
     switch (currentStep) {
-      case "device-selection":
-        return "Selección de Modelo y Plan de Financiamiento"
-      case "contract-generation":
-        return "Generación del Contrato"
-      case "contract-signed":
-        return "Contrato Firmado"
+      case "phone":
+        return "Verificación Telefónica"
+      case "verification":
+        return "Código de Verificación"
+      case "references":
+        return "Referencias de Contacto"
       case "complete":
         return "Venta Completada"
       default:
@@ -536,20 +332,100 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     }
   }
 
-  return (
-    <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-8 md:p-12 mt-8">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center mb-4">
-          <div className="p-3 bg-green-100 rounded-full">
-            <Smartphone className="w-8 h-8 text-green-600" />
-          </div>
-        </div>
-        <h1 className="mb-2 text-3xl font-bold text-gray-800">{getStepTitle()}</h1>
-        <p className="text-gray-600">Módulo independiente de venta de dispositivos</p>
-      </div>
+  // Add progress bar with 8 steps
+  const progressStepKeys = [
+    t.progress_step1,
+    t.progress_step2,
+    t.progress_step3,
+    t.progress_step4,
+    t.progress_step5,
+    t.progress_step6,
+    t.progress_step7,
+    t.progress_step8,
+  ];
 
-      {renderStepContent()}
-      {renderStepButtons()}
+  const getCurrentStepIndex = () => {
+    switch (currentStep) {
+      case "phone":
+        return 0;
+      case "verification":
+        return 1;
+      case "references":
+        return 2;
+      case "complete":
+        return 7;
+      default:
+        return 0;
+    }
+  };
+
+  const renderProgressBar = () => (
+    <div className="flex items-center justify-center mb-8">
+      <div className="flex items-center gap-4">
+        {progressStepKeys.map((step, index) => {
+          const isActive = index <= getCurrentStepIndex();
+          return (
+            <div
+              key={index}
+              className={`flex items-center ${isActive ? "cursor-pointer" : "cursor-default"}`}
+              onClick={() => {
+                // Only allow navigation to completed steps
+                if (index <= getCurrentStepIndex()) {
+                  // Map step index back to currentStep
+                  if (index === 0) setCurrentStep("phone");
+                  else if (index === 1) setCurrentStep("verification");
+                  else if (index === 2) setCurrentStep("references");
+                  else if (index === 7) setCurrentStep("complete");
+                }
+              }}
+            >
+              <div className="flex flex-col items-center text-center w-28">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
+                    isActive ? "bg-green-500" : "bg-white/30"
+                  }`}
+                >
+                  {index + 1}
+                </div>
+                <span
+                  className={`text-xs mt-2 transition-colors duration-300 ${isActive ? "text-green-700" : "text-gray-400"}`}
+                >
+                  {step}
+                </span>
+              </div>
+              {index < progressStepKeys.length - 1 && <div className="w-10 h-0.5 bg-gray-300 mx-2"></div>}
+            </div>
+          );
+        })}
+      </div>
     </div>
+  );
+
+  return (
+    <>
+      <div className="mt-8">{renderProgressBar()}</div>
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-4 md:p-6 mt-4 mx-auto min-h-[480px]">
+        {currentStep === "phone" && (
+          <div className="text-center mb-8">
+            {/* Sin ícono ni subtítulo aquí */}
+          </div>
+        )}
+        {currentStep !== "phone" && (
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center mb-4">
+              <div className="p-3 bg-green-100 rounded-full">
+                <Smartphone className="w-8 h-8 text-green-600" />
+              </div>
+            </div>
+            <h1 className="mb-2 text-3xl font-bold text-gray-800">{getStepTitle()}</h1>
+            <p className="text-gray-600">Módulo independiente de venta de dispositivos</p>
+          </div>
+        )}
+        <div className="space-y-6">
+          {renderStepContent()}
+        </div>
+        {renderStepButtons()}
+      </div>
+    </>
   )
 } 
