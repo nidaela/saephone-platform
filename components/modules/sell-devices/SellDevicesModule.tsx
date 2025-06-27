@@ -11,6 +11,7 @@ import { Smartphone, ArrowLeft, Check, FileText, Download } from "lucide-react"
 import { QRCodeCanvas } from "qrcode.react"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export interface SaleData {
   selectedBrand: string
@@ -39,7 +40,7 @@ type SellDevicesModuleProps = {
 };
 
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
-  const [currentStep, setCurrentStep] = useState<"phone" | "verification" | "references" | "complete">("phone")
+  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "references" | "complete">("phone")
   const [verificationCode, setVerificationCode] = useState(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     let result = ""
@@ -54,6 +55,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const [friendContactName, setFriendContactName] = useState("")
   const [friendContactPhone, setFriendContactPhone] = useState("")
   const [verificationCodeInput, setVerificationCodeInput] = useState("")
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false)
 
   const handleGenerateNewCode = () => {
     let result = ""
@@ -254,10 +257,86 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       </div>
     </div>
   )
+  const renderTermsStep = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-2">
+        <span className="font-semibold text-gray-700 text-lg block mb-4">
+          Importante: Los siguientes términos deben ser leídos y completados personalmente por el cliente.
+        </span>
+      </div>
+      <div className="flex justify-center">
+        <div className="w-full max-w-2xl">
+          <div className="bg-gray-50 rounded-lg p-6 mb-6 max-h-96 overflow-y-auto border border-gray-200">
+            <div className="flex items-center gap-3 mb-4">
+              <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-10 h-10 object-contain" />
+              <h3 className="text-blue-600 text-lg font-bold">Términos y Condiciones</h3>
+            </div>
+            <div className="space-y-4 text-sm text-gray-700">
+              <p>
+                Este documento describe los términos y condiciones generales aplicables al uso de los contenidos,
+                productos y servicios ofrecidos a través del sitio www.saephone.com, del cual es titular SAEPHONE
+                México, S. de R.L. de C.V.
+              </p>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">1. OBJETO</h4>
+                <p>
+                  El objeto de los presentes TÉRMINOS Y CONDICIONES es regular el acceso y la utilización del SITIO WEB.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">2. EL TITULAR</h4>
+                <p>
+                  Se reserva el derecho de realizar cualquier tipo de modificación en el SITIO WEB en cualquier momento y sin previo aviso.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">3. RESPONSABILIDADES</h4>
+                <p>
+                  El usuario se compromete a utilizar el sitio web de manera responsable y conforme a la legislación aplicable.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">4. PRIVACIDAD</h4>
+                <p>
+                  Todos los datos personales proporcionados serán tratados conforme a nuestra política de privacidad.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4 mb-8">
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="terms"
+                checked={acceptTerms}
+                onCheckedChange={checked => setAcceptTerms(!!checked)}
+                className="mt-1"
+              />
+              <label htmlFor="terms" className="text-sm text-gray-700">
+                Acepto los términos y condiciones de SAEPHONE
+              </label>
+            </div>
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="privacy"
+                checked={acceptPrivacy}
+                onCheckedChange={checked => setAcceptPrivacy(!!checked)}
+                className="mt-1"
+              />
+              <label htmlFor="privacy" className="text-sm text-gray-700">
+                Acepto el aviso de privacidad de SAEPHONE
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
   const renderStepContent = () => {
     switch (currentStep) {
       case "phone":
         return renderPhoneStep()
+      case "terms":
+        return renderTermsStep()
       case "references":
         return renderReferencesStep()
       case "complete":
@@ -278,7 +357,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button
               onClick={() => {
                 if (phoneNumber.length === 10 && enteredCode.length === 4) {
-                  setCurrentStep("references")
+                  setCurrentStep("terms")
                 } else {
                   alert("Por favor, ingresa un teléfono válido y un código de 4 dígitos.")
                 }
@@ -287,6 +366,21 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               className="w-full bg-blue-600 py-2.5 md:py-3 text-white hover:bg-blue-700 disabled:bg-gray-300 text-sm md:text-base"
             >
               Verificar y Continuar →
+            </Button>
+          </div>
+        )
+      case "terms":
+        return (
+          <div className="mt-8 flex gap-4 justify-end">
+            <Button onClick={() => setCurrentStep("phone")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Regresar
+            </Button>
+            <Button
+              onClick={() => setCurrentStep("references")}
+              disabled={!acceptTerms || !acceptPrivacy}
+              className="bg-black text-white px-8 py-2 rounded-lg font-medium disabled:bg-gray-300"
+            >
+              Continuar
             </Button>
           </div>
         )
@@ -321,8 +415,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     switch (currentStep) {
       case "phone":
         return "Verificación Telefónica"
-      case "verification":
-        return "Código de Verificación"
+      case "terms":
+        return "Términos y Condiciones"
       case "references":
         return "Referencias de Contacto"
       case "complete":
@@ -348,7 +442,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     switch (currentStep) {
       case "phone":
         return 0;
-      case "verification":
+      case "terms":
         return 1;
       case "references":
         return 2;
@@ -373,7 +467,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                 if (index <= getCurrentStepIndex()) {
                   // Map step index back to currentStep
                   if (index === 0) setCurrentStep("phone");
-                  else if (index === 1) setCurrentStep("verification");
+                  else if (index === 1) setCurrentStep("terms");
                   else if (index === 2) setCurrentStep("references");
                   else if (index === 7) setCurrentStep("complete");
                 }
@@ -412,13 +506,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         )}
         {currentStep !== "phone" && (
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <div className="p-3 bg-green-100 rounded-full">
-                <Smartphone className="w-8 h-8 text-green-600" />
-              </div>
-            </div>
-            <h1 className="mb-2 text-3xl font-bold text-gray-800">{getStepTitle()}</h1>
-            <p className="text-gray-600">Módulo independiente de venta de dispositivos</p>
+            <h1 className="mb-2 text-xl md:text-2xl font-bold text-gray-800">{getStepTitle()}</h1>
           </div>
         )}
         <div className="space-y-6">
