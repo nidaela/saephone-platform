@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Smartphone, ArrowLeft, Check, FileText, Download } from "lucide-react"
+import { Smartphone, ArrowLeft, Check, FileText, Download, User, Loader2 } from "lucide-react"
 import { QRCodeCanvas } from "qrcode.react"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
@@ -40,7 +40,7 @@ type SellDevicesModuleProps = {
 };
 
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
-  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "references" | "complete">("phone")
+  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "appinstall" | "references" | "complete">("phone")
   const [verificationCode, setVerificationCode] = useState(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     let result = ""
@@ -57,6 +57,11 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const [verificationCodeInput, setVerificationCodeInput] = useState("")
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [acceptPrivacy, setAcceptPrivacy] = useState(false)
+  const [frontCaptured, setFrontCaptured] = useState(false)
+  const [backCaptured, setBackCaptured] = useState(false)
+  const [selfieLoading, setSelfieLoading] = useState(false)
+  const [selfieCaptured, setSelfieCaptured] = useState(false)
+  const bothCaptured = frontCaptured && backCaptured
 
   const handleGenerateNewCode = () => {
     let result = ""
@@ -93,6 +98,15 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       friendContactPhone
     })
     setCurrentStep("complete")
+  }
+  const handleSelfieClick = () => {
+    if (!selfieCaptured && !selfieLoading) {
+      setSelfieLoading(true)
+      setTimeout(() => {
+        setSelfieLoading(false)
+        setSelfieCaptured(true)
+      }, 10000)
+    }
   }
 
   const renderPhoneStep = () => (
@@ -152,29 +166,89 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       </div>
     </div>
   )
-  const renderVerificationStep = () => (
-    <div className="space-y-6">
-      <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
-        <div className="flex items-center gap-3">
-          <Check className="w-6 h-6 text-blue-500" />
-          <p className="text-gray-800">
-            Se ha enviado un código al teléfono +52 {phoneNumber}
-          </p>
+  const renderVerificationIdentityStep = () => (
+    <div className="w-full flex flex-col items-center">
+      <p className="text-gray-700 mb-8">Para continuar, necesitamos verificar tu identidad con tu INE y una selfie</p>
+      <div className="w-full max-w-3xl flex flex-col gap-10">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Check className="w-5 h-5 text-green-500" />
+            <span className="font-semibold text-lg text-gray-900">Tarjeta de identificación de usuario</span>
+          </div>
+          <div className="flex gap-8 justify-center mt-4">
+            {/* Anverso */}
+            <div
+              className={`w-64 h-40 rounded-lg flex items-center justify-center relative cursor-pointer transition-all duration-200 ${frontCaptured ? 'bg-red-100' : 'bg-gray-100 hover:bg-red-50'}`}
+              onClick={() => setFrontCaptured(true)}
+            >
+              {frontCaptured ? (
+                <>
+                  <span className="absolute top-3 right-3 bg-green-100 rounded-full p-1"><Check className="w-5 h-5 text-green-500" /></span>
+                  <span className="text-green-600 font-bold text-lg">Anverso capturado</span>
+                </>
+              ) : (
+                <div className="w-16 h-16 border-2 border-dashed border-red-300 rounded-full flex items-center justify-center">
+                  <div className="w-4 h-4 bg-red-300 rounded-full opacity-40" />
+                </div>
+              )}
+            </div>
+            {/* Reverso */}
+            <div
+              className={`w-64 h-40 rounded-lg flex items-center justify-center relative cursor-pointer transition-all duration-200 ${backCaptured ? 'bg-blue-100' : 'bg-gray-100 hover:bg-blue-50'}`}
+              onClick={() => setBackCaptured(true)}
+            >
+              {backCaptured ? (
+                <>
+                  <span className="absolute top-3 right-3 bg-green-100 rounded-full p-1"><Check className="w-5 h-5 text-green-500" /></span>
+                  <span className="text-green-600 font-bold text-lg">Reverso capturado</span>
+                </>
+              ) : (
+                <div className="w-16 h-16 border-2 border-dashed border-blue-300 rounded-full flex items-center justify-center">
+                  <div className="w-4 h-4 bg-blue-300 rounded-full opacity-40" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {bothCaptured && (
+          <div className="w-full bg-green-50 border-l-4 border-green-400 flex items-center p-4 mt-6 rounded-md">
+            <Check className="w-6 h-6 text-green-500 mr-2" />
+            <span className="font-bold text-green-900 mr-2">Nombre extraído del INE:</span>
+            <span className="text-gray-900 font-medium">María Rodríguez Hernández</span>
+          </div>
+        )}
+        <div className="mt-8">
+          <div className="flex items-center gap-2 mb-2">
+            <Check className={`w-5 h-5 ${selfieCaptured ? 'text-green-500' : 'text-green-500 opacity-50'}`} />
+            <span className="font-semibold text-lg text-gray-900">Foto en vivo del usuario</span>
+          </div>
+          <div className="flex flex-col items-center justify-center mt-4">
+            <div
+              className={`w-64 h-64 rounded-full flex items-center justify-center relative border transition-all duration-200 ${selfieCaptured ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-100 border-gray-200 hover:bg-yellow-50'} ${selfieLoading ? 'opacity-80' : ''}`}
+              onClick={bothCaptured && !selfieCaptured && !selfieLoading ? handleSelfieClick : undefined}
+              style={{ pointerEvents: bothCaptured ? 'auto' : 'none', opacity: bothCaptured ? 1 : 0.5 }}
+            >
+              {selfieLoading ? (
+                <Loader2 className="w-20 h-20 text-yellow-400 animate-spin" />
+              ) : (
+                <User className="w-20 h-20 text-red-400" />
+              )}
+              {selfieCaptured && (
+                <span className="absolute top-4 right-4 bg-green-100 rounded-full p-1"><Check className="w-6 h-6 text-green-500" /></span>
+              )}
+            </div>
+            {selfieCaptured && (
+              <p className="mt-4 text-green-600 font-bold text-lg">¡Selfie capturada correctamente!</p>
+            )}
+          </div>
         </div>
       </div>
-      <div>
-        <Label htmlFor="enter-code" className="text-gray-700">
-          Ingresa el código
-        </Label>
-        <Input
-          id="enter-code"
-          placeholder="Código de 4 dígitos"
-          className="mt-1"
-          value={enteredCode}
-          onChange={e => setEnteredCode(e.target.value)}
-          maxLength={4}
-        />
-      </div>
+    </div>
+  )
+  const renderAppInstallStep = () => (
+    <div className="space-y-6 text-center">
+      <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Instalación de App</h2>
+      <p className="text-gray-600 mb-6">Aquí va el contenido de instalación de la app.</p>
     </div>
   )
   const renderReferencesStep = () => (
@@ -337,6 +411,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return renderPhoneStep()
       case "terms":
         return renderTermsStep()
+      case "identity":
+        return renderVerificationIdentityStep()
+      case "appinstall":
+        return renderAppInstallStep()
       case "references":
         return renderReferencesStep()
       case "complete":
@@ -376,7 +454,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               ← Regresar
             </Button>
             <Button
-              onClick={() => setCurrentStep("references")}
+              onClick={() => setCurrentStep("identity")}
               disabled={!acceptTerms || !acceptPrivacy}
               className="bg-black text-white px-8 py-2 rounded-lg font-medium disabled:bg-gray-300"
             >
@@ -384,18 +462,40 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             </Button>
           </div>
         )
+      case "identity":
+        return (
+          <div className="mt-8 flex gap-4 justify-end">
+            <Button onClick={() => setCurrentStep("terms")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Regresar
+            </Button>
+            <Button onClick={() => setCurrentStep("references")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
+              Continuar
+            </Button>
+          </div>
+        )
       case "references":
         return (
           <div className="mt-8 grid grid-cols-2 gap-4">
-            <Button onClick={() => setCurrentStep("phone")} className="w-full bg-gray-200 py-3 text-gray-700 hover:bg-gray-300">
+            <Button onClick={() => setCurrentStep("identity")} className="w-full bg-gray-200 py-3 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
             <Button
-              onClick={handleCompleteAccount}
+              onClick={() => setCurrentStep("appinstall")}
               disabled={!userEmail || !familyContactName || !familyContactPhone || !friendContactName || !friendContactPhone}
               className="w-full bg-green-600 py-3 text-white hover:bg-green-700 disabled:bg-gray-300"
             >
-              Completar Venta →
+              Continuar a Instalación de App →
+            </Button>
+          </div>
+        )
+      case "appinstall":
+        return (
+          <div className="mt-8 flex gap-4 justify-end">
+            <Button onClick={() => setCurrentStep("references")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Regresar
+            </Button>
+            <Button onClick={handleCompleteAccount} className="bg-blue-600 text-white px-8 py-2 rounded-lg font-medium">
+              Finalizar
             </Button>
           </div>
         )
@@ -417,8 +517,12 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return "Verificación Telefónica"
       case "terms":
         return "Términos y Condiciones"
+      case "identity":
+        return "Verificación de Identidad"
       case "references":
         return "Referencias de Contacto"
+      case "appinstall":
+        return "Instalación de App"
       case "complete":
         return "Venta Completada"
       default:
@@ -428,14 +532,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
 
   // Add progress bar with 8 steps
   const progressStepKeys = [
-    t.progress_step1,
-    t.progress_step2,
-    t.progress_step3,
-    t.progress_step4,
+    t.progress_step1, // Verificación Telefónica
+    t.progress_step2, // Términos y Condiciones
+    t.progress_step4, // Verificación de Identidad
+    t.progress_step3, // Referencias de Contacto
     t.progress_step5,
     t.progress_step6,
     t.progress_step7,
-    t.progress_step8,
+    t.progress_step8, // Instalación de App (antes de Finalizar)
   ];
 
   const getCurrentStepIndex = () => {
@@ -444,10 +548,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return 0;
       case "terms":
         return 1;
-      case "references":
+      case "identity":
         return 2;
-      case "complete":
+      case "references":
+        return 3;
+      case "appinstall":
         return 7;
+      case "complete":
+        return 8;
       default:
         return 0;
     }
@@ -469,7 +577,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                   if (index === 0) setCurrentStep("phone");
                   else if (index === 1) setCurrentStep("terms");
                   else if (index === 2) setCurrentStep("references");
-                  else if (index === 7) setCurrentStep("complete");
+                  else if (index === 7) setCurrentStep("appinstall");
+                  else if (index === 8) setCurrentStep("complete");
                 }
               }}
             >
