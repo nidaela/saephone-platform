@@ -39,7 +39,7 @@ type SellDevicesModuleProps = {
 };
 
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
-  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "credit" | "appinstall" | "references" | "complete">("phone")
+  const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "credit" | "modelplan" | "appinstall" | "references" | "complete">("phone")
   const [verificationCode, setVerificationCode] = useState(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     let result = ""
@@ -63,6 +63,54 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const bothCaptured = frontCaptured && backCaptured
   const [creditLoading, setCreditLoading] = useState(true)
   const [creditEvaluated, setCreditEvaluated] = useState(false)
+
+  // Simulación de datos para el paso de modelo y plan
+  const brands = ["Apple", "Samsung", "Xiaomi"];
+  const modelsByBrand = {
+    Apple: ["iPhone 15 Pro", "iPhone 14", "iPhone SE"],
+    Samsung: ["Galaxy S23", "Galaxy A54", "Galaxy Z Flip"],
+    Xiaomi: ["Redmi Note 12", "Mi 11", "Poco X5"]
+  };
+  const capacities = ["64GB", "128GB", "256GB"];
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [selectedBrand, setSelectedBrand] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedCapacity, setSelectedCapacity] = useState<string>("");
+  const [devicePrice, setDevicePrice] = useState<number>(0);
+  const [selectedPlan, setSelectedPlan] = useState<number|null>(null);
+  const [customWeeks, setCustomWeeks] = useState<number>(10);
+  // Precios simulados por modelo
+  const priceTable: Record<string, number> = {
+    "iPhone 15 Pro": 3997,
+    "iPhone 14": 2999,
+    "iPhone SE": 1999,
+    "Galaxy S23": 3499,
+    "Galaxy A54": 2499,
+    "Galaxy Z Flip": 4299,
+    "Redmi Note 12": 1599,
+    "Mi 11": 1899,
+    "Poco X5": 1799
+  };
+  // Planes simulados
+  const plans = [10, 20, 26, 30];
+  // Cálculo de pago inicial y saldo
+  const initialPayment = Math.round(devicePrice * 0.15);
+  const balance = devicePrice - initialPayment;
+  // Cálculo de pagos por semana
+  const getWeeklyPayment = (weeks: number) => weeks > 0 ? Math.round(balance / weeks) : 0;
+  // Actualiza precio al seleccionar modelo
+  React.useEffect(() => {
+    if (selectedModel && priceTable[selectedModel]) {
+      setDevicePrice(priceTable[selectedModel]);
+    }
+  }, [selectedModel]);
+  // Helper para obtener modelos por marca
+  const getModelsByBrand = (brand: string): string[] => {
+    if (brand === "Apple") return modelsByBrand.Apple;
+    if (brand === "Samsung") return modelsByBrand.Samsung;
+    if (brand === "Xiaomi") return modelsByBrand.Xiaomi;
+    return [];
+  };
 
   const handleGenerateNewCode = () => {
     let result = ""
@@ -333,6 +381,83 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       )}
     </div>
   )
+  const renderModelPlanStep = () => (
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Título eliminado por solicitud */}
+      <div className="mb-6">
+        <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">1</span>Método de pago</div>
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <button type="button" onClick={() => setPaymentMethod("financiado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="financiado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>Financiado por Saephone<br/><span className="font-normal text-sm">Pagos a meses sin intereses</span></button>
+          <button type="button" onClick={() => setPaymentMethod("contado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="contado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>Pago de Contado<br/><span className="font-normal text-sm">Pago único completo</span></button>
+        </div>
+        {!paymentMethod && <div className="text-red-500 text-sm mt-1">* Selecciona un método de pago</div>}
+      </div>
+      {/* 2. Modelo */}
+      <div className="mb-6">
+        <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">2</span>Modelo</div>
+        <div className="flex gap-2 mb-2">
+          <select className="border rounded-md px-3 py-2" value={selectedBrand} onChange={e => {setSelectedBrand(e.target.value); setSelectedModel("");}}>
+            <option value="">Selecciona una marca</option>
+            {brands.map(b => <option key={b} value={b}>{b}</option>)}
+          </select>
+          <select className="border rounded-md px-3 py-2" value={selectedModel} onChange={e => setSelectedModel(e.target.value)} disabled={!selectedBrand}>
+            <option value="">Selecciona un modelo</option>
+            {selectedBrand && getModelsByBrand(selectedBrand).map((m: string) => <option key={m} value={m}>{m}</option>)}
+          </select>
+          <select className="border rounded-md px-3 py-2" value={selectedCapacity} onChange={e => setSelectedCapacity(e.target.value)}>
+            <option value="">Selecciona capacidad</option>
+            {capacities.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        {!selectedBrand && <div className="text-red-500 text-sm mt-1">* Selecciona una marca</div>}
+        <div className="mt-2">
+          <Label className="text-blue-700 text-sm">Precio del dispositivo</Label>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="border rounded-l px-2 py-1 bg-gray-100">$</span>
+            <Input type="number" className="w-32 h-10 text-lg" value={devicePrice} onChange={e => setDevicePrice(Number(e.target.value))} min={0} />
+          </div>
+          <div className="text-xs text-gray-500 mt-1">El precio se actualiza automáticamente al seleccionar modelo y capacidad, pero puedes editarlo manualmente</div>
+        </div>
+      </div>
+      {/* Pago inicial requerido */}
+      {paymentMethod==="financiado" && devicePrice > 0 && (
+        <div className="bg-blue-50 border-l-4 border-blue-400 rounded-lg p-4 mb-6">
+          <div className="font-bold text-blue-900 mb-2">Pago Inicial Requerido</div>
+          <div className="flex flex-col gap-1 text-sm">
+            <div className="flex justify-between"><span>Precio del dispositivo:</span><span className="font-bold">${devicePrice.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>Pago inicial (15%):</span><span className="font-bold text-blue-700">${initialPayment.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>Saldo a financiar:</span><span className="font-bold text-green-700">${balance.toLocaleString()}</span></div>
+          </div>
+          <div className="text-xs text-blue-700 mt-2">Importante: El pago inicial del 15% debe ser realizado al momento de la entrega del dispositivo.</div>
+        </div>
+      )}
+      {/* 3. Plan de financiamiento */}
+      {paymentMethod==="financiado" && devicePrice > 0 && (
+        <div className="mb-6">
+          <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">3</span>Plan de financiamiento</div>
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {plans.map(weeks => (
+              <button key={weeks} type="button" onClick={() => setSelectedPlan(weeks)} className={`border rounded-lg py-4 font-bold text-lg text-center ${selectedPlan===weeks ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>
+                {weeks} SEMANAS
+                <div className="font-normal text-base mt-1">${getWeeklyPayment(weeks)} <span className="text-xs">/SEMANA</span></div>
+                <div className="text-xs text-gray-500 mt-1">pago inicial: ${initialPayment} <br/> saldo final: ${(getWeeklyPayment(weeks)*weeks+initialPayment).toLocaleString()}</div>
+              </button>
+            ))}
+          </div>
+          {/* Plan personalizado */}
+          <div className="bg-gray-50 rounded-lg p-4 mt-4">
+            <div className="font-bold text-blue-700 text-center mb-2">Plan personalizado</div>
+            <div className="flex flex-col items-center">
+              <span className="mb-2">Semanas: {customWeeks}</span>
+              <input type="range" min={10} max={30} value={customWeeks} onChange={e => {setCustomWeeks(Number(e.target.value)); setSelectedPlan(null);}} className="w-full mb-2" />
+              <div className="font-bold text-2xl text-green-700 mb-1">${getWeeklyPayment(customWeeks)}</div>
+              <div className="text-xs text-gray-500">pago inicial: ${initialPayment} <br/> saldo final: ${(getWeeklyPayment(customWeeks)*customWeeks+initialPayment).toLocaleString()}</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
   const renderAppInstallStep = () => (
     <div className="space-y-6 text-center">
       <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Instalación de App</h2>
@@ -503,6 +628,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return renderVerificationIdentityStep()
       case "credit":
         return renderCreditProfileStep()
+      case "modelplan":
+        return renderModelPlanStep()
       case "appinstall":
         return renderAppInstallStep()
       case "references":
@@ -569,6 +696,17 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("identity")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
+            <Button onClick={() => setCurrentStep("modelplan")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
+              Continuar
+            </Button>
+          </div>
+        )
+      case "modelplan":
+        return (
+          <div className="mt-8 flex gap-4 justify-end">
+            <Button onClick={() => setCurrentStep("credit")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+              ← Regresar
+            </Button>
             <Button onClick={() => setCurrentStep("appinstall")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
               Continuar
             </Button>
@@ -622,6 +760,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return "Verificación de Identidad"
       case "credit":
         return "Verificación de Perfil Crediticio"
+      case "modelplan":
+        return "Selección de Modelo y Plan de Financiamiento"
       case "appinstall":
         return "Instalación de App"
       case "references":
@@ -639,6 +779,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     t.progress_step2, // Términos y Condiciones
     t.progress_step4, // Verificación de Identidad
     "Verificación de Perfil Crediticio",
+    "Selección de Modelo y Plan de Financiamiento",
     t.progress_step8, // Instalación de App
     t.progress_step3, // Referencias de Contacto
     t.progress_step5,
@@ -656,12 +797,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return 2;
       case "credit":
         return 3;
-      case "appinstall":
+      case "modelplan":
         return 4;
-      case "references":
+      case "appinstall":
         return 5;
+      case "references":
+        return 6;
       case "complete":
-        return 9;
+        return 10;
       default:
         return 0;
     }
@@ -684,9 +827,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                   else if (index === 1) setCurrentStep("terms");
                   else if (index === 2) setCurrentStep("identity");
                   else if (index === 3) setCurrentStep("credit");
-                  else if (index === 4) setCurrentStep("appinstall");
-                  else if (index === 5) setCurrentStep("references");
-                  else if (index === 6) setCurrentStep("complete");
+                  else if (index === 4) setCurrentStep("modelplan");
+                  else if (index === 5) setCurrentStep("appinstall");
+                  else if (index === 6) setCurrentStep("references");
+                  else if (index === 7) setCurrentStep("complete");
                 }
               }}
             >
