@@ -4,7 +4,8 @@ import type React from "react"
 
 import { useState, useCallback, useEffect } from "react"
 import LoginPage from "@/components/login-page"
-import CreateAccountPage from "@/components/create-account-page"
+import CreateAccountModule from "@/components/modules/create-account/CreateAccountModule"
+import SellDevicesModule from "@/components/modules/sell-devices/SellDevicesModule"
 import { translations } from "@/lib/translations"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -40,6 +41,7 @@ import html2canvas from "html2canvas"
 type PageType =
   | "login"
   | "create-account"
+  | "sell-devices"
   | "terms"
   | "app-install"
   | "identity-verification"
@@ -353,10 +355,21 @@ export default function SaephonePlatform() {
             <div className="w-full max-w-4xl mt-8">
               <ContractProgressSteps />
             </div>
-            <CreateAccountPage 
-              onBack={() => setCurrentPage("dashboard")} 
-              onNext={() => setCurrentPage("terms")} 
-              t={t} 
+            <CreateAccountModule
+              onBack={() => setCurrentPage("dashboard")}
+              onComplete={() => setCurrentPage("dashboard")}
+              t={t}
+            />
+          </div>
+        )
+      case "sell-devices":
+        return (
+          <div className="relative z-10 flex flex-col items-center min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <FlowHeader />
+            <SellDevicesModule
+              onBack={() => setCurrentPage("dashboard")}
+              onComplete={() => setCurrentPage("dashboard")}
+              t={t}
             />
           </div>
         )
@@ -667,7 +680,7 @@ export default function SaephonePlatform() {
                           </div>
                           <p className="text-gray-600 mb-6">{t.dashboard_sellDevicesDesc}</p>
                         </div>
-                        <Button onClick={() => setCurrentPage("create-account")} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
+                        <Button onClick={() => setCurrentPage("sell-devices")} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg">
                           {t.dashboard_newSaleBtn}
                         </Button>
                       </CardContent>
