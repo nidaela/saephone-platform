@@ -996,8 +996,24 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               <div className="flex flex-row items-center justify-center w-full">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 mx-auto ${
-                    index <= getCurrentStepIndex() ? "bg-green-500" : "bg-white/30"
+                    index <= getCurrentStepIndex() ? "bg-green-500 cursor-pointer" : "bg-white/30 cursor-default"
                   }`}
+                  onClick={() => {
+                    if (index <= getCurrentStepIndex()) {
+                      if (index === 0) setCurrentStep("phone");
+                      else if (index === 1) setCurrentStep("terms");
+                      else if (index === 2) setCurrentStep("identity");
+                      else if (index === 3) setCurrentStep("credit");
+                      else if (index === 4) setCurrentStep("modelplan");
+                      else if (index === 5) setCurrentStep("contract");
+                      else if (index === 6) setCurrentStep("references");
+                      else if (index === 7) setCurrentStep("appinstall");
+                      else if (index === 8) setCurrentStep("complete");
+                    }
+                  }}
+                  role="button"
+                  tabIndex={index <= getCurrentStepIndex() ? 0 : -1}
+                  aria-label={`Ir al paso ${index + 1}`}
                 >
                   {index + 1}
                 </div>
