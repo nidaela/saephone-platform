@@ -229,16 +229,16 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const renderPhoneStep = () => (
       <div>
       <div className="text-center mb-4">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-1">Registrar nuevo cliente en Saephone</h2>
-        <p className="text-gray-600 text-sm md:text-base">Para comenzar, necesitamos verificar tu número de teléfono</p>
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-1">{t.create_formTitle}</h2>
+        <p className="text-gray-600 text-sm md:text-base">{t.create_formSubtitle}</p>
       </div>
       <div className="space-y-4">
       <div>
-          <Label htmlFor="verification-code" className="text-gray-700 text-sm">Código de verificación</Label>
+          <Label htmlFor="verification-code" className="text-gray-700 text-sm">{t.create_verificationCodeLabel}</Label>
           <div className="mt-1 flex items-center gap-2 md:gap-4">
             <Input
               id="verification-code"
-              placeholder="Ingresa el código que ves a la derecha"
+              placeholder={t.create_verificationCodePlaceholder}
               className="font-mono tracking-widest h-10 text-sm flex-1"
               value={verificationCodeInput}
               onChange={e => setVerificationCodeInput(e.target.value)}
@@ -248,32 +248,32 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               {verificationCode}
             </div>
             <Button onClick={handleGenerateNewCode} className="bg-green-500 text-white hover:bg-green-600 h-10 px-3 text-sm">
-              Generar nuevo código
+              {t.create_generateCode}
             </Button>
           </div>
         </div>
           <div>
-          <Label htmlFor="phone-number" className="text-gray-700 text-sm">Número de teléfono</Label>
+          <Label htmlFor="phone-number" className="text-gray-700 text-sm">{t.create_phoneLabel}</Label>
           <div className="mt-1 flex items-center gap-2 md:gap-4">
             <span className="rounded-md border border-gray-300 bg-gray-100 px-3 py-1.5 text-gray-700 text-sm">+52</span>
             <Input
               id="phone-number"
-              placeholder="Ingresa tu número de teléfono"
+              placeholder={t.create_phonePlaceholder}
               value={phoneNumber}
               onChange={handlePhoneChange}
               maxLength={10}
               className="h-10 text-sm"
             />
             <Button onClick={handleSendCode} className="bg-green-500 text-white hover:bg-green-600 h-10 px-3 text-sm">
-              Enviar código
+              {t.create_sendCode}
             </Button>
           </div>
           </div>
           <div>
-          <Label htmlFor="entered-code" className="text-gray-700 text-sm">Introduce el código</Label>
+          <Label htmlFor="entered-code" className="text-gray-700 text-sm">{t.create_enterCodeLabel}</Label>
           <Input
             id="entered-code"
-            placeholder="Código de 4 dígitos"
+            placeholder={t.create_enterCodePlaceholder}
             className="mt-1 h-10 text-sm"
             value={enteredCode}
             onChange={e => setEnteredCode(e.target.value)}
@@ -285,12 +285,12 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   )
   const renderVerificationIdentityStep = () => (
     <div className="w-full flex flex-col items-center">
-      <p className="text-gray-700 mb-8">Para continuar, necesitamos verificar tu identidad con tu INE y una selfie</p>
+      <p className="text-gray-700 mb-8">{t.identityVerification_subtitle}</p>
       <div className="w-full max-w-3xl flex flex-col gap-10">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Check className="w-5 h-5 text-green-500" />
-            <span className="font-semibold text-lg text-gray-900">Tarjeta de identificación de usuario</span>
+            <span className="font-semibold text-lg text-gray-900">{t.identityVerification_idCardTitle}</span>
           </div>
           <div className="flex gap-8 justify-center mt-4">
             {/* Anverso */}
@@ -301,7 +301,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               {frontCaptured ? (
                 <>
                   <span className="absolute top-3 right-3 bg-green-100 rounded-full p-1"><Check className="w-5 h-5 text-green-500" /></span>
-                  <span className="text-green-600 font-bold text-lg">Anverso capturado</span>
+                  <span className="text-green-600 font-bold text-lg">{t.identityVerification_frontId}</span>
                 </>
               ) : (
                 <div className="w-16 h-16 border-2 border-dashed border-red-300 rounded-full flex items-center justify-center">
@@ -317,7 +317,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               {backCaptured ? (
                 <>
                   <span className="absolute top-3 right-3 bg-green-100 rounded-full p-1"><Check className="w-5 h-5 text-green-500" /></span>
-                  <span className="text-green-600 font-bold text-lg">Reverso capturado</span>
+                  <span className="text-green-600 font-bold text-lg">{t.identityVerification_backId}</span>
                 </>
               ) : (
                 <div className="w-16 h-16 border-2 border-dashed border-blue-300 rounded-full flex items-center justify-center">
@@ -330,14 +330,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         {bothCaptured && (
           <div className="w-full bg-green-50 border-l-4 border-green-400 flex items-center p-4 mt-6 rounded-md">
             <Check className="w-6 h-6 text-green-500 mr-2" />
-            <span className="font-bold text-green-900 mr-2">Nombre extraído del INE:</span>
+            <span className="font-bold text-green-900 mr-2">{t.identityVerification_extractedDataTitle}</span>
             <span className="text-gray-900 font-medium">María Rodríguez Hernández</span>
           </div>
         )}
         <div className="mt-8">
           <div className="flex items-center gap-2 mb-2">
             <Check className={`w-5 h-5 ${selfieCaptured ? 'text-green-500' : 'text-green-500 opacity-50'}`} />
-            <span className="font-semibold text-lg text-gray-900">Foto en vivo del usuario</span>
+            <span className="font-semibold text-lg text-gray-900">{t.identityVerification_selfieTitle}</span>
           </div>
           <div className="flex flex-col items-center justify-center mt-4">
             <div
@@ -355,7 +355,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               )}
             </div>
             {selfieCaptured && (
-              <p className="mt-4 text-green-600 font-bold text-lg">¡Selfie capturada correctamente!</p>
+              <p className="mt-4 text-green-600 font-bold text-lg">{t.identityVerification_selfieSuccess}</p>
             )}
           </div>
         </div>
@@ -367,17 +367,17 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       {creditLoading && (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-6" />
-          <p className="text-xl font-semibold text-gray-800 mb-2">Evaluando perfil crediticio con Buró de Crédito...</p>
-          <p className="text-gray-600">Por favor espera unos segundos mientras verificamos tu historial.</p>
+          <p className="text-xl font-semibold text-gray-800 mb-2">{t.creditProfile_loadingTitle}</p>
+          <p className="text-gray-600">{t.creditProfile_loadingSubtitle}</p>
         </div>
       )}
       {creditEvaluated && (
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Perfil crediticio verificado!</h2>
-          <p className="text-gray-700 mb-6">María Rodríguez Hernández tiene un excelente historial crediticio. Es posible otorgar crédito.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.creditProfile_verifiedTitle}</h2>
+          <p className="text-gray-700 mb-6">{t.creditProfile_verifiedSubtitle}</p>
           <div className="flex gap-2 mb-6">
-            <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">Buró de Crédito</button>
-            <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">Círculo de Crédito</button>
+            <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">{t.creditProfile_bureau1}</button>
+            <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">{t.creditProfile_bureau2}</button>
           </div>
           <div className="w-full flex flex-col items-center mb-8">
             {/* Score Gauge (simulado) */}
@@ -395,7 +395,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               </svg>
               <div className="absolute top-14 left-1/2 -translate-x-1/2 flex flex-col items-center">
                 <span className="text-5xl font-bold text-gray-900">803</span>
-                <span className="text-green-600 font-semibold text-lg">Excelente</span>
+                <span className="text-green-600 font-semibold text-lg">{t.creditProfile_scoreExcellent}</span>
               </div>
               <div className="absolute top-24 right-12 flex items-center gap-1 bg-white rounded-full px-2 py-1 shadow text-green-600 font-semibold text-sm border border-green-200">
                 <svg width="16" height="16" fill="none"><path d="M8 12V4M8 4l-4 4m4-4l4 4" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -410,39 +410,39 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               <span>850</span>
             </div>
           </div>
-          <button className="w-full py-3 rounded-lg bg-black text-white font-semibold text-lg mb-8">Actualizar score crediticio</button>
+          <button className="w-full py-3 rounded-lg bg-black text-white font-semibold text-lg mb-8">{t.creditProfile_updateScore}</button>
           <div className="grid grid-cols-2 gap-4 w-full">
             <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
               <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">Historial de pagos</span>
-                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">Alto impacto</span>
+                <span className="font-semibold text-gray-800">{t.creditProfile_paymentHistory}</span>
+                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">{t.creditProfile_highImpact}</span>
               </div>
               <div className="text-2xl font-bold text-gray-900">100%</div>
-              <div className="text-xs text-gray-500">Pagos realizados a tiempo</div>
+              <div className="text-xs text-gray-500">{t.creditProfile_onTimePayments}</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
               <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">Uso de tarjeta</span>
-                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">Alto impacto</span>
+                <span className="font-semibold text-gray-800">{t.creditProfile_cardUsage}</span>
+                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">{t.creditProfile_highImpact}</span>
               </div>
               <div className="text-2xl font-bold text-gray-900">2%</div>
-              <div className="text-xs text-gray-500">Porcentaje de crédito utilizado</div>
+              <div className="text-xs text-gray-500">{t.creditProfile_creditUsed}</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
               <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">Antigüedad crediticia</span>
-                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">Impacto medio</span>
+                <span className="font-semibold text-gray-800">{t.creditProfile_creditAge}</span>
+                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">{t.creditProfile_mediumImpact}</span>
               </div>
-              <div className="text-2xl font-bold text-gray-900">7 años</div>
-              <div className="text-xs text-gray-500">Promedio de antigüedad</div>
+              <div className="text-2xl font-bold text-gray-900">7 {t.creditProfile_years}</div>
+              <div className="text-xs text-gray-500">{t.creditProfile_avgAge}</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
               <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">Cuentas totales</span>
-                <span className="text-red-600 font-semibold text-xs bg-red-100 rounded px-2 py-0.5">Bajo impacto</span>
+                <span className="font-semibold text-gray-800">{t.creditProfile_totalAccounts}</span>
+                <span className="text-red-600 font-semibold text-xs bg-red-100 rounded px-2 py-0.5">{t.creditProfile_lowImpact}</span>
               </div>
               <div className="text-2xl font-bold text-gray-900">28</div>
-              <div className="text-xs text-gray-500">Cuentas abiertas y cerradas</div>
+              <div className="text-xs text-gray-500">{t.creditProfile_openClosed}</div>
             </div>
           </div>
         </div>
@@ -453,73 +453,73 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     <div className="w-full max-w-2xl mx-auto">
       {/* Título eliminado por solicitud */}
       <div className="mb-6">
-        <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">1</span>Método de pago</div>
+        <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">1</span>{t.deviceSelection_paymentMethod}</div>
         <div className="grid grid-cols-2 gap-4 mb-2">
-          <button type="button" onClick={() => setPaymentMethod("financiado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="financiado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>Financiado por Saephone<br/><span className="font-normal text-sm">Pagos a meses sin intereses</span></button>
-          <button type="button" onClick={() => setPaymentMethod("contado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="contado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>Pago de Contado<br/><span className="font-normal text-sm">Pago único completo</span></button>
+          <button type="button" onClick={() => setPaymentMethod("financiado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="financiado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>{t.deviceSelection_financed}<br/><span className="font-normal text-sm">{t.deviceSelection_financedDesc}</span></button>
+          <button type="button" onClick={() => setPaymentMethod("contado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="contado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>{t.deviceSelection_cash}<br/><span className="font-normal text-sm">{t.deviceSelection_cashDesc}</span></button>
         </div>
-        {!paymentMethod && <div className="text-red-500 text-sm mt-1">* Selecciona un método de pago</div>}
+        {!paymentMethod && <div className="text-red-500 text-sm mt-1">{t.deviceSelection_selectPaymentMethod}</div>}
       </div>
       {/* 2. Modelo */}
       <div className="mb-6">
-        <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">2</span>Modelo</div>
+        <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">2</span>{t.deviceSelection_model}</div>
         <div className="flex gap-2 mb-2">
           <select className="border rounded-md px-3 py-2" value={selectedBrand} onChange={e => {setSelectedBrand(e.target.value); setSelectedModel("");}}>
-            <option value="">Selecciona una marca</option>
+            <option value="">{t.deviceSelection_selectBrand}</option>
             {brands.map(b => <option key={b} value={b}>{b}</option>)}
           </select>
           <select className="border rounded-md px-3 py-2" value={selectedModel} onChange={e => setSelectedModel(e.target.value)} disabled={!selectedBrand}>
-            <option value="">Selecciona un modelo</option>
+            <option value="">{t.deviceSelection_selectModel}</option>
             {selectedBrand && getModelsByBrand(selectedBrand).map((m: string) => <option key={m} value={m}>{m}</option>)}
           </select>
           <select className="border rounded-md px-3 py-2" value={selectedCapacity} onChange={e => setSelectedCapacity(e.target.value)}>
-            <option value="">Selecciona capacidad</option>
+            <option value="">{t.deviceSelection_selectCapacity}</option>
             {capacities.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
-        {!selectedBrand && <div className="text-red-500 text-sm mt-1">* Selecciona una marca</div>}
+        {!selectedBrand && <div className="text-red-500 text-sm mt-1">{t.deviceSelection_selectBrandPrompt}</div>}
         <div className="mt-2">
-          <Label className="text-blue-700 text-sm">Precio del dispositivo</Label>
+          <Label className="text-blue-700 text-sm">{t.deviceSelection_devicePrice}</Label>
           <div className="flex items-center gap-2 mt-1">
             <span className="border rounded-l px-2 py-1 bg-gray-100">$</span>
             <Input type="number" className="w-32 h-10 text-lg" value={devicePrice} onChange={e => setDevicePrice(Number(e.target.value))} min={0} />
           </div>
-          <div className="text-xs text-gray-500 mt-1">El precio se actualiza automáticamente al seleccionar modelo y capacidad, pero puedes editarlo manualmente</div>
+          <div className="text-xs text-gray-500 mt-1">{t.deviceSelection_priceDisclaimer}</div>
         </div>
       </div>
       {/* Pago inicial requerido */}
       {paymentMethod==="financiado" && devicePrice > 0 && (
         <div className="bg-blue-50 border-l-4 border-blue-400 rounded-lg p-4 mb-6">
-          <div className="font-bold text-blue-900 mb-2">Pago Inicial Requerido</div>
+          <div className="font-bold text-blue-900 mb-2">{t.deviceSelection_initialPaymentRequired}</div>
           <div className="flex flex-col gap-1 text-sm">
-            <div className="flex justify-between"><span>Precio del dispositivo:</span><span className="font-bold">${devicePrice.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span>Pago inicial (15%):</span><span className="font-bold text-blue-700">${initialPayment.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span>Saldo a financiar:</span><span className="font-bold text-green-700">${balance.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>{t.deviceSelection_devicePrice}:</span><span className="font-bold">${devicePrice.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>{t.deviceSelection_initialPayment} (15%):</span><span className="font-bold text-blue-700">${initialPayment.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>{t.deviceSelection_balanceToFinance}</span><span className="font-bold text-green-700">${balance.toLocaleString()}</span></div>
           </div>
-          <div className="text-xs text-blue-700 mt-2">Importante: El pago inicial del 15% debe ser realizado al momento de la entrega del dispositivo.</div>
+          <div className="text-xs text-blue-700 mt-2">{t.deviceSelection_importantInitialPayment}</div>
         </div>
       )}
       {/* 3. Plan de financiamiento */}
       {paymentMethod==="financiado" && devicePrice > 0 && (
         <div className="mb-6">
-          <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">3</span>Plan de financiamiento</div>
+          <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">3</span>{t.deviceSelection_financingPlan}</div>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {plans.map(weeks => (
               <button key={weeks} type="button" onClick={() => setSelectedPlan(weeks)} className={`border rounded-lg py-4 font-bold text-lg text-center ${selectedPlan===weeks ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>
-                {weeks} SEMANAS
-                <div className="font-normal text-base mt-1">${getWeeklyPayment(weeks)} <span className="text-xs">/SEMANA</span></div>
-                <div className="text-xs text-gray-500 mt-1">pago inicial: ${initialPayment} <br/> saldo final: ${(getWeeklyPayment(weeks)*weeks+initialPayment).toLocaleString()}</div>
+                {weeks} {t.deviceSelection_weeks}
+                <div className="font-normal text-base mt-1">${getWeeklyPayment(weeks)} <span className="text-xs">{t.deviceSelection_perWeek}</span></div>
+                <div className="text-xs text-gray-500 mt-1">{t.deviceSelection_initialPayment}: ${initialPayment} <br/> {t.deviceSelection_finalPrice}: ${(getWeeklyPayment(weeks)*weeks+initialPayment).toLocaleString()}</div>
               </button>
             ))}
           </div>
           {/* Plan personalizado */}
           <div className="bg-gray-50 rounded-lg p-4 mt-4">
-            <div className="font-bold text-blue-700 text-center mb-2">Plan personalizado</div>
+            <div className="font-bold text-blue-700 text-center mb-2">{t.deviceSelection_customPlan}</div>
             <div className="flex flex-col items-center">
-              <span className="mb-2">Semanas: {customWeeks}</span>
+              <span className="mb-2">{t.deviceSelection_weeksLabel}{customWeeks}</span>
               <input type="range" min={10} max={30} value={customWeeks} onChange={e => {setCustomWeeks(Number(e.target.value)); setSelectedPlan(null);}} className="w-full mb-2" />
               <div className="font-bold text-2xl text-green-700 mb-1">${getWeeklyPayment(customWeeks)}</div>
-              <div className="text-xs text-gray-500">pago inicial: ${initialPayment} <br/> saldo final: ${(getWeeklyPayment(customWeeks)*customWeeks+initialPayment).toLocaleString()}</div>
+              <div className="text-xs text-gray-500">{t.deviceSelection_initialPayment}: ${initialPayment} <br/> {t.deviceSelection_finalPrice}: ${(getWeeklyPayment(customWeeks)*customWeeks+initialPayment).toLocaleString()}</div>
             </div>
           </div>
         </div>
@@ -528,43 +528,43 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   )
   const renderContractStep = () => (
     <div className="w-full flex flex-col items-center">
-      <p className="text-gray-700 mb-8 text-center">Escanea el código QR para que el cliente firme el contrato</p>
+      <p className="text-gray-700 mb-8 text-center">{t.contractGeneration_subtitle}</p>
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-8">
         {/* 1. Contrato de Financiamiento */}
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center font-bold">1</span>
-            <span className="font-bold text-green-700 text-lg">Contrato de Financiamiento</span>
+            <span className="font-bold text-green-700 text-lg">{t.contractGeneration_financingTitle}</span>
             <button className="ml-auto bg-gray-100 rounded-full p-2"><FileText className="w-5 h-5 text-gray-500" /></button>
           </div>
           <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-            <div className="text-center font-bold text-lg mb-2">CONTRATO DE VENTA EN PARCIALIDADES</div>
-            <div className="text-center font-bold text-md mb-4">SAEPHONE México, S. de R.L. de C.V.<br/>Fecha: {new Date().toLocaleDateString()}</div>
+            <div className="text-center font-bold text-lg mb-2">{t.contractGeneration_cardTitle}</div>
+            <div className="text-center font-bold text-md mb-4">SAEPHONE México, S. de R.L. de C.V.<br/>{t.contractGeneration_date}: {new Date().toLocaleDateString()}</div>
             <hr className="my-2" />
-            <div className="text-sm mb-2 font-bold">1. DATOS DEL PROVEEDOR</div>
+            <div className="text-sm mb-2 font-bold">{t.contractGeneration_providerData}</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">Razón Social:</span> SAEPHONE México, S. de R.L. de C.V.</div>
-              <div><span className="font-bold">RFC:</span> SAE-123456-ABC</div>
-              <div><span className="font-bold">Domicilio:</span> Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</div>
-              <div><span className="font-bold">Teléfono:</span> (55) 1234-5678</div>
+              <div><span className="font-bold">{t.contractGeneration_providerName}:</span> SAEPHONE México, S. de R.L. de C.V.</div>
+              <div><span className="font-bold">{t.contractGeneration_providerRFC}:</span> SAE-123456-ABC</div>
+              <div><span className="font-bold">{t.contractGeneration_providerAddress}:</span> Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</div>
+              <div><span className="font-bold">{t.contractGeneration_providerPhone}:</span> (55) 1234-5678</div>
             </div>
-            <div className="text-sm mt-4 mb-2 font-bold">2. DATOS DEL CLIENTE</div>
+            <div className="text-sm mt-4 mb-2 font-bold">{t.contractGeneration_clientData}</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">Nombre:</span> {extractedName}</div>
-              <div><span className="font-bold">Teléfono:</span> +52 {phoneNumber}</div>
-              <div><span className="font-bold">Email:</span> {userEmail}</div>
+              <div><span className="font-bold">{t.contractGeneration_clientName}:</span> {extractedName}</div>
+              <div><span className="font-bold">{t.contractGeneration_clientPhone}:</span> +52 {phoneNumber}</div>
+              <div><span className="font-bold">{t.contractGeneration_clientEmail}:</span> {userEmail}</div>
             </div>
-            <div className="text-sm mt-4 mb-2 font-bold">3. DETALLES DEL DISPOSITIVO Y PLAN</div>
+            <div className="text-sm mt-4 mb-2 font-bold">{t.contractGeneration_deviceData}</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">Marca:</span> {selectedBrand}</div>
-              <div><span className="font-bold">Modelo:</span> {selectedModel}</div>
-              <div><span className="font-bold">Capacidad:</span> {selectedCapacity}</div>
-              <div><span className="font-bold">Precio:</span> ${devicePrice}</div>
-              <div><span className="font-bold">Método de pago:</span> {paymentMethod === "financiado" ? "Financiado por Saephone" : paymentMethod === "contado" ? "Pago de Contado" : ""}</div>
-              <div><span className="font-bold">Semanas:</span> {selectedPlan || customWeeks}</div>
-              <div><span className="font-bold">Pago inicial (15%):</span> ${initialPayment}</div>
-              <div><span className="font-bold">Saldo a financiar:</span> ${balance}</div>
-              <div><span className="font-bold">Pago semanal:</span> ${getWeeklyPayment(selectedPlan || customWeeks)}</div>
+              <div><span className="font-bold">{t.deviceSelection_brand}:</span> {selectedBrand}</div>
+              <div><span className="font-bold">{t.deviceSelection_model}:</span> {selectedModel}</div>
+              <div><span className="font-bold">{t.deviceSelection_capacity}:</span> {selectedCapacity}</div>
+              <div><span className="font-bold">{t.deviceSelection_devicePrice}:</span> ${devicePrice}</div>
+              <div><span className="font-bold">{t.contractGeneration_paymentMethod}:</span> {paymentMethod === "financiado" ? t.deviceSelection_financed : paymentMethod === "contado" ? t.deviceSelection_cash : ""}</div>
+              <div><span className="font-bold">{t.contractGeneration_weeks}:</span> {selectedPlan || customWeeks}</div>
+              <div><span className="font-bold">{t.contractGeneration_initialPayment}:</span> ${initialPayment}</div>
+              <div><span className="font-bold">{t.contractGeneration_balance}:</span> ${balance}</div>
+              <div><span className="font-bold">{t.contractGeneration_weeklyPayment}:</span> ${getWeeklyPayment(selectedPlan || customWeeks)}</div>
             </div>
           </div>
         </div>
@@ -572,10 +572,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center font-bold">2</span>
-            <span className="font-bold text-green-700 text-lg">Firma Digital del Cliente</span>
+            <span className="font-bold text-green-700 text-lg">{t.contractGeneration_signatureTitle}</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="mb-2 text-gray-700">Haz click sobre el código para ampliarlo</span>
+            <span className="mb-2 text-gray-700">{t.contractGeneration_qrInstruction}</span>
             <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
               <div className="bg-white p-2 rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition">
                 <QRCodeCanvas value={pdfUrl} size={128} />
@@ -587,46 +587,46 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center font-bold">3</span>
-            <span className="font-bold text-green-700 text-lg">Acciones Disponibles</span>
+            <span className="font-bold text-green-700 text-lg">{t.contractGeneration_actionsTitle}</span>
           </div>
           <a href={pdfUrl} download={`Contrato_Saephone_${extractedName.replace(/ /g, "_")}.pdf`}>
             <Button className="bg-green-600 text-white font-bold px-6 py-2 rounded-lg flex items-center gap-2">
-              <Download className="w-5 h-5" /> Descargar Contrato PDF
+              <Download className="w-5 h-5" /> {t.contractGeneration_downloadBtn}
             </Button>
           </a>
         </div>
-        </div>
       </div>
-    )
+    </div>
+  )
   const renderAppInstallStep = () => {
     // URL de ejemplo para el APK
     const apkUrl = "https://saephone.com/app.apk";
     return (
       <div className="w-full flex flex-col items-center">
-        <div className="text-center text-gray-700 text-base mb-8">Escanea el código QR para descargar e instalar la aplicación móvil</div>
+        <div className="text-center text-gray-700 text-base mb-8">{t.appInstall_subtitle}</div>
         <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           {/* Lado izquierdo: QR */}
           <div className="flex flex-col items-center">
-            <div className="text-lg font-bold text-gray-800 mb-1">Código QR APK</div>
-            <div className="text-gray-500 text-sm mb-4">Da clic para aumentar el tamaño del código QR</div>
+            <div className="text-lg font-bold text-gray-800 mb-1">{t.appInstall_qrTitle}</div>
+            <div className="text-gray-500 text-sm mb-4">{t.appInstall_qrSubtitle}</div>
             <div className="cursor-pointer" onClick={() => setQrExpanded(!qrExpanded)}>
               <QRCodeCanvas value={apkUrl} size={qrExpanded ? 256 : 160} />
             </div>
           </div>
           {/* Lado derecho: Estado de instalación */}
           <div className="flex flex-col items-center w-full">
-            <div className="text-lg font-bold text-gray-800 mb-4 text-center">Instalación de la aplicación</div>
+            <div className="text-lg font-bold text-gray-800 mb-4 text-center">{t.appInstall_statusTitle}</div>
             <div className="w-full flex flex-col items-center justify-center bg-gray-50 rounded-xl p-8 min-h-[180px]">
               {installing ? (
                 <>
                   <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-4" />
-                  <div className="text-blue-600 text-lg font-semibold">Instalando aplicación...</div>
+                  <div className="text-blue-600 text-lg font-semibold">{t.appInstall_statusTitle}...</div>
                 </>
               ) : (
                 <>
                   <Check className="w-16 h-16 text-green-500 mb-4" />
-                  <div className="text-green-600 text-lg font-bold mb-1">¡Aplicación instalada correctamente!</div>
-                  <div className="text-gray-700 text-base">La aplicación SAEPHONE está lista para usar</div>
+                  <div className="text-green-600 text-lg font-bold mb-1">{t.appInstall_successTitle}</div>
+                  <div className="text-gray-700 text-base">{t.appInstall_successSubtitle}</div>
                 </>
               )}
             </div>
@@ -637,132 +637,118 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   }
   const renderReferencesStep = () => (
     <div className="w-full flex flex-col items-center">
-      <p className="text-gray-700 mb-8 text-center">¡Ayúdanos a conocerte mejor! Por favor, completa la información sobre usted.</p>
+      <p className="text-gray-700 mb-8 text-center">{t.references_subtitle}</p>
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
         <div>
-          <Label htmlFor="user-email" className="text-blue-700 font-bold">email :</Label>
+          <Label htmlFor="user-email" className="text-blue-700 font-bold">{t.references_email}</Label>
           <Input
             id="user-email"
             type="email"
-            placeholder="Ingrese su correo electrónico"
+            placeholder={t.references_emailPlaceholder}
             value={userEmail}
             onChange={e => setUserEmail(e.target.value)}
             className="mt-1"
           />
-            </div>
+        </div>
         <div>
-          <Label htmlFor="family-contact-name" className="text-blue-700 font-bold">Nombre del contacto familiar :</Label>
+          <Label htmlFor="family-contact-name" className="text-blue-700 font-bold">{t.references_famContactName}</Label>
           <Input
             id="family-contact-name"
             type="text"
-            placeholder="Nombre completo del contacto familiar"
+            placeholder={t.references_famContactNamePlaceholder}
             value={familyContactName}
             onChange={e => setFamilyContactName(e.target.value)}
             className="mt-1"
           />
-          </div>
+        </div>
         <div>
-          <Label htmlFor="family-contact-phone" className="text-blue-700 font-bold">Número de teléfono 1 :</Label>
+          <Label htmlFor="family-contact-phone" className="text-blue-700 font-bold">{t.references_phone1}</Label>
           <Input
             id="family-contact-phone"
             type="tel"
-            placeholder="Ingrese número de teléfono"
+            placeholder={t.references_phone1Placeholder}
             value={familyContactPhone}
             onChange={e => setFamilyContactPhone(e.target.value)}
             className="mt-1"
           />
-            </div>
+        </div>
         <div>
-          <Label htmlFor="friend-contact-name" className="text-blue-700 font-bold">Nombre del contacto amigo :</Label>
+          <Label htmlFor="friend-contact-name" className="text-blue-700 font-bold">{t.references_friendContactName}</Label>
           <Input
             id="friend-contact-name"
             type="text"
-            placeholder="Nombre completo del contacto amigo"
+            placeholder={t.references_friendContactNamePlaceholder}
             value={friendContactName}
             onChange={e => setFriendContactName(e.target.value)}
             className="mt-1"
           />
         </div>
         <div>
-          <Label htmlFor="friend-contact-phone" className="text-blue-700 font-bold">Número de teléfono 2 :</Label>
+          <Label htmlFor="friend-contact-phone" className="text-blue-700 font-bold">{t.references_phone2}</Label>
           <Input
             id="friend-contact-phone"
             type="tel"
-            placeholder="Ingrese número de teléfono del amigo"
+            placeholder={t.references_phone2Placeholder}
             value={friendContactPhone}
             onChange={e => setFriendContactPhone(e.target.value)}
             className="mt-1"
           />
-            </div>
+        </div>
         <div className="flex gap-4 justify-end mt-8">
           <Button onClick={() => setCurrentStep("contract")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-            ← Regresar
-            </Button>
+            ← {t.deviceSelection_back}
+          </Button>
           <Button
             onClick={() => setCurrentStep("appinstall")}
             className="bg-black text-white font-bold px-6 py-2 rounded-lg"
             disabled={!userEmail || !familyContactName || !familyContactPhone || !friendContactName || !friendContactPhone}
           >
-            Continuar
-            </Button>
-          </div>
+            {t.deviceSelection_continue} →
+          </Button>
         </div>
       </div>
-    )
+    </div>
+  )
   const renderCompleteStep = () => (
     <div className="text-center space-y-6">
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
         <Check className="w-8 h-8 text-green-600" />
       </div>
       <div>
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Venta completada exitosamente</h3>
-        <p className="text-gray-600">La venta ha sido registrada en el sistema</p>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">{t.deviceConfig_success}</h3>
+        <p className="text-gray-600">{t.deviceConfig_successMsg}</p>
       </div>
     </div>
   )
   const renderTermsStep = () => (
     <div className="space-y-6">
       <div className="text-center mb-2">
-        <span className="font-semibold text-gray-700 text-lg block mb-4">
-          Importante: Los siguientes términos deben ser leídos y completados personalmente por el cliente.
-        </span>
+        {/* Título eliminado por solicitud */}
       </div>
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
           <div className="bg-gray-50 rounded-lg p-6 mb-6 max-h-96 overflow-y-auto border border-gray-200">
             <div className="flex items-center gap-3 mb-4">
               <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-10 h-10 object-contain" />
-              <h3 className="text-blue-600 text-lg font-bold">Términos y Condiciones</h3>
+              {/* Título azul eliminado por solicitud */}
             </div>
             <div className="space-y-4 text-sm text-gray-700">
-              <p>
-                Este documento describe los términos y condiciones generales aplicables al uso de los contenidos,
-                productos y servicios ofrecidos a través del sitio www.saephone.com, del cual es titular SAEPHONE
-                México, S. de R.L. de C.V.
-              </p>
+              <p>{t.terms_content1}</p>
               <div>
-                <h4 className="font-bold text-gray-900 mb-2">1. OBJETO</h4>
-                <p>
-                  El objeto de los presentes TÉRMINOS Y CONDICIONES es regular el acceso y la utilización del SITIO WEB.
-                </p>
+                <h4 className="font-bold text-gray-900 mb-2">{t.terms_content2}</h4>
+                <p>{t.terms_content3}</p>
               </div>
               <div>
-                <h4 className="font-bold text-gray-900 mb-2">2. EL TITULAR</h4>
-                <p>
-                  Se reserva el derecho de realizar cualquier tipo de modificación en el SITIO WEB en cualquier momento y sin previo aviso.
-                </p>
+                <h4 className="font-bold text-gray-900 mb-2">{t.terms_content4}</h4>
+                <p>{t.terms_content5}</p>
               </div>
               <div>
-                <h4 className="font-bold text-gray-900 mb-2">3. RESPONSABILIDADES</h4>
-                <p>
-                  El usuario se compromete a utilizar el sitio web de manera responsable y conforme a la legislación aplicable.
-                </p>
-      </div>
-      <div>
-                <h4 className="font-bold text-gray-900 mb-2">4. PRIVACIDAD</h4>
-                <p>
-                  Todos los datos personales proporcionados serán tratados conforme a nuestra política de privacidad.
-                </p>
+                <h4 className="font-bold text-gray-900 mb-2">{t.terms_content6}</h4>
+                <p>{t.terms_content7}</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">{t.terms_content8}</h4>
+                <p>{t.terms_content9}</p>
               </div>
             </div>
           </div>
@@ -775,7 +761,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                 className="mt-1"
               />
               <label htmlFor="terms" className="text-sm text-gray-700">
-                Acepto los términos y condiciones de SAEPHONE
+                {t.terms_acceptTerms}
               </label>
             </div>
             <div className="flex items-start gap-3">
@@ -786,7 +772,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                 className="mt-1"
               />
               <label htmlFor="privacy" className="text-sm text-gray-700">
-                Acepto el aviso de privacidad de SAEPHONE
+                {t.terms_acceptPrivacy}
               </label>
             </div>
           </div>
@@ -825,7 +811,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
           <div className="mt-6 grid grid-cols-2 gap-3 md:gap-4">
             <Button onClick={onBack} className="w-full bg-gray-200 py-2.5 md:py-3 text-gray-700 hover:bg-gray-300 text-sm md:text-base">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Regresar a Panel Principal
+              {t.deviceSelection_back}
             </Button>
             <Button
               onClick={() => {
@@ -838,7 +824,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               disabled={!(phoneNumber.length === 10 && enteredCode.length === 4)}
               className="w-full bg-blue-600 py-2.5 md:py-3 text-white hover:bg-blue-700 disabled:bg-gray-300 text-sm md:text-base"
             >
-              Verificar y Continuar →
+              {t.deviceSelection_continue} →
             </Button>
           </div>
         )
@@ -846,14 +832,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8 flex gap-4 justify-end">
             <Button onClick={() => setCurrentStep("phone")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-              ← Regresar
+              ← {t.deviceSelection_back}
             </Button>
             <Button 
               onClick={() => setCurrentStep("identity")}
               disabled={!acceptTerms || !acceptPrivacy}
               className="bg-black text-white px-8 py-2 rounded-lg font-medium disabled:bg-gray-300"
             >
-              Continuar
+              {t.deviceSelection_continue}
             </Button>
           </div>
         )
@@ -861,10 +847,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8 flex gap-4 justify-end">
             <Button onClick={() => setCurrentStep("terms")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-              ← Regresar
+              ← {t.deviceSelection_back}
             </Button>
             <Button onClick={() => setCurrentStep("credit")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
-              Continuar
+              {t.deviceSelection_continue}
             </Button>
           </div>
         )
@@ -872,10 +858,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8 flex gap-4 justify-end">
             <Button onClick={() => setCurrentStep("identity")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-              ← Regresar
+              ← {t.deviceSelection_back}
             </Button>
             <Button onClick={() => setCurrentStep("modelplan")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
-              Continuar
+              {t.deviceSelection_continue}
             </Button>
           </div>
         )
@@ -883,10 +869,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8 flex gap-4 justify-end">
             <Button onClick={() => setCurrentStep("credit")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-              ← Regresar
+              ← {t.deviceSelection_back}
             </Button>
             <Button onClick={() => setCurrentStep("contract")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
-              Continuar
+              {t.deviceSelection_continue}
             </Button>
           </div>
         )
@@ -894,10 +880,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8 flex gap-4 justify-end">
             <Button onClick={() => setCurrentStep("modelplan")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-              ← Regresar
+              ← {t.deviceSelection_back}
             </Button>
             <Button onClick={() => setCurrentStep("references")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
-              Continuar
+              {t.deviceSelection_continue}
             </Button>
           </div>
         )
@@ -905,10 +891,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8 flex gap-4 justify-end">
             <Button onClick={() => setCurrentStep("references")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
-              ← Regresar
+              ← {t.deviceSelection_back}
             </Button>
             <Button onClick={() => setCurrentStep("complete")} className="bg-black text-white font-bold px-6 py-2 rounded-lg">
-              Continuar
+              {t.deviceSelection_continue}
             </Button>
           </div>
         )
@@ -916,7 +902,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return (
           <div className="mt-8">
             <Button onClick={onBack} className="w-full bg-blue-600 py-3 text-white hover:bg-blue-700">
-              Volver al Dashboard
+              {t.deviceSelection_back}
             </Button>
           </div>
         )
@@ -927,39 +913,39 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const getStepTitle = () => {
     switch (currentStep) {
       case "phone":
-        return "Verificación Telefónica"
+        return t.progress_step1
       case "terms":
-        return "Términos y Condiciones"
+        return t.progress_step2
       case "identity":
-        return "Verificación de Identidad"
+        return t.progress_step4
       case "credit":
-        return "Verificación de Perfil Crediticio"
+        return t.creditProfile_title
       case "modelplan":
-        return "Financiamiento"
+        return t.deviceSelection_title
       case "contract":
-        return "Generación del Contrato"
-      case "appinstall":
-        return "Instalación de App"
+        return t.contractGeneration_title
       case "references":
-        return "Referencias de Contacto"
+        return t.references_title
+      case "appinstall":
+        return t.appInstall_title
       case "complete":
-        return "Finalizar"
+        return t.deviceConfig_title
       default:
-        return "Vender Dispositivos"
+        return t.sell_device
     }
   }
 
-  // Barra de progreso solo con pasos 1 al 9
+  // Barra de progreso solo con pasos 1 al 9, traducibles dinámicamente
   const progressStepKeys = [
-    t.progress_step1, // Verificación Telefónica
-    t.progress_step2, // Términos y Condiciones
-    t.progress_step4, // Verificación de Identidad
-    "Verificación de Perfil Crediticio",
-    "Financiamiento",
-    "Generación del Contrato",
-    "Referencias",
-    "Instalación de App",
-    "Finalizar"
+    t.progress_step1, // Verificación Telefónica / Phone Verification
+    t.progress_step2, // Términos y Condiciones / Terms and Conditions
+    t.progress_step4, // Verificación de Identidad / Identity Verification
+    t.creditProfile_title, // Perfil crediticio / Credit Profile
+    t.deviceSelection_title, // Selección de Modelo y Plan de Financiamiento / Model and Financing Plan Selection
+    t.contractGeneration_title, // Generación del Contrato / Contract Generation
+    t.references_title, // Referencias / References
+    t.appInstall_title, // Instalación de la Aplicación SAEPHONE / SAEPHONE Application Installation
+    t.deviceConfig_title // Finalizar / Finish
   ];
 
   const getCurrentStepIndex = () => {
