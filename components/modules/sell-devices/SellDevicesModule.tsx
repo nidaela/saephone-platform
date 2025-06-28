@@ -594,71 +594,76 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     </div>
   )
   const renderReferencesStep = () => (
-    <div className="space-y-6">
-      <div>
-        <Label htmlFor="user-email" className="text-gray-700">
-          Email del usuario
-        </Label>
-        <Input
-          id="user-email"
-          type="email"
-          placeholder="Ingrese su correo electrónico"
-          value={userEmail}
-          onChange={e => setUserEmail(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label htmlFor="family-contact-name" className="text-gray-700">
-          Nombre del contacto familiar
-        </Label>
-        <Input
-          id="family-contact-name"
-          type="text"
-          placeholder="Nombre completo del contacto familiar"
-          value={familyContactName}
-          onChange={e => setFamilyContactName(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label htmlFor="family-contact-phone" className="text-gray-700">
-          Número de teléfono familiar
-        </Label>
-        <Input
-          id="family-contact-phone"
-          type="tel"
-          placeholder="Ingrese número de teléfono"
-          value={familyContactPhone}
-          onChange={e => setFamilyContactPhone(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label htmlFor="friend-contact-name" className="text-gray-700">
-          Nombre del contacto amigo
-        </Label>
-        <Input
-          id="friend-contact-name"
-          type="text"
-          placeholder="Nombre completo del contacto amigo"
-          value={friendContactName}
-          onChange={e => setFriendContactName(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label htmlFor="friend-contact-phone" className="text-gray-700">
-          Número de teléfono del amigo
-        </Label>
-        <Input
-          id="friend-contact-phone"
-          type="tel"
-          placeholder="Ingrese número de teléfono del amigo"
-          value={friendContactPhone}
-          onChange={e => setFriendContactPhone(e.target.value)}
-          className="mt-1"
-        />
+    <div className="w-full flex flex-col items-center">
+      <p className="text-gray-700 mb-8 text-center">¡Ayúdanos a conocerte mejor! Por favor, completa la información sobre usted.</p>
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
+        <div>
+          <Label htmlFor="user-email" className="text-blue-700 font-bold">email :</Label>
+          <Input
+            id="user-email"
+            type="email"
+            placeholder="Ingrese su correo electrónico"
+            value={userEmail}
+            onChange={e => setUserEmail(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="family-contact-name" className="text-blue-700 font-bold">Nombre del contacto familiar :</Label>
+          <Input
+            id="family-contact-name"
+            type="text"
+            placeholder="Nombre completo del contacto familiar"
+            value={familyContactName}
+            onChange={e => setFamilyContactName(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="family-contact-phone" className="text-blue-700 font-bold">Número de teléfono 1 :</Label>
+          <Input
+            id="family-contact-phone"
+            type="tel"
+            placeholder="Ingrese número de teléfono"
+            value={familyContactPhone}
+            onChange={e => setFamilyContactPhone(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="friend-contact-name" className="text-blue-700 font-bold">Nombre del contacto amigo :</Label>
+          <Input
+            id="friend-contact-name"
+            type="text"
+            placeholder="Nombre completo del contacto amigo"
+            value={friendContactName}
+            onChange={e => setFriendContactName(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor="friend-contact-phone" className="text-blue-700 font-bold">Número de teléfono 2 :</Label>
+          <Input
+            id="friend-contact-phone"
+            type="tel"
+            placeholder="Ingrese número de teléfono del amigo"
+            value={friendContactPhone}
+            onChange={e => setFriendContactPhone(e.target.value)}
+            className="mt-1"
+          />
+        </div>
+        <div className="flex gap-4 justify-end mt-8">
+          <Button onClick={() => setCurrentStep("contract")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
+            ← Regresar
+          </Button>
+          <Button
+            onClick={() => setCurrentStep("appinstall")}
+            className="bg-black text-white font-bold px-6 py-2 rounded-lg"
+            disabled={!userEmail || !familyContactName || !familyContactPhone || !friendContactName || !friendContactPhone}
+          >
+            Continuar
+          </Button>
+        </div>
       </div>
     </div>
   )
@@ -849,23 +854,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("modelplan")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
-            <Button onClick={() => setCurrentStep("appinstall")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
+            <Button onClick={() => setCurrentStep("references")} className="bg-black text-white px-8 py-2 rounded-lg font-medium">
               Continuar
-            </Button>
-          </div>
-        )
-      case "references":
-        return (
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            <Button onClick={() => setCurrentStep("identity")} className="w-full bg-gray-200 py-3 text-gray-700 hover:bg-gray-300">
-              ← Regresar
-            </Button>
-            <Button
-              onClick={() => setCurrentStep("appinstall")}
-              disabled={!userEmail || !familyContactName || !familyContactPhone || !friendContactName || !friendContactPhone}
-              className="w-full bg-green-600 py-3 text-white hover:bg-green-700 disabled:bg-gray-300"
-            >
-              Continuar a Instalación de App →
             </Button>
           </div>
         )
@@ -925,8 +915,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     "Verificación de Perfil Crediticio",
     "Selección de Modelo y Plan de Financiamiento",
     "Generación del Contrato",
+    "Referencias",
     t.progress_step8, // Instalación de App
-    t.progress_step3, // Referencias de Contacto
     t.progress_step5,
     t.progress_step6,
     t.progress_step7,
@@ -946,9 +936,9 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         return 4;
       case "contract":
         return 5;
-      case "appinstall":
-        return 6;
       case "references":
+        return 6;
+      case "appinstall":
         return 7;
       case "complete":
         return 10;
@@ -976,8 +966,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                   else if (index === 3) setCurrentStep("credit");
                   else if (index === 4) setCurrentStep("modelplan");
                   else if (index === 5) setCurrentStep("contract");
-                  else if (index === 6) setCurrentStep("appinstall");
-                  else if (index === 7) setCurrentStep("references");
+                  else if (index === 6) setCurrentStep("references");
+                  else if (index === 7) setCurrentStep("appinstall");
                   else if (index === 8) setCurrentStep("complete");
                 }
               }}
