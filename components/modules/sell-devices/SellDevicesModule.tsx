@@ -227,13 +227,13 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   }, [currentStep]);
 
   const renderPhoneStep = () => (
-    <div>
+      <div>
       <div className="text-center mb-4">
         <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-1">Registrar nuevo cliente en Saephone</h2>
         <p className="text-gray-600 text-sm md:text-base">Para comenzar, necesitamos verificar tu número de teléfono</p>
       </div>
       <div className="space-y-4">
-        <div>
+      <div>
           <Label htmlFor="verification-code" className="text-gray-700 text-sm">Código de verificación</Label>
           <div className="mt-1 flex items-center gap-2 md:gap-4">
             <Input
@@ -252,7 +252,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             </Button>
           </div>
         </div>
-        <div>
+          <div>
           <Label htmlFor="phone-number" className="text-gray-700 text-sm">Número de teléfono</Label>
           <div className="mt-1 flex items-center gap-2 md:gap-4">
             <span className="rounded-md border border-gray-300 bg-gray-100 px-3 py-1.5 text-gray-700 text-sm">+52</span>
@@ -268,8 +268,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
               Enviar código
             </Button>
           </div>
-        </div>
-        <div>
+          </div>
+          <div>
           <Label htmlFor="entered-code" className="text-gray-700 text-sm">Introduce el código</Label>
           <Input
             id="entered-code"
@@ -595,9 +595,9 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             </Button>
           </a>
         </div>
+        </div>
       </div>
-    </div>
-  )
+    )
   const renderAppInstallStep = () => {
     // URL de ejemplo para el APK
     const apkUrl = "https://saephone.com/app.apk";
@@ -649,7 +649,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             onChange={e => setUserEmail(e.target.value)}
             className="mt-1"
           />
-        </div>
+            </div>
         <div>
           <Label htmlFor="family-contact-name" className="text-blue-700 font-bold">Nombre del contacto familiar :</Label>
           <Input
@@ -660,7 +660,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             onChange={e => setFamilyContactName(e.target.value)}
             className="mt-1"
           />
-        </div>
+          </div>
         <div>
           <Label htmlFor="family-contact-phone" className="text-blue-700 font-bold">Número de teléfono 1 :</Label>
           <Input
@@ -671,7 +671,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             onChange={e => setFamilyContactPhone(e.target.value)}
             className="mt-1"
           />
-        </div>
+            </div>
         <div>
           <Label htmlFor="friend-contact-name" className="text-blue-700 font-bold">Nombre del contacto amigo :</Label>
           <Input
@@ -693,22 +693,22 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             onChange={e => setFriendContactPhone(e.target.value)}
             className="mt-1"
           />
-        </div>
+            </div>
         <div className="flex gap-4 justify-end mt-8">
           <Button onClick={() => setCurrentStep("contract")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
             ← Regresar
-          </Button>
+            </Button>
           <Button
             onClick={() => setCurrentStep("appinstall")}
             className="bg-black text-white font-bold px-6 py-2 rounded-lg"
             disabled={!userEmail || !familyContactName || !familyContactPhone || !friendContactName || !friendContactPhone}
           >
             Continuar
-          </Button>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
   const renderCompleteStep = () => (
     <div className="text-center space-y-6">
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -757,8 +757,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
                 <p>
                   El usuario se compromete a utilizar el sitio web de manera responsable y conforme a la legislación aplicable.
                 </p>
-              </div>
-              <div>
+      </div>
+      <div>
                 <h4 className="font-bold text-gray-900 mb-2">4. PRIVACIDAD</h4>
                 <p>
                   Todos los datos personales proporcionados serán tratados conforme a nuestra política de privacidad.
@@ -848,7 +848,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("phone")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
-            <Button
+            <Button 
               onClick={() => setCurrentStep("identity")}
               disabled={!acceptTerms || !acceptPrivacy}
               className="bg-black text-white px-8 py-2 rounded-lg font-medium disabled:bg-gray-300"
@@ -935,7 +935,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       case "credit":
         return "Verificación de Perfil Crediticio"
       case "modelplan":
-        return "Selección de Modelo y Plan de Financiamiento"
+        return "Financiamiento"
       case "contract":
         return "Generación del Contrato"
       case "appinstall":
@@ -949,19 +949,17 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     }
   }
 
-  // Add progress bar with 8 steps
+  // Barra de progreso solo con pasos 1 al 9
   const progressStepKeys = [
     t.progress_step1, // Verificación Telefónica
     t.progress_step2, // Términos y Condiciones
     t.progress_step4, // Verificación de Identidad
     "Verificación de Perfil Crediticio",
-    "Selección de Modelo y Plan de Financiamiento",
+    "Financiamiento",
     "Generación del Contrato",
     "Referencias",
     "Instalación de App",
-    "Finalizar",
-    t.progress_step6,
-    t.progress_step7,
+    "Finalizar"
   ];
 
   const getCurrentStepIndex = () => {
@@ -990,48 +988,32 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   };
 
   const renderProgressBar = () => (
-    <div className="flex items-center justify-center mb-8">
-      <div className="flex items-center gap-4">
-        {progressStepKeys.map((step, index) => {
-          const isActive = index <= getCurrentStepIndex();
-          return (
-            <div
-              key={index}
-              className={`flex items-center ${isActive ? "cursor-pointer" : "cursor-default"}`}
-              onClick={() => {
-                // Only allow navigation to completed steps
-                if (index <= getCurrentStepIndex()) {
-                  // Map step index back to currentStep
-                  if (index === 0) setCurrentStep("phone");
-                  else if (index === 1) setCurrentStep("terms");
-                  else if (index === 2) setCurrentStep("identity");
-                  else if (index === 3) setCurrentStep("credit");
-                  else if (index === 4) setCurrentStep("modelplan");
-                  else if (index === 5) setCurrentStep("contract");
-                  else if (index === 6) setCurrentStep("references");
-                  else if (index === 7) setCurrentStep("appinstall");
-                  else if (index === 8) setCurrentStep("complete");
-                }
-              }}
-            >
-              <div className="flex flex-col items-center text-center w-28">
+    <div className="flex items-center justify-center mb-8 w-full">
+      <div className="flex items-center justify-between w-full max-w-6xl gap-x-8">
+        {progressStepKeys.map((step, index) => (
+          <React.Fragment key={index}>
+            <div className="flex flex-col items-center flex-1 min-w-[110px] min-h-[70px]">
+              <div className="flex flex-row items-center justify-center w-full">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 ${
-                    isActive ? "bg-green-500" : "bg-white/30"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 mx-auto ${
+                    index <= getCurrentStepIndex() ? "bg-green-500" : "bg-white/30"
                   }`}
                 >
                   {index + 1}
                 </div>
-                <span
-                  className={`text-xs mt-2 transition-colors duration-300 ${isActive ? "text-green-700" : "text-gray-400"}`}
-                >
-                  {step}
-                </span>
+                {index < progressStepKeys.length - 1 && (
+                  <div className="h-0.5 bg-gray-300 w-10 mx-1" />
+                )}
               </div>
-              {index < progressStepKeys.length - 1 && <div className="w-10 h-0.5 bg-gray-300 mx-2"></div>}
+              <span
+                className={`block text-xs mt-2 transition-colors duration-300 text-center ${index <= getCurrentStepIndex() ? "text-white" : "text-gray-400"}`}
+                style={{lineHeight: '1.1', maxWidth: '110px', wordBreak: 'break-word'}}
+              >
+                {step}
+              </span>
             </div>
-          );
-        })}
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
@@ -1058,7 +1040,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
           </div>
         )}
         {currentStep !== "phone" && (
-          <div className="text-center mb-8">
+      <div className="text-center mb-8">
             <h1 className="mb-2 text-xl md:text-2xl font-bold text-gray-800">{getStepTitle()}</h1>
           </div>
         )}
