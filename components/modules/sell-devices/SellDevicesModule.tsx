@@ -215,6 +215,17 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     // eslint-disable-next-line
   }, [selectedBrand, selectedModel, selectedCapacity, devicePrice, paymentMethod, selectedPlan, customWeeks, phoneNumber, userEmail]);
 
+  // Estado para el paso de instalación de app (Paso 8)
+  const [qrExpanded, setQrExpanded] = React.useState(false);
+  const [installing, setInstalling] = React.useState(true);
+  React.useEffect(() => {
+    if (currentStep === "appinstall") {
+      setInstalling(true);
+      const timer = setTimeout(() => setInstalling(false), 30000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
+
   const renderPhoneStep = () => (
     <div>
       <div className="text-center mb-4">
@@ -587,12 +598,43 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       </div>
     </div>
   )
-  const renderAppInstallStep = () => (
-    <div className="space-y-6 text-center">
-      <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Instalación de App</h2>
-      <p className="text-gray-600 mb-6">Aquí va el contenido de instalación de la app.</p>
-    </div>
-  )
+  const renderAppInstallStep = () => {
+    // URL de ejemplo para el APK
+    const apkUrl = "https://saephone.com/app.apk";
+    return (
+      <div className="w-full flex flex-col items-center">
+        <div className="text-center text-gray-700 text-base mb-8">Escanea el código QR para descargar e instalar la aplicación móvil</div>
+        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          {/* Lado izquierdo: QR */}
+          <div className="flex flex-col items-center">
+            <div className="text-lg font-bold text-gray-800 mb-1">Código QR APK</div>
+            <div className="text-gray-500 text-sm mb-4">Da clic para aumentar el tamaño del código QR</div>
+            <div className="cursor-pointer" onClick={() => setQrExpanded(!qrExpanded)}>
+              <QRCodeCanvas value={apkUrl} size={qrExpanded ? 256 : 160} />
+            </div>
+          </div>
+          {/* Lado derecho: Estado de instalación */}
+          <div className="flex flex-col items-center w-full">
+            <div className="text-lg font-bold text-gray-800 mb-4 text-center">Instalación de la aplicación</div>
+            <div className="w-full flex flex-col items-center justify-center bg-gray-50 rounded-xl p-8 min-h-[180px]">
+              {installing ? (
+                <>
+                  <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-4" />
+                  <div className="text-blue-600 text-lg font-semibold">Instalando aplicación...</div>
+                </>
+              ) : (
+                <>
+                  <Check className="w-16 h-16 text-green-500 mb-4" />
+                  <div className="text-green-600 text-lg font-bold mb-1">¡Aplicación instalada correctamente!</div>
+                  <div className="text-gray-700 text-base">La aplicación SAEPHONE está lista para usar</div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const renderReferencesStep = () => (
     <div className="w-full flex flex-col items-center">
       <p className="text-gray-700 mb-8 text-center">¡Ayúdanos a conocerte mejor! Por favor, completa la información sobre usted.</p>
@@ -865,8 +907,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("references")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
-            <Button onClick={handleCompleteAccount} className="bg-blue-600 text-white px-8 py-2 rounded-lg font-medium">
-              Finalizar
+            <Button onClick={handleCompleteAccount} className="bg-black text-white font-bold px-6 py-2 rounded-lg">
+              Continuar
             </Button>
           </div>
         )
