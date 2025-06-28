@@ -907,7 +907,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <Button onClick={() => setCurrentStep("references")} className="bg-gray-200 text-gray-700 hover:bg-gray-300">
               ← Regresar
             </Button>
-            <Button onClick={handleCompleteAccount} className="bg-black text-white font-bold px-6 py-2 rounded-lg">
+            <Button onClick={() => setCurrentStep("complete")} className="bg-black text-white font-bold px-6 py-2 rounded-lg">
               Continuar
             </Button>
           </div>
@@ -943,7 +943,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       case "references":
         return "Referencias de Contacto"
       case "complete":
-        return "Venta Completada"
+        return "Finalizar"
       default:
         return "Vender Dispositivos"
     }
@@ -958,8 +958,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     "Selección de Modelo y Plan de Financiamiento",
     "Generación del Contrato",
     "Referencias",
-    t.progress_step8, // Instalación de App
-    t.progress_step5,
+    "Instalación de App",
+    "Finalizar",
     t.progress_step6,
     t.progress_step7,
   ];
@@ -983,7 +983,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       case "appinstall":
         return 7;
       case "complete":
-        return 10;
+        return 8;
       default:
         return 0;
     }
