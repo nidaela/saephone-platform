@@ -59,6 +59,40 @@ type PageType =
   | "billing" // Nueva página de facturación
   | "investment-board" // Nueva página de tablero de inversión
 
+// 1. Definir los permisos por rol
+const rolePermissions: Record<string, PageType[]> = {
+  "super-admin": [
+    "dashboard", "create-account", "sell-devices", "terms", "app-install", "identity-verification", "device-selection", "contract-generation", "contract-signed", "references", "device-configuration", "settings", "payments", "reports", "billing", "investment-board", "login"
+  ],
+  admin: [
+    "dashboard", "create-account", "reports", "billing", "investment-board", "settings", "terms", "app-install", "identity-verification", "device-selection", "contract-generation", "contract-signed", "references", "device-configuration", "payments", "login"
+  ],
+  manager: [
+    "dashboard", "reports", "billing", "investment-board", "login"
+  ],
+  sales: [
+    "dashboard", "sell-devices", "payments", "terms", "app-install", "identity-verification", "device-selection", "contract-generation", "contract-signed", "references", "device-configuration", "login"
+  ],
+}
+
+// 2. Función para validar acceso
+function hasAccess(page: PageType, role: string | null): boolean {
+  if (!role) return page === "login";
+  const allowed = rolePermissions[role];
+  return allowed ? allowed.includes(page) : false;
+}
+
+// 3. Mensaje de acceso denegado
+const AccessDenied = ({ onBack }: { onBack: () => void }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-2">Acceso denegado</h2>
+      <p>No tienes permisos para acceder a este módulo.</p>
+      <Button className="mt-6" onClick={onBack}>Volver al Panel Principal</Button>
+    </div>
+  </div>
+)
+
 export default function SaephonePlatform() {
   const [currentPage, setCurrentPage] = useState<PageType>("login")
   const [language, setLanguage] = useState<"es" | "en">("es")
@@ -343,6 +377,10 @@ export default function SaephonePlatform() {
   )
 
   const renderPage = () => {
+    // Validar acceso antes de renderizar cada página protegida
+    if (!hasAccess(currentPage, userRole)) {
+      return <AccessDenied onBack={() => setCurrentPage("dashboard")} />;
+    }
     switch (currentPage) {
       case "login":
         return <LoginPage onLogin={handleLogin} t={t} />
@@ -628,7 +666,7 @@ export default function SaephonePlatform() {
                   <p className="text-white/80 text-lg">{t.dashboard_manage}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("create-account", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -647,7 +685,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("payments", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -666,7 +704,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "sales" || userRole === "super-admin") && (
+                  {hasAccess("sell-devices", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -685,7 +723,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "manager" || userRole === "super-admin") && (
+                  {hasAccess("reports", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -704,7 +742,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("settings", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -722,7 +760,7 @@ export default function SaephonePlatform() {
                       </CardContent>
                     </Card>
                   )}
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("billing", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -740,7 +778,7 @@ export default function SaephonePlatform() {
                       </CardContent>
                     </Card>
                   )}
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("investment-board", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
