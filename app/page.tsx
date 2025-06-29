@@ -56,6 +56,7 @@ type PageType =
   | "settings" // Nueva página de configuración
   | "payments" // Nueva página de procesar pagos
   | "reports" // Nueva página de reportes
+  | "billing" // Nueva página de facturación
 
 export default function SaephonePlatform() {
   const [currentPage, setCurrentPage] = useState<PageType>("login")
@@ -300,7 +301,12 @@ export default function SaephonePlatform() {
 
   const DashboardHeader = () => (
     <div className="flex items-center justify-between px-6 pt-20 pb-6">
-      <HomeLogoHeader onNavigateToDashboard={() => setCurrentPage("dashboard")} />
+      <HomeLogoHeader 
+        onNavigateToDashboard={() => setCurrentPage("dashboard")}
+        title={t.homeLogo_title}
+        subtitle={t.homeLogo_subtitle}
+        ariaLabel={t.homeLogo_ariaLabel}
+      />
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
@@ -326,7 +332,12 @@ export default function SaephonePlatform() {
 
   const FlowHeader = () => (
     <div className="w-full max-w-4xl">
-      <HomeLogoHeader onNavigateToDashboard={() => setCurrentPage("dashboard")} />
+      <HomeLogoHeader 
+        onNavigateToDashboard={() => setCurrentPage("dashboard")}
+        title={t.homeLogo_title}
+        subtitle={t.homeLogo_subtitle}
+        ariaLabel={t.homeLogo_ariaLabel}
+      />
     </div>
   )
 
@@ -706,6 +717,24 @@ export default function SaephonePlatform() {
                         </div>
                         <Button onClick={() => setCurrentPage("settings")} variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg">
                           {t.dashboard_goToConfigBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                  {(userRole === "admin" || userRole === "super-admin") && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-green-600">{t.dashboard_billing}</h3>
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              <span className="text-green-600 font-bold text-lg">$</span>
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_billingDesc}</p>
+                        </div>
+                        <Button onClick={() => setCurrentPage("billing")} className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_goToBillingBtn}
                         </Button>
                       </CardContent>
                     </Card>
@@ -1534,6 +1563,124 @@ export default function SaephonePlatform() {
                   )}
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        )
+      case "billing":
+        return (
+          <div className="relative z-10 min-h-screen flex flex-col">
+            <DashboardHeader />
+            <div className="flex-1 flex flex-col items-center justify-center p-4">
+              <div className="w-full max-w-6xl mx-auto">
+                <Card className="shadow-2xl">
+                  <CardContent className="p-8">
+                    <div className="text-center mb-8">
+                      <h2 className="text-green-600 text-3xl font-bold mb-2">{t.billing_title}</h2>
+                      <p className="text-gray-600">{t.billing_subtitle}</p>
+                    </div>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b-2 border-gray-200">
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_invoiceCode}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_date}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_total}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_status}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_action}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-001</td>
+                            <td className="py-4 px-6 text-gray-600">15/01/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$12,450.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_paid}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_download}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-002</td>
+                            <td className="py-4 px-6 text-gray-600">22/01/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$8,750.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_pending}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_generate}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-003</td>
+                            <td className="py-4 px-6 text-gray-600">29/01/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$15,200.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_inProcess}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_generate}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-004</td>
+                            <td className="py-4 px-6 text-gray-600">05/02/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$6,800.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_paid}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_download}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-005</td>
+                            <td className="py-4 px-6 text-gray-600">12/02/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$9,300.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                                Vencida
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                Generar Factura
+                              </Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <div className="flex justify-start mt-8">
+                      <Button
+                        onClick={() => setCurrentPage("dashboard")}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                      >
+                        ← Volver al Panel Principal
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         )

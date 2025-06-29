@@ -74,6 +74,9 @@ export const translations = {
     dashboard_config: "Configuración",
     dashboard_configDesc: "Ajusta la configuración de tu cuenta y del sistema.",
     dashboard_goToConfigBtn: "Ir a Configuración",
+    dashboard_billing: "Facturación",
+    dashboard_billingDesc: "Accede al portal para consultar y generar facturas de liquidación.",
+    dashboard_goToBillingBtn: "Ir al Portal",
     dashboard_adminProfile: "Perfil de distribuidor / administrador: Admin Testing",
     dashboard_salesProfile: "Perfil de vendedor: Sales Testing",
     dashboard_managerProfile: "Perfil de gerente: Manager Testing",
@@ -331,6 +334,27 @@ export const translations = {
     creditProfile_openClosed: "Cuentas abiertas y cerradas",
     creditProfile_loadingTitle: "Evaluando perfil crediticio con Buró de Crédito...",
     creditProfile_loadingSubtitle: "Por favor espera unos segundos mientras verificamos tu historial.",
+
+    // Home Logo Header
+    homeLogo_title: "SAEPHONE",
+    homeLogo_subtitle: "PLATAFORMA DE VENTAS",
+    homeLogo_ariaLabel: "Ir al inicio",
+
+    // Billing Page
+    billing_title: "Portal de Facturación",
+    billing_subtitle: "Consulta y genera facturas de liquidación",
+    billing_invoiceCode: "Código de Factura",
+    billing_date: "Fecha",
+    billing_total: "Total a Facturar (MXN)",
+    billing_status: "Estatus",
+    billing_action: "Acción",
+    billing_paid: "Pagada",
+    billing_pending: "Pendiente",
+    billing_inProcess: "En Proceso",
+    billing_overdue: "Vencida",
+    billing_download: "Descargar",
+    billing_generate: "Generar Factura",
+    billing_backToMain: "← Volver al Panel Principal",
   },
   en: {
     // Login Page
@@ -407,6 +431,9 @@ export const translations = {
     dashboard_config: "Configuration",
     dashboard_configDesc: "Adjust your account and system settings.",
     dashboard_goToConfigBtn: "Go to Settings",
+    dashboard_billing: "Billing",
+    dashboard_billingDesc: "Access the portal to view and generate settlement invoices.",
+    dashboard_goToBillingBtn: "Go to Portal",
     dashboard_adminProfile: "Distributor/Administrator Profile: Admin Testing",
     dashboard_salesProfile: "Salesperson Profile: Sales Testing",
     dashboard_managerProfile: "Manager Profile: Manager Testing",
@@ -664,5 +691,26 @@ export const translations = {
     creditProfile_openClosed: "Open and closed accounts",
     creditProfile_loadingTitle: "Evaluating credit profile with Credit Bureau...",
     creditProfile_loadingSubtitle: "Please wait a few seconds while we check your history.",
+
+    // Home Logo Header (English)
+    homeLogo_title: "SAEPHONE",
+    homeLogo_subtitle: "SALES PLATFORM",
+    homeLogo_ariaLabel: "Go to home",
+
+    // Billing Page (English)
+    billing_title: "Billing Portal",
+    billing_subtitle: "View and generate settlement invoices",
+    billing_invoiceCode: "Invoice Code",
+    billing_date: "Date",
+    billing_total: "Total to Invoice (MXN)",
+    billing_status: "Status",
+    billing_action: "Action",
+    billing_paid: "Paid",
+    billing_pending: "Pending",
+    billing_inProcess: "In Process",
+    billing_overdue: "Overdue",
+    billing_download: "Download",
+    billing_generate: "Generate Invoice",
+    billing_backToMain: "← Back to Main Panel",
   },
 } 
