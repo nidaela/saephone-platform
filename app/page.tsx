@@ -1712,47 +1712,47 @@ export default function SaephonePlatform() {
                 <Card className="shadow-2xl">
                   <CardContent className="p-8">
                     <div className="text-center mb-8">
-                      <h2 className="text-green-600 text-3xl font-bold mb-2">{t.investmentBoard_title}</h2>
-                      <p className="text-gray-600">{t.investmentBoard_subtitle}</p>
+                      <h2 className="text-green-600 text-3xl font-bold mb-2">{t["investmentBoard_title"]}</h2>
+                      <p className="text-gray-600">{t["investmentBoard_subtitle"]}</p>
                     </div>
                     {/* Resumen superior */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                       <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
-                        <span className="text-gray-500 text-sm mb-2">Monto invertido</span>
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_invested"]}</span>
                         <span className="text-3xl font-bold text-green-600 mb-1">$210,000.00</span>
                       </div>
                       <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
-                        <span className="text-gray-500 text-sm mb-2">Deuda total</span>
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_debt"]}</span>
                         <span className="text-3xl font-bold text-blue-600 mb-1">$45,000.00</span>
                       </div>
                       <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
-                        <span className="text-gray-500 text-sm mb-2">Pagos recibidos</span>
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_received"]}</span>
                         <span className="text-3xl font-bold text-cyan-600 mb-1">$180,400.00</span>
                       </div>
                       <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
-                        <span className="text-gray-500 text-sm mb-2">Pagos vencidos</span>
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_overdue"]}</span>
                         <span className="text-3xl font-bold text-red-500 mb-1">$7,200.00</span>
                       </div>
                     </div>
                     {/* Gráficos circulares */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                       <div className="flex flex-col items-center">
-                        <span className="mb-2 text-gray-700 font-medium">Proporción del monto del reembolso</span>
+                        <span className="mb-2 text-gray-700 font-medium">{t["investmentBoard_reimbursementProp"]}</span>
                         <svg width="160" height="160" viewBox="0 0 160 160">
                           <circle cx="80" cy="80" r="70" fill="#f3f4f6" />
                           <circle cx="80" cy="80" r="70" fill="none" stroke="#fbbf24" strokeWidth="14" strokeDasharray="330" strokeDashoffset="60" />
                           <text x="50%" y="54%" textAnchor="middle" fontSize="2.2em" fill="#fbbf24" fontWeight="bold">92%</text>
                         </svg>
-                        <span className="mt-2 text-gray-500 text-sm">Pagos recibidos / Deuda total</span>
+                        <span className="mt-2 text-gray-500 text-sm">{t["investmentBoard_ratioLabel"]}</span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <span className="mb-2 text-gray-700 font-medium">Proporción del plazo de financiamiento</span>
+                        <span className="mb-2 text-gray-700 font-medium">{t["investmentBoard_termProp"]}</span>
                         <svg width="160" height="160" viewBox="0 0 160 160">
                           <circle cx="80" cy="80" r="70" fill="#f3f4f6" />
                           <circle cx="80" cy="80" r="70" fill="none" stroke="#06b6d4" strokeWidth="14" strokeDasharray="330" strokeDashoffset="110" />
                           <text x="50%" y="54%" textAnchor="middle" fontSize="2.2em" fill="#06b6d4" fontWeight="bold">78%</text>
                         </svg>
-                        <span className="mt-2 text-gray-500 text-sm">Semanas transcurridas / Total semanas</span>
+                        <span className="mt-2 text-gray-500 text-sm">{t["investmentBoard_weeksLabel"]}</span>
                       </div>
                     </div>
                     {/* Tabla de tiendas */}
@@ -1760,11 +1760,11 @@ export default function SaephonePlatform() {
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Posición</th>
-                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nombre de la tienda</th>
-                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Proporción de reembolso</th>
-                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Monto recuperado</th>
-                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Monto financiado</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colPosition"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colStore"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colReimbursement"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colRecovered"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colFinanced"]}</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
@@ -1804,7 +1804,7 @@ export default function SaephonePlatform() {
                         onClick={() => setCurrentPage("dashboard")}
                         className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
                       >
-                        ← Volver al Panel Principal
+                        {t["investmentBoard_backBtn"]}
                       </Button>
                     </div>
                   </CardContent>
