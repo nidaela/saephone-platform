@@ -39,6 +39,7 @@ import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import Link from "next/link"
 import { HomeLogoHeader } from "@/components/ui/HomeLogoHeader"
+import { UserMenu } from "@/components/ui/UserMenu"
 
 type PageType =
   | "login"
@@ -335,33 +336,25 @@ export default function SaephonePlatform() {
   )
 
   const DashboardHeader = () => (
-    <div className="flex items-center justify-between px-6 pt-20 pb-6">
-      <HomeLogoHeader 
-        onNavigateToDashboard={() => setCurrentPage("dashboard")}
-        title={t.homeLogo_title}
-        subtitle={t.homeLogo_subtitle}
-        ariaLabel={t.homeLogo_ariaLabel}
+    <div className="flex items-center justify-end px-6 pt-20 pb-6">
+      <UserMenu
+        onLogout={handleLogout}
+        onProfileClick={() => setCurrentPage("settings")}
+        userRole={userRole || undefined}
+        userName={
+          userRole === "admin"
+            ? t.dashboard_adminProfile
+            : userRole === "sales"
+            ? t.dashboard_salesProfile
+            : userRole === "manager"
+            ? t.dashboard_managerProfile
+            : userRole === "super-admin"
+            ? t.dashboard_superAdminProfile
+            : "Usuario"
+        }
+        theme={"default"} // Puedes cambiar esto si tienes lógica de tema
+        t={t}
       />
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 text-white">
-          <User className="w-5 h-5" />
-          <span>
-            {userRole === "admin"
-              ? t.dashboard_adminProfile
-              : userRole === "sales"
-              ? t.dashboard_salesProfile
-              : userRole === "manager"
-              ? t.dashboard_managerProfile
-              : userRole === "super-admin"
-              ? t.dashboard_superAdminProfile
-              : ""}
-          </span>
-        </div>
-        <Button onClick={handleLogout} variant="destructive" className="flex items-center gap-2">
-          <LogOut className="w-5 h-5" />
-          <span>{t.dashboard_logout}</span>
-        </Button>
-      </div>
     </div>
   )
 
