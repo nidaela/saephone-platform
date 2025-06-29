@@ -37,6 +37,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { QRCodeCanvas } from "qrcode.react"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import Link from "next/link"
+import { HomeLogoHeader } from "@/components/ui/HomeLogoHeader"
 
 type PageType =
   | "login"
@@ -298,15 +300,7 @@ export default function SaephonePlatform() {
 
   const DashboardHeader = () => (
     <div className="flex items-center justify-between px-6 pt-20 pb-6">
-      <div className="flex items-center gap-4">
-        <div className="bg-white rounded-2xl p-2 shadow-lg">
-          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12 object-contain" />
-        </div>
-        <div>
-          <h1 className="text-white text-xl font-bold">SAEPHONE</h1>
-          <p className="text-white/80 text-sm">{t.dashboard_salesPlatform}</p>
-        </div>
-      </div>
+      <HomeLogoHeader onNavigateToDashboard={() => setCurrentPage("dashboard")} />
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
@@ -332,15 +326,7 @@ export default function SaephonePlatform() {
 
   const FlowHeader = () => (
     <div className="w-full max-w-4xl">
-      <div className="flex items-center gap-4">
-        <div className="bg-white rounded-2xl p-2 shadow-lg">
-          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12 object-contain" />
-        </div>
-        <div>
-          <h1 className="text-white text-2xl font-bold">SAEPHONE</h1>
-          <p className="text-white/80 text-sm">{t.create_headerSubtitle}</p>
-        </div>
-      </div>
+      <HomeLogoHeader onNavigateToDashboard={() => setCurrentPage("dashboard")} />
     </div>
   )
 

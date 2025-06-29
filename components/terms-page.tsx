@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
+import { HomeLogoHeader } from "@/components/ui/HomeLogoHeader"
 
 interface TermsPageProps {
   onBack: () => void
@@ -19,15 +20,7 @@ export default function TermsPage({ onBack, onAccept }: TermsPageProps) {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between p-6">
-        <div className="flex items-center gap-4">
-          <div className="bg-white rounded-2xl p-2 shadow-lg">
-            <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-16 h-16 object-contain" />
-          </div>
-          <div>
-            <h1 className="text-white text-2xl font-bold">SAEPHONE</h1>
-            <p className="text-white/80 text-sm">SMARTPHONE & ACCESORIOS</p>
-          </div>
-        </div>
+        <HomeLogoHeader onNavigateToDashboard={onBack} />
         <Button variant="ghost" onClick={onBack} className="text-white hover:bg-white/10">
           Volver al inicio
         </Button>
