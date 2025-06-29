@@ -37,6 +37,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { QRCodeCanvas } from "qrcode.react"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import Link from "next/link"
+import { HomeLogoHeader } from "@/components/ui/HomeLogoHeader"
 
 type PageType =
   | "login"
@@ -54,6 +56,42 @@ type PageType =
   | "settings" // Nueva página de configuración
   | "payments" // Nueva página de procesar pagos
   | "reports" // Nueva página de reportes
+  | "billing" // Nueva página de facturación
+  | "investment-board" // Nueva página de tablero de inversión
+
+// 1. Definir los permisos por rol
+const rolePermissions: Record<string, PageType[]> = {
+  "super-admin": [
+    "dashboard", "create-account", "sell-devices", "terms", "app-install", "identity-verification", "device-selection", "contract-generation", "contract-signed", "references", "device-configuration", "settings", "payments", "reports", "billing", "investment-board", "login"
+  ],
+  admin: [
+    "dashboard", "create-account", "reports", "billing", "investment-board", "settings", "terms", "app-install", "identity-verification", "device-selection", "contract-generation", "contract-signed", "references", "device-configuration", "payments", "login"
+  ],
+  manager: [
+    "dashboard", "reports", "billing", "investment-board", "login"
+  ],
+  sales: [
+    "dashboard", "sell-devices", "payments", "terms", "app-install", "identity-verification", "device-selection", "contract-generation", "contract-signed", "references", "device-configuration", "login"
+  ],
+}
+
+// 2. Función para validar acceso
+function hasAccess(page: PageType, role: string | null): boolean {
+  if (!role) return page === "login";
+  const allowed = rolePermissions[role];
+  return allowed ? allowed.includes(page) : false;
+}
+
+// 3. Mensaje de acceso denegado
+const AccessDenied = ({ onBack }: { onBack: () => void }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div className="bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-2">Acceso denegado</h2>
+      <p>No tienes permisos para acceder a este módulo.</p>
+      <Button className="mt-6" onClick={onBack}>Volver al Panel Principal</Button>
+    </div>
+  </div>
+)
 
 export default function SaephonePlatform() {
   const [currentPage, setCurrentPage] = useState<PageType>("login")
@@ -298,15 +336,12 @@ export default function SaephonePlatform() {
 
   const DashboardHeader = () => (
     <div className="flex items-center justify-between px-6 pt-20 pb-6">
-      <div className="flex items-center gap-4">
-        <div className="bg-white rounded-2xl p-2 shadow-lg">
-          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12 object-contain" />
-        </div>
-        <div>
-          <h1 className="text-white text-xl font-bold">SAEPHONE</h1>
-          <p className="text-white/80 text-sm">{t.dashboard_salesPlatform}</p>
-        </div>
-      </div>
+      <HomeLogoHeader 
+        onNavigateToDashboard={() => setCurrentPage("dashboard")}
+        title={t.homeLogo_title}
+        subtitle={t.homeLogo_subtitle}
+        ariaLabel={t.homeLogo_ariaLabel}
+      />
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
@@ -332,19 +367,20 @@ export default function SaephonePlatform() {
 
   const FlowHeader = () => (
     <div className="w-full max-w-4xl">
-      <div className="flex items-center gap-4">
-        <div className="bg-white rounded-2xl p-2 shadow-lg">
-          <img src="/saephone-logo.jpg" alt="SAEPHONE Logo" className="w-12 h-12 object-contain" />
-        </div>
-        <div>
-          <h1 className="text-white text-2xl font-bold">SAEPHONE</h1>
-          <p className="text-white/80 text-sm">{t.create_headerSubtitle}</p>
-        </div>
-      </div>
+      <HomeLogoHeader 
+        onNavigateToDashboard={() => setCurrentPage("dashboard")}
+        title={t.homeLogo_title}
+        subtitle={t.homeLogo_subtitle}
+        ariaLabel={t.homeLogo_ariaLabel}
+      />
     </div>
   )
 
   const renderPage = () => {
+    // Validar acceso antes de renderizar cada página protegida
+    if (!hasAccess(currentPage, userRole)) {
+      return <AccessDenied onBack={() => setCurrentPage("dashboard")} />;
+    }
     switch (currentPage) {
       case "login":
         return <LoginPage onLogin={handleLogin} t={t} />
@@ -630,7 +666,7 @@ export default function SaephonePlatform() {
                   <p className="text-white/80 text-lg">{t.dashboard_manage}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("create-account", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -649,7 +685,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("payments", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -668,7 +704,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "sales" || userRole === "super-admin") && (
+                  {hasAccess("sell-devices", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -687,7 +723,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "manager" || userRole === "super-admin") && (
+                  {hasAccess("reports", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -706,7 +742,7 @@ export default function SaephonePlatform() {
                     </Card>
                   )}
 
-                  {(userRole === "admin" || userRole === "super-admin") && (
+                  {hasAccess("settings", userRole) && (
                     <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
                       <CardContent className="p-8 flex flex-col h-full">
                         <div className="flex-1">
@@ -720,6 +756,42 @@ export default function SaephonePlatform() {
                         </div>
                         <Button onClick={() => setCurrentPage("settings")} variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg">
                           {t.dashboard_goToConfigBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                  {hasAccess("billing", userRole) && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-green-600">{t.dashboard_billing}</h3>
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              <span className="text-green-600 font-bold text-lg">$</span>
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_billingDesc}</p>
+                        </div>
+                        <Button onClick={() => setCurrentPage("billing")} className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_goToBillingBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                  {hasAccess("investment-board", userRole) && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-cyan-700">{t.dashboard_investmentBoard}</h3>
+                            <div className="p-2 bg-cyan-100 rounded-lg">
+                              <BarChart3 className="w-6 h-6 text-cyan-600" />
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_investmentBoardDesc}</p>
+                        </div>
+                        <Button onClick={() => setCurrentPage("investment-board")} className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_investmentBoardBtn}
                         </Button>
                       </CardContent>
                     </Card>
@@ -1548,6 +1620,234 @@ export default function SaephonePlatform() {
                   )}
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        )
+      case "billing":
+        return (
+          <div className="relative z-10 min-h-screen flex flex-col">
+            <DashboardHeader />
+            <div className="flex-1 flex flex-col items-center justify-center p-4">
+              <div className="w-full max-w-6xl mx-auto">
+                <Card className="shadow-2xl">
+                  <CardContent className="p-8">
+                    <div className="text-center mb-8">
+                      <h2 className="text-green-600 text-3xl font-bold mb-2">{t.billing_title}</h2>
+                      <p className="text-gray-600">{t.billing_subtitle}</p>
+                    </div>
+                    
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b-2 border-gray-200">
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_invoiceCode}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_date}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_total}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_status}</th>
+                            <th className="text-left py-4 px-6 text-gray-700 font-semibold">{t.billing_action}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-001</td>
+                            <td className="py-4 px-6 text-gray-600">15/01/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$12,450.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_paid}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_download}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-002</td>
+                            <td className="py-4 px-6 text-gray-600">22/01/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$8,750.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_pending}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_generate}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-003</td>
+                            <td className="py-4 px-6 text-gray-600">29/01/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$15,200.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_inProcess}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_generate}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-004</td>
+                            <td className="py-4 px-6 text-gray-600">05/02/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$6,800.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                                {t.billing_paid}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                {t.billing_download}
+                              </Button>
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">FAC-2024-005</td>
+                            <td className="py-4 px-6 text-gray-600">12/02/2024</td>
+                            <td className="py-4 px-6 font-semibold text-green-600">$9,300.00</td>
+                            <td className="py-4 px-6">
+                              <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                                Vencida
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <Button className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                                Generar Factura
+                              </Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    <div className="flex justify-start mt-8">
+                      <Button
+                        onClick={() => setCurrentPage("dashboard")}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                      >
+                        ← Volver al Panel Principal
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        )
+      case "investment-board":
+        return (
+          <div className="relative z-10 min-h-screen flex flex-col">
+            <DashboardHeader />
+            <div className="flex-1 flex flex-col items-center justify-center p-4">
+              <div className="w-full max-w-6xl mx-auto">
+                <Card className="shadow-2xl">
+                  <CardContent className="p-8">
+                    <div className="text-center mb-8">
+                      <h2 className="text-green-600 text-3xl font-bold mb-2">{t["investmentBoard_title"]}</h2>
+                      <p className="text-gray-600">{t["investmentBoard_subtitle"]}</p>
+                    </div>
+                    {/* Resumen superior */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_invested"]}</span>
+                        <span className="text-3xl font-bold text-green-600 mb-1">$210,000.00</span>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_debt"]}</span>
+                        <span className="text-3xl font-bold text-blue-600 mb-1">$45,000.00</span>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_received"]}</span>
+                        <span className="text-3xl font-bold text-cyan-600 mb-1">$180,400.00</span>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">{t["investmentBoard_overdue"]}</span>
+                        <span className="text-3xl font-bold text-red-500 mb-1">$7,200.00</span>
+                      </div>
+                    </div>
+                    {/* Gráficos circulares */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                      <div className="flex flex-col items-center">
+                        <span className="mb-2 text-gray-700 font-medium">{t["investmentBoard_reimbursementProp"]}</span>
+                        <svg width="160" height="160" viewBox="0 0 160 160">
+                          <circle cx="80" cy="80" r="70" fill="#f3f4f6" />
+                          <circle cx="80" cy="80" r="70" fill="none" stroke="#fbbf24" strokeWidth="14" strokeDasharray="330" strokeDashoffset="60" />
+                          <text x="50%" y="54%" textAnchor="middle" fontSize="2.2em" fill="#fbbf24" fontWeight="bold">92%</text>
+                        </svg>
+                        <span className="mt-2 text-gray-500 text-sm">{t["investmentBoard_ratioLabel"]}</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="mb-2 text-gray-700 font-medium">{t["investmentBoard_termProp"]}</span>
+                        <svg width="160" height="160" viewBox="0 0 160 160">
+                          <circle cx="80" cy="80" r="70" fill="#f3f4f6" />
+                          <circle cx="80" cy="80" r="70" fill="none" stroke="#06b6d4" strokeWidth="14" strokeDasharray="330" strokeDashoffset="110" />
+                          <text x="50%" y="54%" textAnchor="middle" fontSize="2.2em" fill="#06b6d4" fontWeight="bold">78%</text>
+                        </svg>
+                        <span className="mt-2 text-gray-500 text-sm">{t["investmentBoard_weeksLabel"]}</span>
+                      </div>
+                    </div>
+                    {/* Tabla de tiendas */}
+                    <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colPosition"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colStore"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colReimbursement"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colRecovered"]}</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">{t["investmentBoard_colFinanced"]}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-100">
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">1</td>
+                            <td className="py-4 px-6">Crédito Celular Max</td>
+                            <td className="py-4 px-6 text-green-600 font-semibold">92.4%</td>
+                            <td className="py-4 px-6">$85,300.00</td>
+                            <td className="py-4 px-6">$92,300.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">2</td>
+                            <td className="py-4 px-6">TecnoPlan Express</td>
+                            <td className="py-4 px-6 text-green-600 font-semibold">87.1%</td>
+                            <td className="py-4 px-6">$69,000.00</td>
+                            <td className="py-4 px-6">$79,200.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">3</td>
+                            <td className="py-4 px-6">CeluCrédito Uno</td>
+                            <td className="py-4 px-6 text-yellow-500 font-semibold">74.3%</td>
+                            <td className="py-4 px-6">$56,100.00</td>
+                            <td className="py-4 px-6">$75,500.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">4</td>
+                            <td className="py-4 px-6">MoviPagos del Sur</td>
+                            <td className="py-4 px-6 text-red-500 font-semibold">61.8%</td>
+                            <td className="py-4 px-6">$38,200.00</td>
+                            <td className="py-4 px-6">$61,800.00</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="flex justify-start mt-8">
+                      <Button
+                        onClick={() => setCurrentPage("dashboard")}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                      >
+                        {t["investmentBoard_backBtn"]}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         )
