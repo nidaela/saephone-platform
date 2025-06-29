@@ -57,6 +57,7 @@ type PageType =
   | "payments" // Nueva página de procesar pagos
   | "reports" // Nueva página de reportes
   | "billing" // Nueva página de facturación
+  | "investment-board" // Nueva página de tablero de inversión
 
 export default function SaephonePlatform() {
   const [currentPage, setCurrentPage] = useState<PageType>("login")
@@ -735,6 +736,24 @@ export default function SaephonePlatform() {
                         </div>
                         <Button onClick={() => setCurrentPage("billing")} className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg">
                           {t.dashboard_goToBillingBtn}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                  {(userRole === "admin" || userRole === "super-admin") && (
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-2xl">
+                      <CardContent className="p-8 flex flex-col h-full">
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="text-2xl font-bold text-cyan-700">{t.dashboard_investmentBoard}</h3>
+                            <div className="p-2 bg-cyan-100 rounded-lg">
+                              <BarChart3 className="w-6 h-6 text-cyan-600" />
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mb-6">{t.dashboard_investmentBoardDesc}</p>
+                        </div>
+                        <Button onClick={() => setCurrentPage("investment-board")} className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 px-6 rounded-lg">
+                          {t.dashboard_investmentBoardBtn}
                         </Button>
                       </CardContent>
                     </Card>
@@ -1670,6 +1689,116 @@ export default function SaephonePlatform() {
                       </table>
                     </div>
                     
+                    <div className="flex justify-start mt-8">
+                      <Button
+                        onClick={() => setCurrentPage("dashboard")}
+                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg"
+                      >
+                        ← Volver al Panel Principal
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        )
+      case "investment-board":
+        return (
+          <div className="relative z-10 min-h-screen flex flex-col">
+            <DashboardHeader />
+            <div className="flex-1 flex flex-col items-center justify-center p-4">
+              <div className="w-full max-w-6xl mx-auto">
+                <Card className="shadow-2xl">
+                  <CardContent className="p-8">
+                    <div className="text-center mb-8">
+                      <h2 className="text-green-600 text-3xl font-bold mb-2">{t.investmentBoard_title}</h2>
+                      <p className="text-gray-600">{t.investmentBoard_subtitle}</p>
+                    </div>
+                    {/* Resumen superior */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">Monto invertido</span>
+                        <span className="text-3xl font-bold text-green-600 mb-1">$210,000.00</span>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">Deuda total</span>
+                        <span className="text-3xl font-bold text-blue-600 mb-1">$45,000.00</span>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">Pagos recibidos</span>
+                        <span className="text-3xl font-bold text-cyan-600 mb-1">$180,400.00</span>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-6 flex flex-col items-center shadow border border-gray-100">
+                        <span className="text-gray-500 text-sm mb-2">Pagos vencidos</span>
+                        <span className="text-3xl font-bold text-red-500 mb-1">$7,200.00</span>
+                      </div>
+                    </div>
+                    {/* Gráficos circulares */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                      <div className="flex flex-col items-center">
+                        <span className="mb-2 text-gray-700 font-medium">Proporción del monto del reembolso</span>
+                        <svg width="160" height="160" viewBox="0 0 160 160">
+                          <circle cx="80" cy="80" r="70" fill="#f3f4f6" />
+                          <circle cx="80" cy="80" r="70" fill="none" stroke="#fbbf24" strokeWidth="14" strokeDasharray="330" strokeDashoffset="60" />
+                          <text x="50%" y="54%" textAnchor="middle" fontSize="2.2em" fill="#fbbf24" fontWeight="bold">92%</text>
+                        </svg>
+                        <span className="mt-2 text-gray-500 text-sm">Pagos recibidos / Deuda total</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="mb-2 text-gray-700 font-medium">Proporción del plazo de financiamiento</span>
+                        <svg width="160" height="160" viewBox="0 0 160 160">
+                          <circle cx="80" cy="80" r="70" fill="#f3f4f6" />
+                          <circle cx="80" cy="80" r="70" fill="none" stroke="#06b6d4" strokeWidth="14" strokeDasharray="330" strokeDashoffset="110" />
+                          <text x="50%" y="54%" textAnchor="middle" fontSize="2.2em" fill="#06b6d4" fontWeight="bold">78%</text>
+                        </svg>
+                        <span className="mt-2 text-gray-500 text-sm">Semanas transcurridas / Total semanas</span>
+                      </div>
+                    </div>
+                    {/* Tabla de tiendas */}
+                    <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Posición</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Nombre de la tienda</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Proporción de reembolso</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Monto recuperado</th>
+                            <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Monto financiado</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-100">
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">1</td>
+                            <td className="py-4 px-6">Crédito Celular Max</td>
+                            <td className="py-4 px-6 text-green-600 font-semibold">92.4%</td>
+                            <td className="py-4 px-6">$85,300.00</td>
+                            <td className="py-4 px-6">$92,300.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">2</td>
+                            <td className="py-4 px-6">TecnoPlan Express</td>
+                            <td className="py-4 px-6 text-green-600 font-semibold">87.1%</td>
+                            <td className="py-4 px-6">$69,000.00</td>
+                            <td className="py-4 px-6">$79,200.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">3</td>
+                            <td className="py-4 px-6">CeluCrédito Uno</td>
+                            <td className="py-4 px-6 text-yellow-500 font-semibold">74.3%</td>
+                            <td className="py-4 px-6">$56,100.00</td>
+                            <td className="py-4 px-6">$75,500.00</td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-4 px-6 font-medium">4</td>
+                            <td className="py-4 px-6">MoviPagos del Sur</td>
+                            <td className="py-4 px-6 text-red-500 font-semibold">61.8%</td>
+                            <td className="py-4 px-6">$38,200.00</td>
+                            <td className="py-4 px-6">$61,800.00</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                     <div className="flex justify-start mt-8">
                       <Button
                         onClick={() => setCurrentPage("dashboard")}

@@ -81,6 +81,9 @@ export const translations = {
     dashboard_salesProfile: "Perfil de vendedor: Sales Testing",
     dashboard_managerProfile: "Perfil de gerente: Manager Testing",
     dashboard_superAdminProfile: "Perfil de super-admin: Super Admin Testing",
+    dashboard_investmentBoard: "Tablero de Inversión y Retorno",
+    dashboard_investmentBoardDesc: "Consulta métricas de inversión, reembolsos y desempeño de tiendas.",
+    dashboard_investmentBoardBtn: "Ver Tablero de Inversión",
 
     // Process Payments Page
     payments_title: "Procesar Pago",
@@ -355,6 +358,9 @@ export const translations = {
     billing_download: "Descargar",
     billing_generate: "Generar Factura",
     billing_backToMain: "← Volver al Panel Principal",
+
+    investmentBoard_title: "Tablero de Inversión y Retorno",
+    investmentBoard_subtitle: "Consulta métricas de inversión, reembolsos y desempeño de tiendas.",
   },
   en: {
     // Login Page
@@ -438,6 +444,9 @@ export const translations = {
     dashboard_salesProfile: "Salesperson Profile: Sales Testing",
     dashboard_managerProfile: "Manager Profile: Manager Testing",
     dashboard_superAdminProfile: "Super Admin Profile: Super Admin Testing",
+    dashboard_investmentBoard: "Investment & Return Dashboard",
+    dashboard_investmentBoardDesc: "View investment metrics, reimbursements, and store performance.",
+    dashboard_investmentBoardBtn: "View Investment Dashboard",
 
     // Process Payments Page
     payments_title: "Process Payment",
@@ -712,5 +721,8 @@ export const translations = {
     billing_download: "Download",
     billing_generate: "Generate Invoice",
     billing_backToMain: "← Back to Main Panel",
+
+    investmentBoard_title: "Investment & Return Dashboard",
+    investmentBoard_subtitle: "View investment metrics, reimbursements, and store performance.",
   },
 } 
