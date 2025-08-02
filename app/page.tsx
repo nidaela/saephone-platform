@@ -39,10 +39,6 @@ import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import Link from "next/link"
 import { HomeLogoHeader } from "@/components/ui/HomeLogoHeader"
-<<<<<<< HEAD
-import { UserMenu } from "@/components/ui/UserMenu"
-=======
->>>>>>> 7ca823f504da7218633217e492ffa2da9dea223e
 
 type PageType =
   | "login"
@@ -346,26 +342,6 @@ export default function SaephonePlatform() {
         subtitle={t.homeLogo_subtitle}
         ariaLabel={t.homeLogo_ariaLabel}
       />
-<<<<<<< HEAD
-      <UserMenu
-        onLogout={handleLogout}
-        onProfileClick={() => setCurrentPage("settings")}
-        userRole={userRole || undefined}
-        userName={
-          userRole === "admin"
-            ? t.dashboard_adminProfile
-            : userRole === "sales"
-            ? t.dashboard_salesProfile
-            : userRole === "manager"
-            ? t.dashboard_managerProfile
-            : userRole === "super-admin"
-            ? t.dashboard_superAdminProfile
-            : "Usuario"
-        }
-        theme={"default"} // Puedes cambiar esto si tienes lógica de tema
-        t={t}
-      />
-=======
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 text-white">
           <User className="w-5 h-5" />
@@ -386,7 +362,6 @@ export default function SaephonePlatform() {
           <span>{t.dashboard_logout}</span>
         </Button>
       </div>
->>>>>>> 7ca823f504da7218633217e492ffa2da9dea223e
     </div>
   )
 
