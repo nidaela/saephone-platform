@@ -336,7 +336,13 @@ export default function SaephonePlatform() {
   )
 
   const DashboardHeader = () => (
-    <div className="flex items-center justify-end px-6 pt-20 pb-6">
+    <div className="flex items-center justify-between px-6 pt-20 pb-6">
+      <HomeLogoHeader 
+        onNavigateToDashboard={() => setCurrentPage("dashboard")}
+        title={t.homeLogo_title}
+        subtitle={t.homeLogo_subtitle}
+        ariaLabel={t.homeLogo_ariaLabel}
+      />
       <UserMenu
         onLogout={handleLogout}
         onProfileClick={() => setCurrentPage("settings")}
