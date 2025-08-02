@@ -455,8 +455,8 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       <div className="mb-6">
         <div className="font-bold text-lg text-green-600 mb-2 flex items-center gap-2"><span className="rounded-full bg-green-500 text-white w-6 h-6 flex items-center justify-center mr-2">1</span>{t.deviceSelection_paymentMethod}</div>
         <div className="grid grid-cols-2 gap-4 mb-2">
-          <button type="button" onClick={() => setPaymentMethod("financiado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="financiado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>{t.deviceSelection_financed}<br/><span className="font-normal text-sm">{t.deviceSelection_financedDesc}</span></button>
-          <button type="button" onClick={() => setPaymentMethod("contado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="contado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>{t.deviceSelection_cash}<br/><span className="font-normal text-sm">{t.deviceSelection_cashDesc}</span></button>
+          <button type="button" onClick={() => setPaymentMethod("financiado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="financiado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>{t.deviceSelection_financed}</button>
+          <button type="button" onClick={() => setPaymentMethod("contado")} className={`border rounded-lg py-4 font-bold text-lg ${paymentMethod==="contado" ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}>{t.deviceSelection_cash}</button>
         </div>
         {!paymentMethod && <div className="text-red-500 text-sm mt-1">{t.deviceSelection_selectPaymentMethod}</div>}
       </div>
