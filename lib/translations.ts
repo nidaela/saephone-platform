@@ -84,11 +84,14 @@ export const translations = {
     dashboard_investmentBoard: "Tablero de Inversión y Retorno",
     dashboard_investmentBoardDesc: "Consulta métricas de inversión, reembolsos y desempeño de tiendas.",
     dashboard_investmentBoardBtn: "Ver Tablero de Inversión",
+<<<<<<< HEAD
 
     // User Menu
     userMenu_profile: "Perfil del Usuario",
     userMenu_changePassword: "Cambiar contraseña",
     userMenu_logout: "Cerrar sesión",
+=======
+>>>>>>> 7ca823f504da7218633217e492ffa2da9dea223e
 
     // Process Payments Page
     payments_title: "Procesar Pago",
@@ -466,11 +469,14 @@ export const translations = {
     dashboard_investmentBoard: "Investment & Return Dashboard",
     dashboard_investmentBoardDesc: "View investment metrics, reimbursements, and store performance.",
     dashboard_investmentBoardBtn: "View Investment Dashboard",
+<<<<<<< HEAD
 
     // User Menu
     userMenu_profile: "User Profile",
     userMenu_changePassword: "Change Password",
     userMenu_logout: "Logout",
+=======
+>>>>>>> 7ca823f504da7218633217e492ffa2da9dea223e
 
     // Process Payments Page
     payments_title: "Process Payment",
