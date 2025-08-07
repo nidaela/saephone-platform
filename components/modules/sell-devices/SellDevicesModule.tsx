@@ -112,6 +112,48 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     return [];
   };
 
+  // Helper para obtener colores y etiquetas del grado crediticio
+  const getGradeInfo = (grade: string) => {
+    switch (grade) {
+      case 'A':
+        return {
+          gradient: 'from-green-400 to-green-600',
+          badgeColor: 'bg-green-100 text-green-700 border-green-200',
+          label: 'Excelente'
+        };
+      case 'B':
+        return {
+          gradient: 'from-blue-400 to-blue-600',
+          badgeColor: 'bg-blue-100 text-blue-700 border-blue-200',
+          label: 'Bien'
+        };
+      case 'C':
+        return {
+          gradient: 'from-yellow-400 to-yellow-600',
+          badgeColor: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+          label: 'Bien'
+        };
+      case 'D':
+        return {
+          gradient: 'from-orange-400 to-orange-600',
+          badgeColor: 'bg-orange-100 text-orange-700 border-orange-200',
+          label: 'Riesgo controlado'
+        };
+      case 'E':
+        return {
+          gradient: 'from-red-400 to-red-600',
+          badgeColor: 'bg-red-100 text-red-700 border-red-200',
+          label: 'Riesgo controlado'
+        };
+      default:
+        return {
+          gradient: 'from-gray-400 to-gray-600',
+          badgeColor: 'bg-gray-100 text-gray-700 border-gray-200',
+          label: 'No disponible'
+        };
+    }
+  };
+
   const handleGenerateNewCode = () => {
     let result = ""
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -389,76 +431,51 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.creditProfile_verifiedTitle}</h2>
           <p className="text-gray-700 mb-6">{t.creditProfile_verifiedSubtitle}</p>
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-2 mb-8">
             <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">{t.creditProfile_bureau1}</button>
             <button className="px-4 py-2 rounded-lg bg-gray-100 font-semibold text-gray-800 border border-gray-200">{t.creditProfile_bureau2}</button>
           </div>
-          <div className="w-full flex flex-col items-center mb-8">
-            {/* Score Gauge (simulado) */}
-            <div className="relative flex flex-col items-center mb-2">
-              <svg width="260" height="120" viewBox="0 0 260 120">
-                <defs>
-                  <linearGradient id="scoreGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#ef4444" />
-                    <stop offset="50%" stopColor="#facc15" />
-                    <stop offset="100%" stopColor="#22c55e" />
-                  </linearGradient>
-                </defs>
-                <path d="M30,110 A100,100 0 0,1 230,110" fill="none" stroke="url(#scoreGradient)" strokeWidth="16" />
-                <circle cx="200" cy="90" r="8" fill="#22c55e" />
-              </svg>
-              <div className="absolute top-14 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                <span className="text-5xl font-bold text-gray-900">803</span>
-                <span className="text-green-600 font-semibold text-lg">{t.creditProfile_scoreExcellent}</span>
-              </div>
-              <div className="absolute top-24 right-12 flex items-center gap-1 bg-white rounded-full px-2 py-1 shadow text-green-600 font-semibold text-sm border border-green-200">
-                <svg width="16" height="16" fill="none"><path d="M8 12V4M8 4l-4 4m4-4l4 4" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                +6 pts
-              </div>
-            </div>
-            <div className="flex justify-between w-full mt-2 text-xs text-gray-400 px-2">
-              <span>300</span>
-              <span>450</span>
-              <span>580</span>
-              <span>700</span>
-              <span>850</span>
-            </div>
-          </div>
-          <button className="w-full py-3 rounded-lg bg-black text-white font-semibold text-lg mb-8">{t.creditProfile_updateScore}</button>
-          <div className="grid grid-cols-2 gap-4 w-full">
-            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
-              <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">{t.creditProfile_paymentHistory}</span>
-                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">{t.creditProfile_highImpact}</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-900">100%</div>
-              <div className="text-xs text-gray-500">{t.creditProfile_onTimePayments}</div>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
-              <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">{t.creditProfile_cardUsage}</span>
-                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">{t.creditProfile_highImpact}</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-900">2%</div>
-              <div className="text-xs text-gray-500">{t.creditProfile_creditUsed}</div>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
-              <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">{t.creditProfile_creditAge}</span>
-                <span className="text-green-600 font-semibold text-xs bg-green-100 rounded px-2 py-0.5">{t.creditProfile_mediumImpact}</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-900">7 {t.creditProfile_years}</div>
-              <div className="text-xs text-gray-500">{t.creditProfile_avgAge}</div>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-4 flex flex-col items-start shadow border border-gray-100">
-              <div className="flex items-center justify-between w-full mb-2">
-                <span className="font-semibold text-gray-800">{t.creditProfile_totalAccounts}</span>
-                <span className="text-red-600 font-semibold text-xs bg-red-100 rounded px-2 py-0.5">{t.creditProfile_lowImpact}</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-900">28</div>
-              <div className="text-xs text-gray-500">{t.creditProfile_openClosed}</div>
+          <div className="w-full flex flex-col items-center mb-6">
+            {/* Letter Grade Display */}
+            <div className="relative flex flex-col items-center mb-6">
+              {(() => {
+                const grade = 'A'; // Current grade for María Rodríguez Hernández
+                const gradeInfo = getGradeInfo(grade);
+                return (
+                  <>
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradeInfo.gradient} flex items-center justify-center shadow-lg`}>
+                        <span className="text-4xl font-bold text-white">{grade}</span>
+                      </div>
+                      <div className={`flex items-center gap-2 rounded-full px-3 py-1 font-semibold text-sm border ${gradeInfo.badgeColor}`}>
+                        <svg width="14" height="14" fill="none"><path d="M7 10.5V3.5M7 3.5l-3.5 3.5m3.5-3.5l3.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        +6 pts
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl font-bold text-gray-900">{gradeInfo.label}</span>
+                      <div className="relative group">
+                        <button className="w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors">
+                          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                          <div className="flex flex-col gap-1">
+                            <div><span className="font-bold">A</span> = Excelente</div>
+                            <div><span className="font-bold">B/C</span> = Bien</div>
+                            <div><span className="font-bold">D/E</span> = Riesgo controlado</div>
+                          </div>
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
           </div>
+          <button className="w-full py-3 rounded-lg bg-black text-white font-semibold text-lg">{t.creditProfile_updateScore}</button>
         </div>
       )}
     </div>
