@@ -39,6 +39,27 @@ type SellDevicesModuleProps = {
 };
 
 export default function SellDevicesModule({ onBack, onComplete, t }: SellDevicesModuleProps) {
+  // Helper para calcular el pago inicial basado en el grado crediticio
+  const getInitialPaymentPercentage = (grade: string) => {
+    switch (grade) {
+      case 'A':
+        return 0.10; // 10%
+      case 'B':
+      case 'C':
+        return 0.15; // 15%
+      case 'D':
+      case 'E':
+        return 0.20; // 20%
+      default:
+        return 0.15; // Default 15%
+    }
+  };
+
+  // Helper para verificar si el cliente puede usar el plan personalizado
+  const canUseCustomPlan = (grade: string) => {
+    return grade === 'A';
+  };
+
   const [currentStep, setCurrentStep] = useState<"phone" | "terms" | "identity" | "credit" | "modelplan" | "contract" | "appinstall" | "references" | "complete">("phone")
   const [verificationCode, setVerificationCode] = useState(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -63,6 +84,10 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   const bothCaptured = frontCaptured && backCaptured
   const [creditLoading, setCreditLoading] = useState(true)
   const [creditEvaluated, setCreditEvaluated] = useState(false)
+  const [customerGrade, setCustomerGrade] = useState<string>('A') // Default to A for María Rodríguez Hernández
+  // For testing: Change this to 'B', 'C', 'D', or 'E' to test different grades
+  // const [customerGrade, setCustomerGrade] = useState<string>('B') // Test with grade B (15%)
+  // const [customerGrade, setCustomerGrade] = useState<string>('D') // Test with grade D (20%)
 
   // Simulación de datos para el paso de modelo y plan
   const brands = ["Apple", "Samsung", "Xiaomi"];
@@ -93,8 +118,9 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
   };
   // Planes simulados
   const plans = [10, 20, 26, 30];
-  // Cálculo de pago inicial y saldo
-  const initialPayment = Math.round(devicePrice * 0.15);
+  // Cálculo de pago inicial y saldo basado en el grado crediticio
+  const initialPaymentPercentage = getInitialPaymentPercentage(customerGrade);
+  const initialPayment = Math.round(devicePrice * initialPaymentPercentage);
   const balance = devicePrice - initialPayment;
   // Cálculo de pagos por semana
   const getWeeklyPayment = (weeks: number) => weeks > 0 ? Math.round(balance / weeks) : 0;
@@ -104,6 +130,14 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
       setDevicePrice(priceTable[selectedModel]);
     }
   }, [selectedModel]);
+
+  // Recalcula el pago inicial cuando cambia el grado crediticio o el precio del dispositivo
+  React.useEffect(() => {
+    const newInitialPaymentPercentage = getInitialPaymentPercentage(customerGrade);
+    const newInitialPayment = Math.round(devicePrice * newInitialPaymentPercentage);
+    // Note: We can't directly update initialPayment and balance here since they're calculated values
+    // The recalculation will happen automatically when the component re-renders
+  }, [customerGrade, devicePrice]);
   // Helper para obtener modelos por marca
   const getModelsByBrand = (brand: string): string[] => {
     if (brand === "Apple") return modelsByBrand.Apple;
@@ -237,7 +271,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     doc.text("cliente al momento de firmar este contrato, y el pago será realizado conforme", 15, 128);
     doc.text("al plan de financiamiento seleccionado.", 15, 134);
     doc.text("4. PLAN DE FINANCIAMIENTO", 15, 144);
-    doc.text(`Pago inicial: $${initialPayment}`, 15, 150);
+    doc.text(`Pago inicial: $${initialPayment} (${(initialPaymentPercentage * 100).toFixed(0)}%)`, 15, 150);
     doc.text(`Total de pagos parciales: ${weeks}`, 15, 156);
     doc.text(`Monto por pago parcial: $${pagoSemanal}`, 15, 162);
     doc.text("Frecuencia de pago: Semanal", 15, 168);
@@ -439,13 +473,12 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             {/* Letter Grade Display */}
             <div className="relative flex flex-col items-center mb-6">
               {(() => {
-                const grade = 'A'; // Current grade for María Rodríguez Hernández
-                const gradeInfo = getGradeInfo(grade);
+                const gradeInfo = getGradeInfo(customerGrade);
                 return (
                   <>
                     <div className="flex items-center gap-4 mb-3">
                       <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${gradeInfo.gradient} flex items-center justify-center shadow-lg`}>
-                        <span className="text-4xl font-bold text-white">{grade}</span>
+                        <span className="text-4xl font-bold text-white">{customerGrade}</span>
                       </div>
                       <div className={`flex items-center gap-2 rounded-full px-3 py-1 font-semibold text-sm border ${gradeInfo.badgeColor}`}>
                         <svg width="14" height="14" fill="none"><path d="M7 10.5V3.5M7 3.5l-3.5 3.5m3.5-3.5l3.5 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -524,7 +557,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
           <div className="font-bold text-blue-900 mb-2">{t.deviceSelection_initialPaymentRequired}</div>
           <div className="flex flex-col gap-1 text-sm">
             <div className="flex justify-between"><span>{t.deviceSelection_devicePrice}:</span><span className="font-bold">${devicePrice.toLocaleString()}</span></div>
-            <div className="flex justify-between"><span>{t.deviceSelection_initialPayment} (15%):</span><span className="font-bold text-blue-700">${initialPayment.toLocaleString()}</span></div>
+            <div className="flex justify-between"><span>{t.deviceSelection_initialPayment} ({(initialPaymentPercentage * 100).toFixed(0)}%):</span><span className="font-bold text-blue-700">${initialPayment.toLocaleString()}</span></div>
             <div className="flex justify-between"><span>{t.deviceSelection_balanceToFinance}</span><span className="font-bold text-green-700">${balance.toLocaleString()}</span></div>
           </div>
           <div className="text-xs text-blue-700 mt-2">{t.deviceSelection_importantInitialPayment}</div>
@@ -544,15 +577,37 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             ))}
           </div>
           {/* Plan personalizado */}
-          <div className="bg-gray-50 rounded-lg p-4 mt-4">
-            <div className="font-bold text-blue-700 text-center mb-2">{t.deviceSelection_customPlan}</div>
-            <div className="flex flex-col items-center">
-              <span className="mb-2">{t.deviceSelection_weeksLabel}{customWeeks}</span>
-              <input type="range" min={10} max={30} value={customWeeks} onChange={e => {setCustomWeeks(Number(e.target.value)); setSelectedPlan(null);}} className="w-full mb-2" />
-              <div className="font-bold text-2xl text-green-700 mb-1">${getWeeklyPayment(customWeeks)}</div>
-              <div className="text-xs text-gray-500">{t.deviceSelection_initialPayment}: ${initialPayment} <br/> {t.deviceSelection_finalPrice}: ${(getWeeklyPayment(customWeeks)*customWeeks+initialPayment).toLocaleString()}</div>
+          {canUseCustomPlan(customerGrade) ? (
+            <div className="bg-gray-50 rounded-lg p-4 mt-4">
+              <div className="font-bold text-blue-700 text-center mb-2">{t.deviceSelection_customPlan}</div>
+              <div className="flex flex-col items-center">
+                <span className="mb-2">{t.deviceSelection_weeksLabel}{customWeeks}</span>
+                <input type="range" min={10} max={30} value={customWeeks} onChange={e => {setCustomWeeks(Number(e.target.value)); setSelectedPlan(null);}} className="w-full mb-2" />
+                <div className="font-bold text-2xl text-green-700 mb-1">${getWeeklyPayment(customWeeks)}</div>
+                <div className="text-xs text-gray-500">{t.deviceSelection_initialPayment}: ${initialPayment} <br/> {t.deviceSelection_finalPrice}: ${(getWeeklyPayment(customWeeks)*customWeeks+initialPayment).toLocaleString()}</div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-gray-100 rounded-lg p-4 mt-4 border border-gray-300">
+              <div className="font-bold text-gray-500 text-center mb-2 flex items-center justify-center gap-2">
+                {t.deviceSelection_customPlan}
+                <div className="relative group">
+                  <button className="w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center transition-colors">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                    Disponible solo para clientes con calificación A
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-800"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-center text-gray-500 text-sm">
+                Disponible solo para clientes con calificación A
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -591,7 +646,7 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             </div>
             <div className="text-sm mb-2 font-bold">4. PLAN DE FINANCIAMIENTO</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">Pago inicial:</span> ${initialPayment}</div>
+              <div><span className="font-bold">Pago inicial:</span> ${initialPayment} ({(initialPaymentPercentage * 100).toFixed(0)}%)</div>
               <div><span className="font-bold">Total de pagos parciales:</span> {selectedPlan || customWeeks}</div>
               <div><span className="font-bold">Monto por pago parcial:</span> ${getWeeklyPayment(selectedPlan || customWeeks)}</div>
               <div><span className="font-bold">Frecuencia de pago:</span> Semanal</div>
