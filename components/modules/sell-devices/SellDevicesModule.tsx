@@ -171,6 +171,9 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     const fecha = today.toLocaleDateString();
     const weeks = selectedPlan || customWeeks;
     const pagoSemanal = getWeeklyPayment(weeks);
+    const firstPaymentDate = new Date();
+    firstPaymentDate.setDate(firstPaymentDate.getDate() + 7); // First payment in 7 days
+    
     doc.setFontSize(16);
     doc.text("CONTRATO DE VENTA EN PARCIALIDADES", 15, 20);
     doc.setFontSize(12);
@@ -179,24 +182,35 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
     doc.setFontSize(10);
     doc.text("1. DATOS DEL PROVEEDOR", 15, 48);
     doc.text("Razón Social: SAEPHONE México, S. de R.L. de C.V.", 15, 54);
-    doc.text("RFC: SAE-123456-ABC", 15, 60);
-    doc.text("Domicilio: Av. Insurgentes Sur 1234, Col. Del Valle, CDMX", 15, 66);
-    doc.text("Teléfono: (55) 1234-5678", 15, 72);
+    doc.text("RFC: (insertar RFC aquí)", 15, 60);
+    doc.text("Domicilio: (insertar domicilio fiscal aquí)", 15, 66);
+    doc.text("Correo electrónico: (insertar correo de contacto aquí)", 15, 72);
     doc.text("2. DATOS DEL CLIENTE", 15, 82);
     doc.text(`Nombre: ${extractedName}`, 15, 88);
     doc.text(`Teléfono: +52 ${phoneNumber}`, 15, 94);
-    doc.text(`Email: ${userEmail}`, 15, 100);
-    doc.text("3. DETALLES DEL DISPOSITIVO Y PLAN", 15, 110);
-    doc.text(`Marca: ${selectedBrand}`, 15, 116);
-    doc.text(`Modelo: ${selectedModel}`, 15, 122);
-    doc.text(`Capacidad: ${selectedCapacity}`, 15, 128);
-    doc.text(`Precio: $${devicePrice}`, 15, 134);
-    doc.text(`Método de pago: ${paymentMethod === "financiado" ? "Financiado por Saephone" : paymentMethod === "contado" ? "Pago de Contado" : ""}`, 15, 140);
-    doc.text(`Semanas: ${weeks}`, 15, 146);
-    doc.text(`Pago inicial (15%): $${initialPayment}`, 15, 152);
-    doc.text(`Saldo a financiar: $${balance}`, 15, 158);
-    doc.text(`Pago semanal: $${pagoSemanal}`, 15, 164);
-    doc.text("\n\nEl cliente acepta los términos y condiciones del presente contrato.", 15, 180);
+    doc.text(`Correo electrónico: ${userEmail}`, 15, 100);
+    doc.text("3. OBJETO DEL CONTRATO", 15, 110);
+    doc.text("El presente contrato tiene por objeto la compraventa de un dispositivo móvil", 15, 116);
+    doc.text("nuevo bajo la modalidad de venta a plazos. El dispositivo será entregado al", 15, 122);
+    doc.text("cliente al momento de firmar este contrato, y el pago será realizado conforme", 15, 128);
+    doc.text("al plan de financiamiento seleccionado.", 15, 134);
+    doc.text("4. PLAN DE FINANCIAMIENTO", 15, 144);
+    doc.text(`Pago inicial: $${initialPayment}`, 15, 150);
+    doc.text(`Total de pagos parciales: ${weeks}`, 15, 156);
+    doc.text(`Monto por pago parcial: $${pagoSemanal}`, 15, 162);
+    doc.text("Frecuencia de pago: Semanal", 15, 168);
+    doc.text(`Fecha de primer pago: ${firstPaymentDate.toLocaleDateString()}`, 15, 174);
+    doc.text("5. DISPOSICIONES GENERALES", 15, 184);
+    doc.text("- El equipo será bloqueado en caso de incumplimiento de pago.", 15, 190);
+    doc.text("- El cliente reconoce haber sido informado sobre las condiciones del plan.", 15, 196);
+    doc.text("- El cliente autoriza el uso de sus datos para fines de verificación y", 15, 202);
+    doc.text("  cobranza conforme a la legislación vigente.", 15, 208);
+    doc.text("- La propiedad del equipo permanecerá en SAEPHONE hasta el pago total", 15, 214);
+    doc.text("  del monto financiado.", 15, 220);
+    doc.text("6. FIRMA DEL CONTRATO", 15, 230);
+    doc.text("El cliente declara haber leído, comprendido y aceptado los términos de este", 15, 236);
+    doc.text("contrato. El contrato se considera válido al momento de su firma digital", 15, 242);
+    doc.text("mediante el escaneo del código QR provisto por la plataforma.", 15, 248);
     // Generar blob y url
     const pdfBlob = doc.output("blob");
     const url = URL.createObjectURL(pdfBlob);
@@ -538,33 +552,48 @@ export default function SellDevicesModule({ onBack, onComplete, t }: SellDevices
             <button className="ml-auto bg-gray-100 rounded-full p-2"><FileText className="w-5 h-5 text-gray-500" /></button>
           </div>
           <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-            <div className="text-center font-bold text-lg mb-2">{t.contractGeneration_cardTitle}</div>
-            <div className="text-center font-bold text-md mb-4">SAEPHONE México, S. de R.L. de C.V.<br/>{t.contractGeneration_date}: {new Date().toLocaleDateString()}</div>
+            <div className="text-center font-bold text-lg mb-2">CONTRATO DE VENTA EN PARCIALIDADES</div>
+            <div className="text-center font-bold text-md mb-4">SAEPHONE México, S. de R.L. de C.V.<br/>Fecha: {new Date().toLocaleDateString()}</div>
             <hr className="my-2" />
-            <div className="text-sm mb-2 font-bold">{t.contractGeneration_providerData}</div>
+            <div className="text-sm mb-2 font-bold">1. DATOS DEL PROVEEDOR</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">{t.contractGeneration_providerName}:</span> SAEPHONE México, S. de R.L. de C.V.</div>
-              <div><span className="font-bold">{t.contractGeneration_providerRFC}:</span> SAE-123456-ABC</div>
-              <div><span className="font-bold">{t.contractGeneration_providerAddress}:</span> Av. Insurgentes Sur 1234, Col. Del Valle, CDMX</div>
-              <div><span className="font-bold">{t.contractGeneration_providerPhone}:</span> (55) 1234-5678</div>
+              <div><span className="font-bold">Razón Social:</span> SAEPHONE México, S. de R.L. de C.V.</div>
+              <div><span className="font-bold">RFC:</span> (insertar RFC aquí)</div>
+              <div><span className="font-bold">Domicilio:</span> (insertar domicilio fiscal aquí)</div>
+              <div><span className="font-bold">Correo electrónico:</span> (insertar correo de contacto aquí)</div>
             </div>
-            <div className="text-sm mt-4 mb-2 font-bold">{t.contractGeneration_clientData}</div>
+            <div className="text-sm mt-4 mb-2 font-bold">2. DATOS DEL CLIENTE</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">{t.contractGeneration_clientName}:</span> {extractedName}</div>
-              <div><span className="font-bold">{t.contractGeneration_clientPhone}:</span> +52 {phoneNumber}</div>
-              <div><span className="font-bold">{t.contractGeneration_clientEmail}:</span> {userEmail}</div>
+              <div><span className="font-bold">Nombre:</span> {extractedName}</div>
+              <div><span className="font-bold">Teléfono:</span> +52 {phoneNumber}</div>
+              <div><span className="font-bold">Correo electrónico:</span> {userEmail}</div>
             </div>
-            <div className="text-sm mt-4 mb-2 font-bold">{t.contractGeneration_deviceData}</div>
+            <div className="text-sm mt-4 mb-2 font-bold">3. OBJETO DEL CONTRATO</div>
+            <div className="text-sm text-gray-700 mb-4">
+              El presente contrato tiene por objeto la compraventa de un dispositivo móvil nuevo bajo la modalidad de venta a plazos. El dispositivo será entregado al cliente al momento de firmar este contrato, y el pago será realizado conforme al plan de financiamiento seleccionado.
+            </div>
+            <div className="text-sm mb-2 font-bold">4. PLAN DE FINANCIAMIENTO</div>
             <div className="text-sm text-gray-700">
-              <div><span className="font-bold">{t.deviceSelection_brand}:</span> {selectedBrand}</div>
-              <div><span className="font-bold">{t.deviceSelection_model}:</span> {selectedModel}</div>
-              <div><span className="font-bold">{t.deviceSelection_capacity}:</span> {selectedCapacity}</div>
-              <div><span className="font-bold">{t.deviceSelection_devicePrice}:</span> ${devicePrice}</div>
-              <div><span className="font-bold">{t.contractGeneration_paymentMethod}:</span> {paymentMethod === "financiado" ? t.deviceSelection_financed : paymentMethod === "contado" ? t.deviceSelection_cash : ""}</div>
-              <div><span className="font-bold">{t.contractGeneration_weeks}:</span> {selectedPlan || customWeeks}</div>
-              <div><span className="font-bold">{t.contractGeneration_initialPayment}:</span> ${initialPayment}</div>
-              <div><span className="font-bold">{t.contractGeneration_balance}:</span> ${balance}</div>
-              <div><span className="font-bold">{t.contractGeneration_weeklyPayment}:</span> ${getWeeklyPayment(selectedPlan || customWeeks)}</div>
+              <div><span className="font-bold">Pago inicial:</span> ${initialPayment}</div>
+              <div><span className="font-bold">Total de pagos parciales:</span> {selectedPlan || customWeeks}</div>
+              <div><span className="font-bold">Monto por pago parcial:</span> ${getWeeklyPayment(selectedPlan || customWeeks)}</div>
+              <div><span className="font-bold">Frecuencia de pago:</span> Semanal</div>
+              <div><span className="font-bold">Fecha de primer pago:</span> {(() => {
+                const firstPaymentDate = new Date();
+                firstPaymentDate.setDate(firstPaymentDate.getDate() + 7);
+                return firstPaymentDate.toLocaleDateString();
+              })()}</div>
+            </div>
+            <div className="text-sm mt-4 mb-2 font-bold">5. DISPOSICIONES GENERALES</div>
+            <div className="text-sm text-gray-700">
+              <div>• El equipo será bloqueado en caso de incumplimiento de pago.</div>
+              <div>• El cliente reconoce haber sido informado sobre las condiciones del plan.</div>
+              <div>• El cliente autoriza el uso de sus datos para fines de verificación y cobranza conforme a la legislación vigente.</div>
+              <div>• La propiedad del equipo permanecerá en SAEPHONE hasta el pago total del monto financiado.</div>
+            </div>
+            <div className="text-sm mt-4 mb-2 font-bold">6. FIRMA DEL CONTRATO</div>
+            <div className="text-sm text-gray-700">
+              El cliente declara haber leído, comprendido y aceptado los términos de este contrato. El contrato se considera válido al momento de su firma digital mediante el escaneo del código QR provisto por la plataforma.
             </div>
           </div>
         </div>
