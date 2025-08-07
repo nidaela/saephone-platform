@@ -175,7 +175,7 @@ export const translations = {
     deviceSelection_paymentMethod: "Método de pago",
     deviceSelection_financed: "Financiado por Saephone",
     deviceSelection_financedDesc: "Pagos a meses sin intereses",
-    deviceSelection_cash: "Pago de Contado",
+    deviceSelection_cash: "Financiamiento Propio",
     deviceSelection_cashDesc: "Pago único completo",
     deviceSelection_selectPaymentMethod: "* Selecciona un método de pago",
     deviceSelection_model: "Modelo",
